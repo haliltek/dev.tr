@@ -1,0 +1,70 @@
+import { useMemo } from 'react';
+import { ThemeMode, useSettingsContext } from '../../contexts/SettingsContext';
+import colors from '../../styles/colors';
+import {
+  cloudinaryFeedFiltersYourFeedLight,
+  cloudinaryFeedFiltersYourFeedDark,
+  cloudinaryFeedFiltersScrollLight,
+  cloudinaryFeedFiltersScrollDark,
+  cloudinaryShortcutsIconsGithubLight,
+  cloudinaryShortcutsIconsGithubDark,
+  cloudinaryIntegrationsSlackHeaderLight,
+  cloudinaryIntegrationsSlackHeaderDark,
+  boostNewPostBanner,
+  boostNewPostBannerLight,
+  jobsWelcomeDarkMode,
+  jobsWelcomeLightMode,
+  jobOfferLightDesktop,
+  jobOfferDarkDesktop,
+  jobOfferDarkMobile,
+  jobOfferLightMobile,
+} from '../../lib/image';
+
+interface UseAsset {
+  postBoostStrip: string;
+  onboardingIntroduction: string;
+  scrollBlock: string;
+  themeColor: string;
+  githubShortcut: string;
+  slackIntegrationHeader: string;
+  jobsWelcome: string;
+  jobOfferDesktop: string;
+  jobOfferMobile: string;
+}
+
+export const useIsLightTheme = (): boolean => {
+  const { themeMode } = useSettingsContext();
+
+  return useMemo(() => {
+    if (themeMode === ThemeMode.Auto) {
+      return globalThis?.window?.matchMedia?.('(prefers-color-scheme:light)')
+        .matches;
+    }
+
+    return themeMode === ThemeMode.Light;
+  }, [themeMode]);
+};
+
+export const useThemedAsset = (): UseAsset => {
+  const isLight = useIsLightTheme();
+
+  return {
+    postBoostStrip: isLight ? boostNewPostBannerLight : boostNewPostBanner,
+    onboardingIntroduction: isLight
+      ? cloudinaryFeedFiltersYourFeedLight
+      : cloudinaryFeedFiltersYourFeedDark,
+    scrollBlock: isLight
+      ? cloudinaryFeedFiltersScrollLight
+      : cloudinaryFeedFiltersScrollDark,
+    themeColor: isLight ? colors.salt['0'] : colors.pepper['90'],
+    githubShortcut: isLight
+      ? cloudinaryShortcutsIconsGithubLight
+      : cloudinaryShortcutsIconsGithubDark,
+    slackIntegrationHeader: isLight
+      ? cloudinaryIntegrationsSlackHeaderLight
+      : cloudinaryIntegrationsSlackHeaderDark,
+    jobsWelcome: isLight ? jobsWelcomeLightMode : jobsWelcomeDarkMode,
+    jobOfferDesktop: isLight ? jobOfferLightDesktop : jobOfferDarkDesktop,
+    jobOfferMobile: isLight ? jobOfferLightMobile : jobOfferDarkMobile,
+  };
+};

@@ -1,0 +1,226 @@
+import { gql } from 'graphql-request';
+import type { Connection } from '../common';
+import { gqlClient } from '../common';
+
+export const MAX_STACK_ITEMS = 100;
+
+export interface DatasetTool {
+  id: string;
+  title: string;
+  slug: string;
+  faviconUrl: string | null;
+  url: string | null;
+}
+
+// autocompleteTools resolves plain TypeORM entities (no GraphORM field
+// mapping), so `slug` (backed by titleNormalized) comes back null there.
+// Excluded until the API adds a resolver fallback.
+export type AutocompleteTool = Omit<DatasetTool, 'slug'>;
+
+export interface ToolTopSquad {
+  id: string;
+  name: string;
+  handle: string;
+  image: string;
+  description: string | null;
+  membersCount: number;
+}
+
+export interface UserStack {
+  id: string;
+  tool: DatasetTool;
+  section: string;
+  position: number;
+  startedAt: string | null;
+  icon: string | null;
+  title: string | null;
+  createdAt: string;
+}
+
+export interface AddUserStackInput {
+  title: string;
+  section: string;
+  startedAt?: string;
+}
+
+export interface UpdateUserStackInput {
+  section?: string;
+  icon?: string;
+  title?: string;
+  startedAt?: string | null;
+}
+
+export interface ReorderUserStackInput {
+  id: string;
+  position: number;
+  section?: string;
+}
+
+export const USER_STACK_FRAGMENT = gql`
+  fragment UserStackFragment on UserStack {
+    id
+    section
+    position
+    startedAt
+    icon
+    title
+    createdAt
+    tool {
+      id
+      title
+      slug
+      faviconUrl
+      url
+    }
+  }
+`;
+
+const USER_STACK_QUERY = gql`
+  query UserStack($userId: ID!, $first: Int, $after: String) {
+    userStack(userId: $userId, first: $first, after: $after) {
+      edges {
+        node {
+          ...UserStackFragment
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+  ${USER_STACK_FRAGMENT}
+`;
+
+const ADD_USER_STACK_MUTATION = gql`
+  mutation AddUserStack($input: AddUserStackInput!) {
+    addUserStack(input: $input) {
+      ...UserStackFragment
+    }
+  }
+  ${USER_STACK_FRAGMENT}
+`;
+
+const UPDATE_USER_STACK_MUTATION = gql`
+  mutation UpdateUserStack($id: ID!, $input: UpdateUserStackInput!) {
+    updateUserStack(id: $id, input: $input) {
+      ...UserStackFragment
+    }
+  }
+  ${USER_STACK_FRAGMENT}
+`;
+
+const DELETE_USER_STACK_MUTATION = gql`
+  mutation DeleteUserStack($id: ID!) {
+    deleteUserStack(id: $id) {
+      _
+    }
+  }
+`;
+
+const REORDER_USER_STACK_MUTATION = gql`
+  mutation ReorderUserStack($items: [ReorderUserStackInput!]!) {
+    reorderUserStack(items: $items) {
+      ...UserStackFragment
+    }
+  }
+  ${USER_STACK_FRAGMENT}
+`;
+
+const AUTOCOMPLETE_TOOLS_QUERY = gql`
+  query AutocompleteTools($query: String!) {
+    autocompleteTools(query: $query) {
+      id
+      title
+      faviconUrl
+      url
+    }
+  }
+`;
+
+const TOP_SQUADS_FOR_TOOL_QUERY = gql`
+  query TopSquadsForTool($toolId: ID!, $first: Int) {
+    sources(
+      filterOpenSquads: true
+      sortByMembersCount: true
+      first: $first
+      toolId: $toolId
+    ) {
+      edges {
+        node {
+          id
+          name
+          handle
+          image
+          description
+          membersCount
+        }
+      }
+    }
+  }
+`;
+
+export const getUserStack = async (
+  userId: string,
+  first = MAX_STACK_ITEMS,
+): Promise<Connection<UserStack>> => {
+  const result = await gqlClient.request<{
+    userStack: Connection<UserStack>;
+  }>(USER_STACK_QUERY, { userId, first });
+  return result.userStack;
+};
+
+export const searchTools = async (
+  query: string,
+): Promise<AutocompleteTool[]> => {
+  const result = await gqlClient.request<{
+    autocompleteTools: AutocompleteTool[];
+  }>(AUTOCOMPLETE_TOOLS_QUERY, { query });
+  return result.autocompleteTools;
+};
+
+export const getTopSquadsForTool = async ({
+  toolId,
+  first,
+}: {
+  toolId: string;
+  first?: number;
+}): Promise<ToolTopSquad[]> => {
+  const result = await gqlClient.request<{
+    sources: Connection<ToolTopSquad>;
+  }>(TOP_SQUADS_FOR_TOOL_QUERY, { toolId, first });
+
+  return result.sources.edges.map(({ node }) => node);
+};
+
+export const addUserStack = async (
+  input: AddUserStackInput,
+): Promise<UserStack> => {
+  const result = await gqlClient.request<{
+    addUserStack: UserStack;
+  }>(ADD_USER_STACK_MUTATION, { input });
+  return result.addUserStack;
+};
+
+export const updateUserStack = async (
+  id: string,
+  input: UpdateUserStackInput,
+): Promise<UserStack> => {
+  const result = await gqlClient.request<{
+    updateUserStack: UserStack;
+  }>(UPDATE_USER_STACK_MUTATION, { id, input });
+  return result.updateUserStack;
+};
+
+export const deleteUserStack = async (id: string): Promise<void> => {
+  await gqlClient.request(DELETE_USER_STACK_MUTATION, { id });
+};
+
+export const reorderUserStack = async (
+  items: ReorderUserStackInput[],
+): Promise<UserStack[]> => {
+  const result = await gqlClient.request<{
+    reorderUserStack: UserStack[];
+  }>(REORDER_USER_STACK_MUTATION, { items });
+  return result.reorderUserStack;
+};

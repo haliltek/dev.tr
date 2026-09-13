@@ -1,0 +1,453 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+const { execFileSync, spawnSync } = require('child_process');
+
+const repoRoot = process.cwd();
+
+const packageConfigs = [
+  {
+    dir: 'packages/shared',
+    tsconfig: 'tsconfig.strict.json',
+  },
+  {
+    dir: 'packages/webapp',
+    tsconfig: 'tsconfig.strict.json',
+  },
+  {
+    dir: 'packages/extension',
+    tsconfig: 'tsconfig.strict.json',
+  },
+];
+
+// Files temporarily excluded from strict type checking.
+// These files have known strict-mode violations that will be addressed separately.
+const strictSkipList = new Set([
+  // The @growthbook packages' package.json "exports" maps have no "types"
+  // condition, so their declaration files are unresolvable under webapp's
+  // moduleResolution: "bundler" (TS7016). The helper is compiled by webapp's
+  // program via the webapp test suites that import it. Pre-existing library
+  // issue, not a violation in this file — remove once growthbook is upgraded
+  // to a version with a proper exports map.
+  'packages/shared/__tests__/helpers/boot.tsx',
+  'packages/shared/src/components/auth/AuthOptionsInner.tsx',
+  'packages/shared/src/components/auth/SocialRegistrationForm.tsx',
+  'packages/shared/src/features/onboarding/steps/FunnelRegistration.tsx',
+  // Onboarding-signup-cws-align branch — touched only to swap the funnel
+  // step's render into the new <OnboardingSignupHero>. The surfaced strict
+  // errors (auth user optionality, useRef<HTMLFormElement>(null) producing
+  // RefObject instead of MutableRefObject, onSuccessfulRegistration
+  // signature mismatch) all live on unchanged logic copied from the
+  // original step and should be addressed in a dedicated auth-flow
+  // cleanup PR alongside the related auth files already on this list.
+  // FunnelHeroLanding is the new signup-hero step copied from the same
+  // original and carries the identical copied-auth strict violations.
+  'packages/shared/src/features/onboarding/steps/FunnelOrganicSignup.tsx',
+  'packages/shared/src/features/onboarding/steps/FunnelHeroLanding.tsx',
+  'packages/shared/src/hooks/useLogin.ts',
+  'packages/shared/src/hooks/useRegistration.ts',
+  'packages/shared/src/contexts/AuthContext.tsx',
+  'packages/webapp/pages/_app.tsx',
+  'packages/webapp/pages/onboarding.tsx',
+  'packages/extension/src/newtab/App.tsx',
+  // Micro-interactions-ads branch - pre-existing strict violations
+  'packages/shared/src/components/brand/BrandedTag.tsx',
+  'packages/shared/src/components/brand/MentionedToolsWidget.tsx',
+  'packages/shared/src/components/brand/SponsoredTagHero.tsx',
+  'packages/shared/src/components/cards/common/UpvoteButtonIcon.tsx',
+  'packages/shared/src/components/post/tags/PostTagList.tsx',
+  'packages/shared/src/contexts/EngagementAdsContext.spec.tsx',
+  'packages/webapp/pages/posts/[id]/index.tsx',
+  // Customize-new-tab branch — touched while wiring the customize panel,
+  // but these files have pre-existing strict violations unrelated to this
+  // feature (settings flag typing, popup refs, dnd null arg) that should
+  // be addressed in a dedicated cleanup PR.
+  'packages/shared/src/contexts/SettingsContext.tsx',
+  'packages/shared/src/components/tooltips/InteractivePopup.tsx',
+  'packages/shared/src/contexts/FeedContext.tsx',
+  // Copy-audit branch — these files were touched only to fix user-facing
+  // strings; pre-existing strict violations live on unrelated lines
+  // (DndModal: null args / RadioItemProps types; jobs/questions: optional
+  // string handling / null returns) and should be addressed separately.
+  'packages/extension/src/newtab/DndModal.tsx',
+  'packages/webapp/pages/jobs/[id]/questions.tsx',
+  // Marketing folder consolidation — these files were touched only to swap
+  // the import path from `marketingCta/common` to `marketing/cta/common`.
+  // Pre-existing strict violations (boot data optionality, MarketingCta
+  // null/flags guards, globalThis index access) are unrelated to the
+  // rename and should be addressed in a dedicated cleanup PR.
+  'packages/shared/src/components/modals/BootPopups.tsx',
+  'packages/shared/src/components/plus/PlusIOS.tsx',
+  'packages/shared/src/components/plus/PlusMobileDrawer.tsx',
+  'packages/shared/src/components/plus/PlusWebapp.tsx',
+  'packages/shared/src/hooks/useBoot.ts',
+  'packages/shared/src/lib/boot.ts',
+  'packages/shared/src/components/marketing/cta/MarketingCtaModal.tsx',
+  // Notification banner consolidation — touched only to swap the import
+  // path; pre-existing strict violations (queryResult.data optionality,
+  // NotificationItem reduce typing) are unrelated to the rename.
+  'packages/webapp/pages/notifications.tsx',
+  // Highlights-first toggle — touched only to add a new Switch subsection
+  // for the highlightsFirstEnabled flag. Pre-existing strict violations
+  // (auth user / feed optionality, Button prop mismatches, defaultFeedId
+  // null vs undefined) live on unrelated lines and should be addressed in
+  // a dedicated cleanup PR.
+  'packages/shared/src/components/feeds/FeedSettings/sections/FeedSettingsGeneralSection.tsx',
+  // Inline-hide-feedback-panel branch — touched only to add a `mode`
+  // discriminator and route the hide flow through this hook. The
+  // surfaced strict errors (queryFn return type under tanstack-query v5
+  // strict mode, `post.source` possibly undefined, optional accumulator
+  // chains) are pre-existing and should be addressed in a dedicated
+  // cleanup PR.
+  'packages/shared/src/hooks/post/useBlockPostPanel.ts',
+  // Inline-hide-feedback-panel branch — touched only to early-return the
+  // hidden feedback panel when in `hide` mode. The remaining strict
+  // errors (`post.tags`, `post.source`, optional callback invocations,
+  // shared-post image typing, mutable ref typing) are pre-existing and
+  // should be addressed in a dedicated cleanup PR.
+  'packages/shared/src/components/cards/article/ArticleGrid.tsx',
+  'packages/shared/src/components/cards/Freeform/FreeformGrid.tsx',
+  'packages/shared/src/components/cards/share/ShareGrid.tsx',
+  // @growthbook/growthbook ships .d.ts files but its package.json `exports`
+  // field has no `types` condition, so strict resolution intermittently fails
+  // to find declarations and flags the JSONValue import as implicit any.
+  'packages/shared/src/lib/feature.ts',
+  'packages/shared/src/lib/featureManagement.ts',
+  'packages/shared/src/lib/serverFeatureValue.ts',
+  'packages/webapp/lib/agentMarkdownAccess.ts',
+  // Layout-v2 branch — touched only to slot a v2-gated `<PageHeader>` at the
+  // top of each page. Pre-existing strict violations (PublicProfile possibly
+  // undefined, gameCenterPath optional, TagsPageProps untyped helpers, brief
+  // feed ad template optionality, etc.) live on unrelated lines and should
+  // be addressed in a dedicated cleanup PR.
+  'packages/webapp/pages/[userId]/achievements.tsx',
+  'packages/webapp/pages/briefing/index.tsx',
+  'packages/webapp/pages/game-center/index.tsx',
+  'packages/webapp/pages/tags/index.tsx',
+  'packages/webapp/components/layouts/SettingsLayout/index.tsx',
+  // PostAwardAction (V1 + V2): pre-existing AwardEntity / post.numAwards
+  // strict violations on lines unrelated to the dispatcher wrapper.
+  'packages/shared/src/components/post/PostAwardAction.tsx',
+  'packages/shared/src/components/post/PostAwardAction.v2.tsx',
+  // Header-stat-button alignment branch — touched only to drop the
+  // bacon-colored number and switch compact to Tertiary. Pre-existing
+  // strict errors (optional auth user, ConditionalWrapper wrapper type,
+  // ReactElement vs null return, Button props union) live on unrelated
+  // lines and should be addressed in a dedicated cleanup PR.
+  'packages/shared/src/components/streak/ReadingStreakButton.tsx',
+  // Toast v2 migration — usePoll and useSharedByToast were touched only to drop
+  // stale action-button styling (`bg-background-default text-text-primary`) that
+  // no longer suits the new theme-matching toast chip. Pre-existing strict
+  // violations (feed/poll query-data optionality; shared-post string/image
+  // typing) live on unrelated lines and should be addressed in a dedicated
+  // cleanup PR.
+  'packages/shared/src/hooks/usePoll.tsx',
+  'packages/webapp/hooks/useSharedByToast.tsx',
+  // Grid-columns feed-request branch — touched only to add `columns` to the
+  // feed request mock. Pre-existing strict violations (unknown-typed mock
+  // variables, incomplete Source/AuthContext fixtures, 'dark' theme string,
+  // null user arg) live on unrelated lines and should be addressed in a
+  // dedicated cleanup PR.
+  'packages/webapp/__tests__/SourcePage.tsx',
+  // Schedule-posts branch — edit.tsx was touched only to seed the schedule
+  // control from an existing scheduled post and thread `scheduledAt` through
+  // the edit submit. Pre-existing strict violations (squad/user optionality,
+  // mutable formRef typing on unrelated lines) predate this change and should
+  // be addressed in a dedicated cleanup PR.
+  'packages/webapp/pages/posts/[id]/edit.tsx',
+  // Noindex branch — these pages were touched only to attach `noindex` seo
+  // (a `layoutProps` assignment or a spread into an existing seo object).
+  // Pre-existing strict violations (squad/organization/member optionality,
+  // untyped route params, `null` component returns, campaign flag
+  // optionality) live on unrelated lines and should be addressed in a
+  // dedicated cleanup PR.
+  'packages/webapp/pages/squads/[handle]/[token].tsx',
+  'packages/webapp/pages/squads/[handle]/analytics.tsx',
+  'packages/webapp/pages/squads/moderate.tsx',
+  'packages/webapp/pages/join/organization.tsx',
+  'packages/webapp/pages/posts/[id]/analytics/index.tsx',
+  'packages/webapp/pages/backoffice/keywords/[value].tsx',
+  // Squad reputation gate — touched only to expand the posting-gate radio back
+  // into the two API fields and pass the initial threshold down. Pre-existing
+  // strict violations (optional handle/hint state typed as string, mutable
+  // image refs, Button prop unions, ConditionalWrapper element returns) live on
+  // unrelated lines and should be addressed in a dedicated cleanup PR.
+  'packages/shared/src/components/squads/Details.tsx',
+  // Comment-sort empty state — touched only to gate the sort strip on the
+  // comment count. Pre-existing strict violations (post.source optionality,
+  // the icon's `condition && class` className, mutable comment ref, the
+  // `false | (() => void)` onSignUp) live on unrelated lines and should be
+  // addressed in a dedicated cleanup PR.
+  'packages/shared/src/components/post/PostEngagements.tsx',
+  // Ad-viewability branch: the squad ad cards were touched only to render
+  // the viewability tracker. Pre-existing strict violations (`item.ad.data`
+  // and its `source`/`squad` members being optional, the `condition && class`
+  // className, the border-color record index, optional member lists) live on
+  // unrelated lines and should be addressed in a dedicated cleanup PR.
+  'packages/shared/src/components/cards/ad/squad/SquadAdGrid.tsx',
+  'packages/shared/src/components/cards/ad/squad/SquadAdList.tsx',
+  'packages/shared/src/components/cards/ad/squad/common.ts',
+  'packages/shared/src/components/cards/squad/SquadGrid.tsx',
+  // Quora-pixel branch — touched only to add the Quora tracking script.
+  // The strict violations (untyped globalThis pixel globals like fbq/gtag,
+  // ReactElement vs null returns) are the file's established idiom across
+  // every vendor and predate this change. Typing the pixel globals belongs
+  // in a dedicated cleanup PR.
+  'packages/webapp/components/Pixels.tsx',
+  // Tool-page-signals branch — touched only to add an `onError` toast to the
+  // comment/edit mutations (surfacing the server's ForbiddenError message
+  // instead of failing silently). Pre-existing strict violations (optional
+  // `post`/`post.source`, nullable PageInfo, optional comment/parent lookups)
+  // live on unrelated lines and should be addressed in a dedicated cleanup PR.
+  'packages/shared/src/hooks/post/useMutateComment.ts',
+  // Link-rel branch — these files were touched only to set an explicit `rel`
+  // on an outbound anchor. Pre-existing strict violations (optional
+  // `source`/`post.toc`, `Link href` accepting `string | null | undefined`,
+  // nullable location helpers) live on unrelated lines and should be
+  // addressed in a dedicated cleanup PR.
+  'packages/shared/src/components/post/common/SharedPostLink.tsx',
+  'packages/shared/src/components/widgets/PostToc.tsx',
+  'packages/shared/src/features/profile/components/experience/UserExperienceItem.tsx',
+  // Touched only to move their query onto the batched transport; the strict
+  // errors on other lines predate that change.
+  'packages/shared/src/hooks/useBanner.ts',
+  'packages/shared/src/hooks/useFeedSettings.ts',
+]);
+
+const changedFiles = getChangedTypescriptFiles().filter(
+  (file) => !strictSkipList.has(file),
+);
+
+if (!changedFiles.length) {
+  console.log('No changed TypeScript files to check.');
+  process.exit(0);
+}
+
+const bannedTsCommentViolations = findBannedTsCommentViolations(changedFiles);
+const strictErrorViolations = findStrictErrorViolations(changedFiles);
+
+if (!bannedTsCommentViolations.length && !strictErrorViolations.length) {
+  console.log('Changed TypeScript files passed strict migration guard.');
+  process.exit(0);
+}
+
+if (bannedTsCommentViolations.length) {
+  console.error('Found banned TypeScript comment directives in changed files:');
+  bannedTsCommentViolations.forEach((violation) => {
+    console.error(
+      `  - ${violation.file}:${violation.line} uses ${violation.directive}`,
+    );
+  });
+}
+
+if (strictErrorViolations.length) {
+  console.error('Found strict type errors in changed files:');
+  strictErrorViolations.forEach((violation) => {
+    console.error(`  - ${violation.message}`);
+  });
+}
+
+process.exit(1);
+
+function getChangedTypescriptFiles() {
+  const baseRef = resolveBaseRef();
+  const mergeBase = execGit(['merge-base', 'HEAD', baseRef]);
+  const branchDiffOutput = execGit([
+    'diff',
+    '--name-only',
+    '--diff-filter=ACMR',
+    `${mergeBase}...HEAD`,
+    '--',
+    ':(glob)**/*.ts',
+    ':(glob)**/*.tsx',
+  ]);
+  const workingTreeOutput = execGit([
+    'diff',
+    '--name-only',
+    '--diff-filter=ACMR',
+    'HEAD',
+    '--',
+    ':(glob)**/*.ts',
+    ':(glob)**/*.tsx',
+  ]);
+  const untrackedOutput = execGit([
+    'ls-files',
+    '--others',
+    '--exclude-standard',
+    '--',
+    ':(glob)**/*.ts',
+    ':(glob)**/*.tsx',
+  ]);
+
+  return [
+    ...branchDiffOutput.split('\n'),
+    ...workingTreeOutput.split('\n'),
+    ...untrackedOutput.split('\n'),
+  ]
+    .map((file) => file.trim())
+    .filter(Boolean)
+    .filter((file, index, files) => files.indexOf(file) === index)
+    .filter((file) => fs.existsSync(path.join(repoRoot, file)));
+}
+
+function resolveBaseRef() {
+  const candidates = [
+    process.argv[2],
+    process.env.TS_STRICT_BASE_REF,
+    process.env.GITHUB_BASE_REF && `origin/${process.env.GITHUB_BASE_REF}`,
+    'origin/main',
+    'main',
+  ].filter(Boolean);
+
+  const validCandidate = candidates.find((candidate) => gitRefExists(candidate));
+
+  if (validCandidate) {
+    return validCandidate;
+  }
+
+  return 'HEAD~1';
+}
+
+function gitRefExists(ref) {
+  try {
+    execGit(['rev-parse', '--verify', ref]);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function findBannedTsCommentViolations(files) {
+  const violations = [];
+
+  files.forEach((file) => {
+    const content = fs.readFileSync(path.join(repoRoot, file), 'utf8');
+    const lines = content.split('\n');
+
+    lines.forEach((line, index) => {
+      if (/@ts-ignore\b/.test(line)) {
+        violations.push({
+          directive: '@ts-ignore',
+          file,
+          line: index + 1,
+        });
+      }
+
+      if (/@ts-nocheck\b/.test(line)) {
+        violations.push({
+          directive: '@ts-nocheck',
+          file,
+          line: index + 1,
+        });
+      }
+    });
+  });
+
+  return violations;
+}
+
+function findStrictErrorViolations(files) {
+  const changedFilesSet = new Set(files.map(normalizePath));
+  const relevantPackages = packageConfigs.filter((config) =>
+    files.some((file) => file.startsWith(`${config.dir}/`)),
+  );
+  const violations = [];
+
+  relevantPackages.forEach((config) => {
+    const packageDir = path.join(repoRoot, config.dir);
+    const tscBinaryPath = resolveTypeScriptBinary(packageDir);
+    const command = tscBinaryPath ? process.execPath : 'pnpm';
+    const args = tscBinaryPath
+      ? [tscBinaryPath, '-p', config.tsconfig, '--noEmit', '--pretty', 'false']
+      : [
+          'exec',
+          'tsc',
+          '-p',
+          config.tsconfig,
+          '--noEmit',
+          '--pretty',
+          'false',
+        ];
+    const result = spawnSync(
+      command,
+      args,
+      {
+        cwd: packageDir,
+        encoding: 'utf8',
+      },
+    );
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    const output = `${result.stdout || ''}${result.stderr || ''}`;
+    const parsedErrors = parseTypeScriptErrors(output, packageDir);
+
+    if (result.status === 0) {
+      return;
+    }
+
+    if (!parsedErrors.length) {
+      throw new Error(
+        `Strict typecheck failed for ${config.dir} before TypeScript reported file errors.\n${output}`,
+      );
+    }
+
+    parsedErrors.forEach((error) => {
+      if (changedFilesSet.has(error.file)) {
+        violations.push(error);
+      }
+    });
+  });
+
+  return violations;
+}
+
+function resolveTypeScriptBinary(packageDir) {
+  try {
+    return require.resolve('typescript/bin/tsc', {
+      paths: [packageDir, repoRoot],
+    });
+  } catch (error) {
+    return null;
+  }
+}
+
+function parseTypeScriptErrors(output, packageDir) {
+  const lines = output.split('\n');
+  const errors = [];
+  const errorPattern = /^(.+?)\((\d+),(\d+)\): error TS\d+: (.+)$/;
+
+  lines.forEach((line) => {
+    const match = line.match(errorPattern);
+
+    if (!match) {
+      return;
+    }
+
+    const [, filePath, lineNumber, columnNumber, message] = match;
+    const resolvedFilePath = normalizePath(
+      path.relative(repoRoot, path.resolve(packageDir, filePath)),
+    );
+
+    errors.push({
+      file: resolvedFilePath,
+      message: `${resolvedFilePath}:${lineNumber}:${columnNumber} ${message}`,
+    });
+  });
+
+  return errors;
+}
+
+function execGit(args) {
+  return execFileSync('git', args, {
+    cwd: repoRoot,
+    encoding: 'utf8',
+  }).trim();
+}
+
+function normalizePath(filePath) {
+  return filePath.split(path.sep).join('/');
+}

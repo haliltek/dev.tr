@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "ES2018",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "verbatimModuleSyntax": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "paths": {
+      // `moduleResolution: node` predates package `exports` maps, so TS cannot
+      // follow edge-aura's "./react" subpath on its own. Bundlers do read the
+      // map, so the import specifier stays `edge-aura/react` and only the
+      // type lookup is pointed at the file behind it.
+      "edge-aura/react": ["./node_modules/edge-aura/dist/react.d.ts"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "custom.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "build"
+  ]
+}

@@ -1,0 +1,836 @@
+import type { ReactNode } from 'react';
+import React, { useContext } from 'react';
+import type { NextRouter } from 'next/router';
+import { useRouter } from 'next/router';
+import nock from 'nock';
+import type { RenderResult } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import AuthContext from './AuthContext';
+import defaultUser from '../../__tests__/fixture/loggedUser';
+import type { LoggedUser, AnonymousUser } from '../lib/user';
+import {
+  deleteAccount,
+  logout as dispatchLogout,
+  LogoutReason,
+} from '../lib/user';
+import SettingsContext, {
+  remoteThemes,
+  ThemeMode,
+  themeModes,
+} from './SettingsContext';
+import { mockGraphQL } from '../../__tests__/helpers/graphql';
+import { dailyClientHeader, gqlClient } from '../graphql/common';
+import { getDailyClientPlatform } from '../lib/func';
+import AlertContext from './AlertContext';
+import NotificationsContext from './NotificationsContext';
+import type { Alerts } from '../graphql/alerts';
+import { UPDATE_ALERTS } from '../graphql/alerts';
+import type {
+  RemoteSettings,
+  SettingsFlags,
+  Spaciness,
+} from '../graphql/settings';
+import { UPDATE_USER_SETTINGS_MUTATION } from '../graphql/settings';
+import { BootDataProvider } from './BootProvider';
+import { BOOT_LOCAL_KEY } from './common';
+import type { Boot, BootCacheData } from '../lib/boot';
+import { BootApp, getBootData } from '../lib/boot';
+import type { AuthTriggersType } from '../lib/auth';
+import { AuthTriggers } from '../lib/auth';
+import { expectToHaveTestValue } from '../../__tests__/helpers/utilities';
+import { useSidebarCompact } from '../hooks/useSidebarCompact';
+import { SortCommentsBy } from '../graphql/comments';
+
+jest.mock('../lib/boot', () => {
+  const actual = jest.requireActual('../lib/boot');
+
+  return {
+    ...actual,
+    getBootData: jest.fn(),
+  };
+});
+
+jest.mock('../lib/user', () => {
+  const actual = jest.requireActual('../lib/user');
+
+  return {
+    ...actual,
+    deleteAccount: jest.fn(),
+    logout: jest.fn(),
+  };
+});
+
+const getRedirectUriMock = jest.fn();
+
+const mockUseRouter = (router: Partial<NextRouter> = {}) => {
+  jest.mocked(useRouter).mockReturnValue({
+    query: {},
+    push: jest.fn(),
+    pathname: '/',
+    ...router,
+  } as unknown as NextRouter);
+};
+
+beforeEach(() => {
+  nock.cleanAll();
+  localStorage.clear();
+  mockUseRouter();
+});
+
+const defaultAlerts: Alerts = { filter: true, rankLastSeen: undefined };
+
+const defaultSettings: RemoteSettings = {
+  theme: 'bright',
+  openNewTab: false,
+  spaciness: 'roomy',
+  insaneMode: false,
+  showTopSites: true,
+  sidebarExpanded: true,
+  companionExpanded: false,
+  sortingEnabled: false,
+  optOutReadingStreak: true,
+  optOutStreakFreeze: false,
+  optOutAchievements: false,
+  optOutLevelSystem: false,
+  optOutQuestSystem: false,
+  autoDismissNotifications: true,
+  optOutCompanion: false,
+  sortCommentsBy: SortCommentsBy.NewestFirst,
+  showFeedbackButton: true,
+};
+
+const defaultBootData: BootCacheData = {
+  alerts: defaultAlerts,
+  user: defaultUser,
+  settings: defaultSettings,
+  notifications: { unreadNotificationsCount: 0 },
+  squads: [],
+  feeds: [],
+  geo: {},
+};
+
+const getBootMock = (bootMock: BootCacheData): Boot => ({
+  ...bootMock,
+  accessToken: { token: '1', expiresIn: '1' },
+  visit: { sessionId: '1', visitId: '1' },
+});
+
+const renderComponent = (
+  children: ReactNode,
+  bootData = defaultBootData,
+): RenderResult => {
+  const queryClient = new QueryClient();
+  const app = BootApp.Extension;
+  jest.mocked(getBootData).mockResolvedValue(getBootMock(bootData));
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <BootDataProvider
+        app={app}
+        version="test-version"
+        deviceId="test-device"
+        getPage={() => '/'}
+        getRedirectUri={getRedirectUriMock}
+      >
+        {children}
+      </BootDataProvider>
+    </QueryClientProvider>,
+  );
+};
+
+const mockSettingsMutation = (params: Partial<RemoteSettings>) =>
+  mockGraphQL({
+    request: {
+      query: UPDATE_USER_SETTINGS_MUTATION,
+      variables: { data: { ...defaultSettings, ...params } },
+    },
+    result: () => {
+      return { data: { _: true } };
+    },
+  });
+
+interface SettingsMockProps {
+  toTheme?: ThemeMode;
+  toSpaciness?: Spaciness;
+  toInsaneMode?: boolean;
+}
+
+const SettingsMock = ({
+  toTheme,
+  toSpaciness,
+  toInsaneMode,
+}: SettingsMockProps) => {
+  const {
+    toggleSidebarExpanded,
+    sidebarExpanded,
+    setTheme,
+    themeMode,
+    toggleOpenNewTab,
+    openNewTab,
+    setSpaciness,
+    spaciness,
+    toggleInsaneMode,
+    insaneMode,
+    toggleShowTopSites,
+    showTopSites,
+    toggleSortingEnabled,
+    sortingEnabled,
+    optOutReadingStreak,
+    toggleOptOutReadingStreak,
+    optOutLevelSystem,
+    toggleOptOutLevelSystem,
+    optOutQuestSystem,
+    toggleOptOutQuestSystem,
+    autoDismissNotifications,
+    toggleAutoDismissNotifications,
+  } = useContext(SettingsContext);
+
+  return (
+    <>
+      <button
+        onClick={toggleSidebarExpanded}
+        type="button"
+        data-test-value={sidebarExpanded}
+      >
+        Sidebar
+      </button>
+      <button
+        onClick={() => {
+          if (toTheme) {
+            setTheme(toTheme);
+          }
+        }}
+        type="button"
+        data-test-value={themeMode}
+      >
+        Theme
+      </button>
+      <button
+        onClick={toggleOptOutReadingStreak}
+        type="button"
+        data-test-value={optOutReadingStreak}
+      >
+        Show Weekly Goal widget
+      </button>
+      <button
+        onClick={toggleOptOutLevelSystem}
+        type="button"
+        data-test-value={optOutLevelSystem}
+      >
+        Show Level System
+      </button>
+      <button
+        onClick={toggleOptOutQuestSystem}
+        type="button"
+        data-test-value={optOutQuestSystem}
+      >
+        Show Quest System
+      </button>
+      <button
+        onClick={() => {
+          if (toSpaciness) {
+            setSpaciness(toSpaciness);
+          }
+        }}
+        type="button"
+        data-test-value={spaciness}
+      >
+        Spaciness
+      </button>
+      <button
+        onClick={() => {
+          if (typeof toInsaneMode === 'boolean') {
+            toggleInsaneMode(toInsaneMode);
+          }
+        }}
+        type="button"
+        data-test-value={insaneMode}
+      >
+        Insane Mode
+      </button>
+      <button
+        onClick={toggleOpenNewTab}
+        type="button"
+        data-test-value={openNewTab}
+      >
+        Open New Tab
+      </button>
+      <button
+        onClick={toggleShowTopSites}
+        type="button"
+        data-test-value={showTopSites}
+      >
+        Show Top Sites
+      </button>
+      <button
+        onClick={toggleSortingEnabled}
+        type="button"
+        data-test-value={sortingEnabled}
+      >
+        Sorting Feed
+      </button>
+      <button
+        onClick={toggleAutoDismissNotifications}
+        type="button"
+        data-test-value={autoDismissNotifications}
+      >
+        Auto dismiss notifications
+      </button>
+    </>
+  );
+};
+
+const waitForRemoteBoot = async () => {
+  const theme = await screen.findByText('Theme');
+  await expectToHaveTestValue(theme, themeModes[defaultSettings.theme]);
+};
+
+it('should toggle the sidebar callback', async () => {
+  const expected = false;
+  mockSettingsMutation({ sidebarExpanded: expected });
+  renderComponent(<SettingsMock />);
+  await waitForRemoteBoot();
+  const sidebar = await screen.findByText('Sidebar');
+  await expectToHaveTestValue(
+    sidebar,
+    defaultSettings.sidebarExpanded.toString(),
+  );
+  fireEvent.click(sidebar);
+  await expectToHaveTestValue(sidebar, expected.toString());
+});
+
+const clientOnlyFlagsKey = `dailydev:settings:clientOnlyFlags:${defaultUser.id}`;
+
+const SidebarCompactMock = () => {
+  const { value, toggle } = useSidebarCompact();
+
+  return (
+    <button onClick={toggle} type="button" data-test-value={value}>
+      Compact sidebar
+    </button>
+  );
+};
+
+const renderWithSidebarCompactFlag = () =>
+  renderComponent(
+    <>
+      <SettingsMock />
+      <SidebarCompactMock />
+    </>,
+  );
+
+it('should store a sidebar flag through the settings API', async () => {
+  mockSettingsMutation({ flags: { sidebarCompact: false } as SettingsFlags });
+  renderWithSidebarCompactFlag();
+  await waitForRemoteBoot();
+  const compact = await screen.findByText('Compact sidebar');
+  await expectToHaveTestValue(compact, 'true');
+  fireEvent.click(compact);
+  await expectToHaveTestValue(compact, 'false');
+  await waitFor(() => expect(nock.isDone()).toBe(true));
+  expect(localStorage.getItem(clientOnlyFlagsKey)).toBeNull();
+});
+
+it('should migrate stored sidebar flags into settings', async () => {
+  localStorage.setItem(
+    clientOnlyFlagsKey,
+    JSON.stringify({
+      sidebarCompact: false,
+      sidebarShortcuts: ['tags'],
+      sidebarPinnedExpanded: false,
+      sidebarRecentExpanded: true,
+      removedFlag: true,
+    }),
+  );
+  mockSettingsMutation({
+    flags: {
+      sidebarCompact: false,
+      sidebarShortcuts: ['tags'],
+      sidebarPinnedExpanded: false,
+      sidebarRecentExpanded: true,
+    } as SettingsFlags,
+  });
+  renderComponent(<SettingsMock />);
+  await waitForRemoteBoot();
+  await waitFor(() => expect(nock.isDone()).toBe(true));
+  await waitFor(() =>
+    expect(localStorage.getItem(clientOnlyFlagsKey)).toBeNull(),
+  );
+});
+
+it('should keep stored sidebar flags when the migration write fails', async () => {
+  localStorage.setItem(
+    clientOnlyFlagsKey,
+    JSON.stringify({ sidebarCompact: false }),
+  );
+  nock('http://localhost:3000')
+    .post('/graphql', {
+      query: UPDATE_USER_SETTINGS_MUTATION,
+      variables: {
+        data: {
+          ...defaultSettings,
+          flags: { sidebarCompact: false },
+        },
+      },
+    })
+    .reply(500, {});
+  renderComponent(<SettingsMock />);
+  await waitForRemoteBoot();
+  await waitFor(() => expect(nock.isDone()).toBe(true));
+  await waitFor(() =>
+    expect(localStorage.getItem(clientOnlyFlagsKey)).toEqual(
+      JSON.stringify({ sidebarCompact: false }),
+    ),
+  );
+});
+
+it('should let remote settings win over the legacy local sidebar store', async () => {
+  localStorage.setItem(
+    clientOnlyFlagsKey,
+    JSON.stringify({ sidebarCompact: false }),
+  );
+  mockSettingsMutation({ flags: { sidebarCompact: false } as SettingsFlags });
+  renderComponent(<SettingsMock />, {
+    ...defaultBootData,
+    settings: {
+      ...defaultSettings,
+      flags: { sidebarCompact: true } as SettingsFlags,
+    },
+  });
+  await waitForRemoteBoot();
+  await waitFor(() =>
+    expect(localStorage.getItem(clientOnlyFlagsKey)).toBeNull(),
+  );
+  expect(nock.isDone()).toBe(false);
+});
+
+it('should hand the pre-per-account flag store to the first account that loads', async () => {
+  localStorage.setItem(
+    'dailydev:settings:clientOnlyFlags:global',
+    JSON.stringify({ sidebarCompact: false }),
+  );
+  mockSettingsMutation({ flags: { sidebarCompact: false } as SettingsFlags });
+  renderWithSidebarCompactFlag();
+  await waitForRemoteBoot();
+  await waitFor(() => expect(nock.isDone()).toBe(true));
+  // Removed, so the next account on this device doesn't inherit it too.
+  expect(
+    localStorage.getItem('dailydev:settings:clientOnlyFlags:global'),
+  ).toBeNull();
+  await waitFor(() =>
+    expect(localStorage.getItem(clientOnlyFlagsKey)).toBeNull(),
+  );
+});
+
+it('should trigger set theme callback', async () => {
+  const expected = ThemeMode.Dark;
+  mockSettingsMutation({ theme: remoteThemes[expected] });
+  renderComponent(<SettingsMock toTheme={expected} />);
+  await waitForRemoteBoot();
+  const theme = await screen.findByText('Theme');
+  await expectToHaveTestValue(theme, themeModes[defaultSettings.theme]);
+  fireEvent.click(theme);
+  await expectToHaveTestValue(theme, expected);
+});
+
+it('should set spaciness callback', async () => {
+  const expected = 'eco';
+  mockSettingsMutation({ spaciness: expected });
+  renderComponent(<SettingsMock toSpaciness={expected} />);
+  await waitForRemoteBoot();
+  const spaciness = await screen.findByText('Spaciness');
+  await expectToHaveTestValue(spaciness, defaultSettings.spaciness);
+  fireEvent.click(spaciness);
+  await expectToHaveTestValue(spaciness, expected);
+});
+
+it('should toggle insane mode callback', async () => {
+  const expected = true;
+  mockSettingsMutation({ insaneMode: expected });
+  renderComponent(<SettingsMock toInsaneMode />);
+  await waitForRemoteBoot();
+  const insaneMode = await screen.findByText('Insane Mode');
+  // screen.debug();
+  await expectToHaveTestValue(
+    insaneMode,
+    defaultSettings.insaneMode.toString(),
+  );
+  fireEvent.click(insaneMode);
+  await expectToHaveTestValue(insaneMode, expected.toString());
+});
+
+it('should toggle open new tab settings callback', async () => {
+  const expected = true;
+  mockSettingsMutation({ openNewTab: expected });
+  renderComponent(<SettingsMock />);
+  await waitForRemoteBoot();
+  const openNewTab = await screen.findByText('Open New Tab');
+  await expectToHaveTestValue(
+    openNewTab,
+    defaultSettings.openNewTab.toString(),
+  );
+  fireEvent.click(openNewTab);
+  await expectToHaveTestValue(openNewTab, expected.toString());
+});
+
+it('should toggle show top sites callback', async () => {
+  const expected = false;
+  mockSettingsMutation({ showTopSites: expected });
+  renderComponent(<SettingsMock />);
+  await waitForRemoteBoot();
+  const showTopSites = await screen.findByText('Show Top Sites');
+  await expectToHaveTestValue(
+    showTopSites,
+    defaultSettings.showTopSites.toString(),
+  );
+  fireEvent.click(showTopSites);
+  await expectToHaveTestValue(showTopSites, expected.toString());
+});
+
+it('should toggle sorting enabled callback', async () => {
+  const expected = true;
+  mockSettingsMutation({ sortingEnabled: expected });
+  renderComponent(<SettingsMock />);
+  await waitForRemoteBoot();
+  const sorting = await screen.findByText('Sorting Feed');
+  await expectToHaveTestValue(
+    sorting,
+    defaultSettings.sortingEnabled.toString(),
+  );
+  fireEvent.click(sorting);
+  await expectToHaveTestValue(sorting, expected.toString());
+});
+
+it('should toggle auto dismiss notifications', async () => {
+  const expected = false;
+  mockSettingsMutation({ autoDismissNotifications: expected });
+  renderComponent(<SettingsMock />);
+  await waitForRemoteBoot();
+  const autoDismiss = await screen.findByText('Auto dismiss notifications');
+  await expectToHaveTestValue(
+    autoDismiss,
+    defaultSettings.autoDismissNotifications.toString(),
+  );
+  fireEvent.click(autoDismiss);
+  await expectToHaveTestValue(autoDismiss, expected.toString());
+});
+
+const AlertsMock = (params: Partial<Alerts>) => {
+  const { updateAlerts, alerts } = useContext(AlertContext);
+
+  return (
+    <button
+      onClick={() => updateAlerts?.(params)}
+      type="button"
+      data-test-value={JSON.stringify(alerts)}
+    >
+      Alerts
+    </button>
+  );
+};
+
+const mockAlertsMutation = (params: Partial<Alerts>) =>
+  mockGraphQL({
+    request: {
+      query: UPDATE_ALERTS,
+      variables: { data: params },
+    },
+    result: () => {
+      return { data: { _: true } };
+    },
+  });
+
+it('should trigger update alerts callback', async () => {
+  const filter = false;
+  const alerts = { ...defaultAlerts, filter };
+  mockAlertsMutation({ filter });
+  renderComponent(<AlertsMock filter={filter} />);
+  const alertsEl = await screen.findByText('Alerts');
+  await expectToHaveTestValue(alertsEl, JSON.stringify(defaultAlerts));
+  fireEvent.click(alertsEl);
+  await expectToHaveTestValue(alertsEl, JSON.stringify(alerts));
+});
+
+interface NotificationsMockProps {
+  incrementBy?: number;
+}
+
+const NotificationsMock = ({ incrementBy = 1 }: NotificationsMockProps) => {
+  const { unreadCount, clearUnreadCount, incrementUnreadCount } =
+    useContext(NotificationsContext);
+
+  return (
+    <>
+      <button
+        onClick={clearUnreadCount}
+        type="button"
+        data-test-value={unreadCount}
+      >
+        Clear notifications
+      </button>
+      <button onClick={() => incrementUnreadCount(incrementBy)} type="button">
+        Increment notifications
+      </button>
+    </>
+  );
+};
+
+const getStoredBootData = (): BootCacheData =>
+  JSON.parse(localStorage.getItem(BOOT_LOCAL_KEY) as string);
+
+it('should persist notification count updates to local boot data', async () => {
+  renderComponent(<NotificationsMock incrementBy={2} />, {
+    ...defaultBootData,
+    notifications: { unreadNotificationsCount: 4 },
+  });
+
+  const clearNotifications = await screen.findByText('Clear notifications');
+  await expectToHaveTestValue(clearNotifications, '4');
+
+  fireEvent.click(clearNotifications);
+  await expectToHaveTestValue(clearNotifications, '0');
+  expect(getStoredBootData().notifications.unreadNotificationsCount).toEqual(0);
+
+  fireEvent.click(screen.getByText('Increment notifications'));
+  await expectToHaveTestValue(clearNotifications, '2');
+  expect(getStoredBootData().notifications.unreadNotificationsCount).toEqual(2);
+});
+
+interface AuthMockProps {
+  updatedUser?: LoggedUser;
+  loginTrigger?: AuthTriggersType;
+}
+
+const AuthMock = ({ updatedUser, loginTrigger }: AuthMockProps) => {
+  const {
+    updateUser,
+    user,
+    deleteAccount: deleteUserAccount,
+    logout,
+    showLogin,
+    closeLogin,
+    loginState,
+    getRedirectUri,
+    trackingId,
+    anonymous,
+  } = useContext(AuthContext);
+
+  return (
+    <>
+      <button
+        onClick={() => {
+          if (updatedUser) {
+            updateUser(updatedUser);
+          }
+        }}
+        type="button"
+        data-test-value={user?.name || 'anonymous'}
+      >
+        User
+      </button>
+      <button onClick={deleteUserAccount} type="button">
+        Delete
+      </button>
+      <button onClick={() => logout(LogoutReason.ManualLogout)} type="button">
+        Logout
+      </button>
+      <button
+        onClick={() => {
+          if (loginTrigger) {
+            showLogin({ trigger: loginTrigger });
+          }
+        }}
+        type="button"
+        data-test-value={JSON.stringify(loginState)}
+      >
+        Log in
+      </button>
+      <button
+        onClick={closeLogin}
+        type="button"
+        data-test-value={JSON.stringify(loginState)}
+      >
+        Close Login
+      </button>
+      <button onClick={getRedirectUri} type="button">
+        Redirect
+      </button>
+      <span data-test-value={trackingId}>Tracking ID</span>
+      <span data-test-value={JSON.stringify(anonymous)}>Anonymous User</span>
+    </>
+  );
+};
+
+it('should trigger update user callback', async () => {
+  const expected = 'Lee';
+  renderComponent(
+    <AuthMock updatedUser={{ ...defaultUser, name: expected }} />,
+  );
+  const user = await screen.findByText('User');
+  await expectToHaveTestValue(user, defaultUser.name);
+  fireEvent.click(user);
+  await expectToHaveTestValue(user, expected);
+});
+
+it('should trigger delete account callback', async () => {
+  renderComponent(<AuthMock />);
+  const deleteUser = await screen.findByText('Delete');
+  fireEvent.click(deleteUser);
+  expect(deleteAccount).toHaveBeenCalled();
+});
+
+it('should redirect to onboarding after logout', async () => {
+  const originalLocation = window.location;
+  const replace = jest.fn();
+
+  Object.defineProperty(window, 'location', {
+    value: {
+      pathname: '/settings',
+      search: '',
+      replace,
+      reload: jest.fn(),
+    },
+    configurable: true,
+  });
+
+  jest.mocked(dispatchLogout).mockResolvedValue(undefined);
+
+  try {
+    renderComponent(<AuthMock />);
+    const logout = await screen.findByText('Logout');
+    fireEvent.click(logout);
+
+    await waitFor(() =>
+      expect(dispatchLogout).toHaveBeenCalledWith(LogoutReason.ManualLogout),
+    );
+    expect(replace).toHaveBeenCalledWith('/onboarding');
+  } finally {
+    Object.defineProperty(window, 'location', {
+      value: originalLocation,
+      configurable: true,
+    });
+  }
+});
+
+const defaultAnonymousUser: AnonymousUser = {
+  id: 'anonymous user',
+  firstVisit: 'first visit',
+  referrer: 'string',
+};
+
+it('should trigger show login callback', async () => {
+  const expected = AuthTriggers.Comment;
+  renderComponent(<AuthMock loginTrigger={expected} />, {
+    ...defaultBootData,
+    user: defaultAnonymousUser,
+  });
+  const login = await screen.findByText('Log in');
+  await expectToHaveTestValue(login, 'null');
+  fireEvent.click(login);
+  await expectToHaveTestValue(login, JSON.stringify({ trigger: expected }));
+});
+
+it('should keep login inline on the webapp after auth intent', async () => {
+  const push = jest.fn();
+  mockUseRouter({
+    push,
+    pathname: '/posts/shared',
+  });
+
+  renderComponent(<AuthMock loginTrigger={AuthTriggers.Comment} />, {
+    ...defaultBootData,
+    user: defaultAnonymousUser,
+  });
+
+  const login = await screen.findByText('Log in');
+  await expectToHaveTestValue(login, 'null');
+  expect(push).not.toHaveBeenCalled();
+
+  fireEvent.click(login);
+
+  await expectToHaveTestValue(
+    login,
+    JSON.stringify({ trigger: AuthTriggers.Comment }),
+  );
+  expect(push).not.toHaveBeenCalled();
+});
+
+it('should trigger close login callback', async () => {
+  const expected = AuthTriggers.Comment;
+  renderComponent(<AuthMock loginTrigger={expected} />, {
+    ...defaultBootData,
+    user: defaultAnonymousUser,
+  });
+  const login = await screen.findByText('Log in');
+  const closeLogin = await screen.findByText('Close Login');
+  await expectToHaveTestValue(closeLogin, 'null');
+  fireEvent.click(login);
+  await expectToHaveTestValue(
+    closeLogin,
+    JSON.stringify({ trigger: expected }),
+  );
+  fireEvent.click(closeLogin);
+  await expectToHaveTestValue(closeLogin, 'null');
+});
+
+it('should trigger get redirect uri callback', async () => {
+  renderComponent(<AuthMock />);
+  const getRedirect = await screen.findByText('Redirect');
+  fireEvent.click(getRedirect);
+  expect(getRedirectUriMock).toHaveBeenCalled();
+});
+
+it('should display user tracking id for anonymous user', async () => {
+  renderComponent(<AuthMock />, {
+    ...defaultBootData,
+    user: defaultAnonymousUser,
+  });
+  const trackingId = await screen.findByText('Tracking ID');
+  await expectToHaveTestValue(trackingId, defaultAnonymousUser.id);
+  const user = await screen.findByText('User');
+  await expectToHaveTestValue(user, 'anonymous');
+});
+
+it('should display accurate information of anonymous user', async () => {
+  renderComponent(<AuthMock />, {
+    ...defaultBootData,
+    user: defaultAnonymousUser,
+  });
+  const anonymousUser = await screen.findByText('Anonymous User');
+  await expectToHaveTestValue(
+    anonymousUser,
+    JSON.stringify(defaultAnonymousUser),
+  );
+  const user = await screen.findByText('User');
+  await expectToHaveTestValue(user, 'anonymous');
+});
+
+it('should set the calling platform header on the gql client', async () => {
+  const setHeaderSpy = jest.spyOn(gqlClient, 'setHeader');
+  renderComponent(<AuthMock />);
+  await waitFor(() =>
+    expect(setHeaderSpy).toHaveBeenCalledWith(
+      dailyClientHeader,
+      getDailyClientPlatform('test-version'),
+    ),
+  );
+  setHeaderSpy.mockRestore();
+});
+
+it('should unset the content language header when user language is cleared', async () => {
+  gqlClient.setHeader('content-language', 'de');
+  const unsetHeaderSpy = jest.spyOn(gqlClient, 'unsetHeader');
+
+  renderComponent(<AuthMock />, {
+    ...defaultBootData,
+    user: { ...defaultUser, isPlus: true, language: null },
+  });
+
+  await waitFor(() =>
+    expect(unsetHeaderSpy).toHaveBeenCalledWith('content-language'),
+  );
+  expect(
+    Reflect.get(Reflect.get(gqlClient, 'options'), 'headers'),
+  ).not.toHaveProperty('content-language');
+  unsetHeaderSpy.mockRestore();
+});

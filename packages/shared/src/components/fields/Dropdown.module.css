@@ -1,0 +1,30 @@
+.dropdown {
+  & button {
+    & :global(.icon) {
+      font-size: 1.5rem;
+      margin-right: 0.5rem;
+    }
+
+    &:focus,
+    &[aria-expanded='true'] {
+      color: var(--theme-text-primary);
+      background: transparent;
+      outline: none;
+      box-shadow: inset 0 0 0 0.0625rem var(--theme-text-primary);
+
+      & .chevron {
+        color: var(--theme-text-primary);
+      }
+    }
+  }
+}
+
+/* Icon-only triggers have no label, so the icon's label-spacing margin would
+   push it off-center inside the square button. */
+.dropdown.iconOnly button :global(.icon) {
+  margin-right: 0;
+}
+
+.item:global(.h-auto) > * {
+  height: auto !important;
+}

@@ -1,0 +1,77 @@
+import type { ReactElement } from 'react';
+import React, { useCallback } from 'react';
+import classNames from 'classnames';
+import { AiIcon } from '../icons';
+import { IconSize } from '../Icon';
+import { isAppleDevice } from '../../lib/func';
+import { KeyboadShortcutLabel } from '../KeyboardShortcutLabel';
+import { useSpotlight } from './SpotlightContext';
+import { ViewSize, useViewSize } from '../../hooks';
+import { useLogContext } from '../../contexts/LogContext';
+import { LogEvent, TargetId, TargetType } from '../../lib/log';
+
+interface SpotlightTriggerProps {
+  className?: string;
+}
+
+const shortcutKeys = [isAppleDevice() ? '⌘' : 'Ctrl', 'K'];
+
+/**
+ * Header pill that lives where the old SearchPanel input used to. The
+ * resting visual is a 1:1 match for the production SearchPanelInput
+ * (`BaseField` + `AiIcon` + `KeyboadShortcutLabel`) so users see no
+ * difference until they actually click and the Spotlight modal opens.
+ */
+export const SpotlightTrigger = ({
+  className,
+}: SpotlightTriggerProps): ReactElement => {
+  const { open, prefetch } = useSpotlight();
+  const { logEvent } = useLogContext();
+  const isLaptop = useViewSize(ViewSize.Laptop);
+
+  const onOpen = useCallback(() => {
+    logEvent({
+      event_name: LogEvent.Click,
+      target_type: TargetType.Spotlight,
+      target_id: TargetId.SpotlightOpen,
+    });
+    open();
+  }, [logEvent, open]);
+
+  return (
+    <button
+      type="button"
+      data-testid="spotlight-trigger"
+      aria-label="Arama yap"
+      aria-keyshortcuts={isLaptop ? shortcutKeys.join('+') : undefined}
+      onClick={onOpen}
+      onMouseEnter={prefetch}
+      onFocus={prefetch}
+      className={classNames(
+        // Sizing, color, and shape match the production SearchPanel field.
+        'relative flex h-12 w-full items-center overflow-hidden rounded-12 border border-transparent bg-background-subtle px-3 text-left transition-colors',
+        'hover:bg-surface-hover',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cabbage-default focus-visible:ring-offset-2',
+        // Same compact desktop width used by SearchPanelInput in production
+        // (26.25rem). Without this the trigger stretches edge-to-edge, which
+        // read as a different field even though the styling matched. It is a
+        // cap rather than a fixed width so the field can give up space when a
+        // crowded header action rail would otherwise overflow; the larger
+        // laptop/laptopL max-widths that used to sit here were dead, since the
+        // fixed width never reached them.
+        'laptop:max-w-[26.25rem] laptop:py-1 laptop:backdrop-blur-[3.75rem]',
+        className,
+      )}
+    >
+      <AiIcon size={IconSize.Large} className="mr-3 text-text-tertiary" />
+      <span className="min-w-0 flex-1 text-text-tertiary typo-body">
+        Ara...
+      </span>
+      <div className="z-1 hidden items-center gap-3 laptop:flex">
+        <KeyboadShortcutLabel keys={shortcutKeys} />
+      </div>
+    </button>
+  );
+};
+
+export default SpotlightTrigger;

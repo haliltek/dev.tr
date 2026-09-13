@@ -1,0 +1,121 @@
+import type { Source } from '@dailydotdev/shared/src/graphql/sources';
+import { cloudinarySquadsImageFallback } from '@dailydotdev/shared/src/lib/image';
+import type {
+  DefaultSeoProps,
+  NextSeoProps,
+  OpenGraph,
+} from 'next-seo/lib/types';
+
+export const defaultOpenGraph: Partial<OpenGraph> = {
+  images: [
+    {
+      url: 'https://media.daily.dev/image/upload/s--VAY5ToZt--/f_auto/v1724209435/public/daily.dev%20-%20open%20graph',
+    },
+  ],
+};
+
+const config: DefaultSeoProps = {
+  openGraph: {
+    ...defaultOpenGraph,
+    type: 'website',
+    site_name: 'devcore.tr',
+  },
+  twitter: {
+    site: '@devcore_tr',
+    cardType: 'summary_large_image',
+  },
+};
+
+export default config;
+
+export const defaultSeo: Partial<NextSeoProps> = {
+  description:
+    'devcore.tr, Türk yazılımcıların en güncel teknoloji haberlerini, blog yazılarını ve teknik tartışmaları bir arada bulabileceği yeni nesil geliştirici platformudur.',
+};
+
+// Robots directives must flow through next-seo's first-class robots handling
+// (noindex/nofollow/robotsProps) so exactly one key="robots" tag is emitted per
+// page and page-level noindex always wins. Do NOT reintroduce robots via
+// additionalMetaTags — those are keyed by meta name, escape next-seo's dedupe,
+// and silently override every page's noindex.
+export const robotsProps: NextSeoProps['robotsProps'] = {
+  maxSnippet: -1,
+  maxImagePreview: 'large',
+  maxVideoPreview: -1,
+};
+
+// Spread into a page's `seo` when it is auth-gated / crawler-inaccessible.
+export const noindexSeoProps: Pick<NextSeoProps, 'nofollow' | 'noindex'> = {
+  nofollow: true,
+  noindex: true,
+};
+
+// Contextual share images rendered by the webapp and screenshotted by
+// daily-api at /og/<type>/<id>.png (mirrors the devcard v2 image pipeline).
+export type ShareImageType =
+  | 'posts'
+  | 'comments'
+  | 'sources'
+  | 'squads'
+  | 'profile'
+  | 'tags'
+  | 'invite'
+  | 'plus';
+
+export const getShareImageUrl = (
+  type: ShareImageType,
+  id: string,
+  params?: Record<string, string | undefined>,
+): string => {
+  const url = new URL(
+    `/og/${type}/${encodeURIComponent(id)}.png`,
+    process.env.NEXT_PUBLIC_API_URL,
+  );
+  Object.entries(params ?? {}).forEach(([key, value]) => {
+    if (value) {
+      url.searchParams.set(key, value);
+    }
+  });
+  return url.toString();
+};
+
+export const getSquadOpenGraph = ({
+  squad,
+}: {
+  squad?: Pick<Source, 'id' | 'image' | 'public'>;
+}): Partial<OpenGraph> => {
+  // The share card is screenshotted from an anonymous render, which can only
+  // read public squads — private ones keep the plain image behavior.
+  if (squad?.id && squad.public) {
+    return {
+      images: [
+        { url: getShareImageUrl('squads', squad.id), width: 1200, height: 630 },
+      ],
+    };
+  }
+
+  return {
+    images:
+      squad?.image && squad.image !== cloudinarySquadsImageFallback
+        ? [{ url: squad.image }]
+        : defaultOpenGraph.images,
+  };
+};
+
+// Canonical marketing tagline. Static surfaces that can't import this TS
+// constant keep their own copy — the extension locale JSON
+// (`packages/extension/public/_locales/en/messages.json`) and `public/llms.txt`
+// — so update those too when the tagline changes.
+export const TAGLINE = 'Türk Yazılımcı Topluluğu & Geliştirici Akışı';
+
+export const defaultSeoTitle = `devcore.tr | ${TAGLINE}`;
+
+// Shared by every logged-in Recruiter surface (dashboard, opportunities,
+// candidate review, org settings, payment). None of them render for a crawler,
+// and they hold customer data, so the whole product stays out of the index.
+export const recruiterSeo: NextSeoProps = {
+  title: 'daily.dev Recruiter | Dashboard',
+  description:
+    'Your dashboard for the developer-first hiring platform. Manage roles, review matches, and track warm introductions.',
+  ...noindexSeoProps,
+};

@@ -1,0 +1,516 @@
+import type {
+  GetStaticPathsResult,
+  GetStaticPropsContext,
+  GetStaticPropsResult,
+} from 'next';
+import Head from 'next/head';
+import type { ParsedUrlQuery } from 'querystring';
+import type { ReactElement } from 'react';
+import classNames from 'classnames';
+import React, { useContext, useMemo } from 'react';
+import type { NextSeoProps } from 'next-seo/lib/types';
+import Feed from '@dailydotdev/shared/src/components/Feed';
+import {
+  baseFeedSupportedTypes,
+  MOST_DISCUSSED_FEED_QUERY,
+  MOST_UPVOTED_FEED_QUERY,
+  SOURCE_FEED_QUERY,
+  SOURCE_TOP_POSTS_QUERY,
+} from '@dailydotdev/shared/src/graphql/feed';
+import type {
+  TopPost,
+  TopPostsData,
+} from '@dailydotdev/shared/src/graphql/feed';
+import type {
+  Source,
+  SourceData,
+} from '@dailydotdev/shared/src/graphql/sources';
+import {
+  isSourceUserSource,
+  SIMILAR_SOURCES_QUERY,
+  SOURCE_QUERY,
+  SOURCE_RELATED_TAGS_QUERY,
+  SourceType,
+} from '@dailydotdev/shared/src/graphql/sources';
+import AuthContext from '@dailydotdev/shared/src/contexts/AuthContext';
+
+import { PageInfoHeader } from '@dailydotdev/shared/src/components/utilities';
+import {
+  DiscussIcon,
+  UpvoteIcon,
+} from '@dailydotdev/shared/src/components/icons';
+import type { Connection } from '@dailydotdev/shared/src/graphql/common';
+import { ApiError, gqlClient } from '@dailydotdev/shared/src/graphql/common';
+import {
+  OtherFeedPage,
+  RequestKey,
+  StaleTime,
+} from '@dailydotdev/shared/src/lib/query';
+import { PostType } from '@dailydotdev/shared/src/graphql/posts';
+import { useFeedLayout } from '@dailydotdev/shared/src/hooks/useFeedLayout';
+import { useQuery } from '@tanstack/react-query';
+import type { TagsData } from '@dailydotdev/shared/src/graphql/feedSettings';
+import { RecommendedTags } from '@dailydotdev/shared/src/components/RecommendedTags';
+import { RelatedEntities } from '@dailydotdev/shared/src/components/RelatedEntities';
+import Link from '@dailydotdev/shared/src/components/utilities/Link';
+import HorizontalFeed from '@dailydotdev/shared/src/components/feeds/HorizontalFeed';
+import { IconSize } from '@dailydotdev/shared/src/components/Icon';
+import { ActiveFeedNameContext } from '@dailydotdev/shared/src/contexts/ActiveFeedNameContext';
+import CustomAuthBanner from '@dailydotdev/shared/src/components/auth/CustomAuthBanner';
+import type { GraphQLError } from '@dailydotdev/shared/src/lib/errors';
+import { ArchiveEntryCard } from '@dailydotdev/shared/src/components/archive/ArchiveEntryCard';
+import { ArchiveBreadcrumbs } from '@dailydotdev/shared/src/components/archive/ArchiveBreadcrumbs';
+import { PageHeader } from '@dailydotdev/shared/src/components/layout/PageHeader';
+import { useLayoutVariant } from '@dailydotdev/shared/src/hooks/layout/useLayoutVariant';
+import { ArchiveScopeType } from '@dailydotdev/shared/src/graphql/archive';
+import { EntitySectionHeading } from '@dailydotdev/shared/src/components/entity/EntitySectionHeading';
+import { EntityRailWithFade } from '@dailydotdev/shared/src/components/entity/EntityRailWithFade';
+import { ExploreSignupStrip } from '@dailydotdev/shared/src/components/auth/ExploreSignupStrip';
+import { useRecentPageMeta } from '@dailydotdev/shared/src/hooks/useRecentPages';
+import Custom404 from '../404';
+import { defaultOpenGraph, defaultSeo, getShareImageUrl } from '../../next-seo';
+import { mainFeedLayoutProps } from '../../components/layouts/MainFeedPage';
+import { getLayout } from '../../components/layouts/FeedLayout';
+import { getPageSeoTitles } from '../../components/layouts/utils';
+import { SourceActions } from '../../../shared/src/components/sources/SourceActions';
+import type { DynamicSeoProps } from '../../components/common';
+import { getAppOrigin } from '../../lib/seo';
+
+const appOrigin = getAppOrigin();
+const pageSectionClassName = 'mx-4';
+const pageSectionAutoWidthClassName = `${pageSectionClassName} !w-auto`;
+// Feed sections must stretch: the page main (BaseFeedPage) is a
+// `flex-col items-start`, so a width-less margined wrapper shrinks to its
+// content and the horizontal rails size their percentage-based grid columns
+// against their own intrinsic width, blowing the cards up to ~2x.
+// `self-stretch` (not `w-full`) accounts for the mx-4 margins.
+const pageFeedSectionClassName = `${pageSectionClassName} self-stretch`;
+const pageFeedClassName = '!mx-4 !w-auto';
+const horizontalRailClassName = '!mx-0 !mb-0';
+
+interface SourcePageProps extends DynamicSeoProps {
+  source?: Source;
+  relatedTags?: TagsData['tags'];
+  topPosts?: TopPost[];
+}
+type SourceIdProps = { sourceId?: string };
+
+const SourceRelatedTags = ({
+  sourceId,
+  initialTags = [],
+}: SourceIdProps & {
+  initialTags?: TagsData['tags'];
+}): ReactElement => {
+  const { data: relatedTags, isPending } = useQuery({
+    queryKey: [RequestKey.SourceRelatedTags, null, sourceId],
+
+    queryFn: async () =>
+      await gqlClient.request<{
+        relatedTags: TagsData;
+      }>(SOURCE_RELATED_TAGS_QUERY, {
+        sourceId,
+      }),
+    enabled: !!sourceId,
+    staleTime: StaleTime.OneHour,
+  });
+
+  return (
+    <RecommendedTags
+      isLoading={isPending && initialTags.length === 0}
+      tags={relatedTags?.relatedTags?.tags ?? initialTags}
+    />
+  );
+};
+
+const SimilarSources = ({
+  sourceId,
+  sourceName,
+}: SourceIdProps & { sourceName: string }) => {
+  const { data: similarSources, isPending } = useQuery({
+    queryKey: [RequestKey.SimilarSources, null, sourceId],
+
+    queryFn: async () =>
+      await gqlClient.request<{ similarSources: Connection<Source> }>(
+        SIMILAR_SOURCES_QUERY,
+        {
+          sourceId,
+          first: 6,
+        },
+      ),
+
+    enabled: !!sourceId,
+    staleTime: StaleTime.OneHour,
+  });
+
+  const sources = similarSources?.similarSources?.edges?.map(
+    (edge) => edge.node,
+  );
+
+  return (
+    <RelatedEntities
+      isLoading={isPending}
+      items={sources?.map((source) => ({
+        id: source.id,
+        image: source.image,
+        imageAlt: `${source.name} logo`,
+        name: source.name,
+        permalink: source.permalink,
+      }))}
+      title={`Sources similar to ${sourceName}`}
+      className={pageSectionClassName}
+    />
+  );
+};
+
+const getSourcePageJsonLd = (source: Source): string => {
+  const sourceHandle = source.handle || source.id;
+  if (!sourceHandle) {
+    throw new Error('Source page JSON-LD requires a source handle or id');
+  }
+
+  const sourcePageUrl = `${appOrigin}/sources/${encodeURIComponent(
+    sourceHandle,
+  )}`;
+  const sourceUrl = source.permalink || sourcePageUrl;
+
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': `${sourcePageUrl}#organization`,
+        name: source.name,
+        url: sourceUrl,
+        ...(source.image && {
+          logo: { '@type': 'ImageObject', url: source.image },
+        }),
+        ...(source.description && { description: source.description }),
+      },
+      {
+        '@type': 'CollectionPage',
+        '@id': `${sourcePageUrl}#page`,
+        url: sourcePageUrl,
+        name: `${source.name} posts on daily.dev`,
+        ...(source.description && { description: source.description }),
+        about: { '@id': `${sourcePageUrl}#organization` },
+        isPartOf: { '@type': 'WebSite', url: appOrigin },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: appOrigin,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Sources',
+            item: `${appOrigin}/sources`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: source.name,
+          },
+        ],
+      },
+    ],
+  });
+};
+
+const SourcePage = ({
+  source,
+  relatedTags = [],
+  topPosts = [],
+}: SourcePageProps): ReactElement => {
+  const { isV2 } = useLayoutVariant();
+  const isV2Laptop = isV2;
+  const { user } = useContext(AuthContext);
+  useRecentPageMeta({ image: source?.image });
+  const mostUpvotedQueryVariables = useMemo(
+    () => ({
+      source: source?.id,
+      supportedTypes: [
+        PostType.Article,
+        PostType.SocialTwitter,
+        PostType.VideoYouTube,
+        PostType.Collection,
+      ],
+      period: 365,
+    }),
+    [source?.id],
+  );
+  const bestDiscussedQueryVariables = useMemo(
+    () => ({
+      source: source?.id,
+      period: 365,
+    }),
+    [source?.id],
+  );
+  // Must be memoized to prevent refreshing the feed
+  const queryVariables = useMemo(
+    () => ({
+      source: source?.id,
+      ranking: 'TIME',
+      supportedTypes: baseFeedSupportedTypes,
+    }),
+    [source?.id],
+  );
+  const { FeedPageLayoutComponent } = useFeedLayout();
+
+  if (!source) {
+    return <Custom404 />;
+  }
+
+  const jsonLd = getSourcePageJsonLd(source);
+
+  return (
+    <>
+      {/* v2: hoist the page-header strip OUT of FeedPageLayoutComponent
+          so it spans the full floating-card width without being clamped
+          by the list-mode max-width. */}
+      {isV2Laptop && <PageHeader title={source.name} />}
+      <FeedPageLayoutComponent className="overflow-x-hidden">
+        <Head>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: jsonLd }}
+          />
+        </Head>
+        <ExploreSignupStrip
+          className={classNames(pageSectionAutoWidthClassName, 'mb-4')}
+        />
+        <ArchiveBreadcrumbs
+          items={[
+            { label: 'Sources', href: '/sources' },
+            { label: source.name },
+          ]}
+          className={pageSectionClassName}
+        />
+        <PageInfoHeader className={pageSectionAutoWidthClassName}>
+          <div className="flex items-center font-bold">
+            <img
+              src={source.image}
+              alt={`${source.name} logo`}
+              className="size-10 rounded-full"
+            />
+            <h1 className="ml-2 w-fit typo-title2">{source.name}</h1>
+          </div>
+          <div className="flex flex-row gap-3">
+            <SourceActions showCopyLink source={source} />
+          </div>
+          {source?.description && (
+            <p className="typo-body">{source?.description}</p>
+          )}
+          <SourceRelatedTags sourceId={source.id} initialTags={relatedTags} />
+        </PageInfoHeader>
+        <SimilarSources sourceId={source.id} sourceName={source.name} />
+        {relatedTags.length > 0 && (
+          <div className="sr-only">
+            {relatedTags
+              .map((tag) => tag.name)
+              .filter((tag): tag is string => !!tag)
+              .map((tag) => (
+                <Link key={tag} href={`/tags/${tag}`} prefetch={false}>
+                  <a>Posts about {tag}</a>
+                </Link>
+              ))}
+          </div>
+        )}
+        {topPosts.length > 0 && (
+          <div className="sr-only">
+            {topPosts.map((post) => (
+              <Link
+                key={post.id}
+                href={`/posts/${post.slug || post.id}`}
+                prefetch={false}
+              >
+                <a>{post.title}</a>
+              </Link>
+            ))}
+          </div>
+        )}
+        <ActiveFeedNameContext.Provider
+          value={{ feedName: OtherFeedPage.SourceMostUpvoted }}
+        >
+          <div className={pageFeedSectionClassName}>
+            <EntitySectionHeading
+              icon={<UpvoteIcon size={IconSize.Medium} className="shrink-0" />}
+            >
+              Most upvoted posts from {source.name}
+            </EntitySectionHeading>
+            <EntityRailWithFade>
+              <HorizontalFeed
+                feedName={OtherFeedPage.SourceMostUpvoted}
+                feedQueryKey={[
+                  'sourceMostUpvoted',
+                  user?.id ?? 'anonymous',
+                  Object.values(mostUpvotedQueryVariables),
+                ]}
+                query={MOST_UPVOTED_FEED_QUERY}
+                variables={mostUpvotedQueryVariables}
+                className={horizontalRailClassName}
+                emptyScreen={<></>}
+              />
+            </EntityRailWithFade>
+          </div>
+        </ActiveFeedNameContext.Provider>
+        <ActiveFeedNameContext.Provider
+          value={{ feedName: OtherFeedPage.SourceBestDiscussed }}
+        >
+          <div className={pageFeedSectionClassName}>
+            <EntitySectionHeading
+              icon={<DiscussIcon size={IconSize.Medium} className="shrink-0" />}
+            >
+              Best discussed posts from {source.name}
+            </EntitySectionHeading>
+            <EntityRailWithFade>
+              <HorizontalFeed
+                feedName={OtherFeedPage.SourceBestDiscussed}
+                feedQueryKey={[
+                  'sourceBestDiscussed',
+                  user?.id ?? 'anonymous',
+                  Object.values(bestDiscussedQueryVariables),
+                ]}
+                query={MOST_DISCUSSED_FEED_QUERY}
+                variables={bestDiscussedQueryVariables}
+                className={horizontalRailClassName}
+                emptyScreen={<></>}
+              />
+            </EntityRailWithFade>
+          </div>
+        </ActiveFeedNameContext.Provider>
+        <ArchiveEntryCard
+          scopeType={ArchiveScopeType.Source}
+          scopeId={source.id ?? ''}
+          scopeName={source.name}
+          className={`${pageSectionClassName} mb-6`}
+        />
+        <div className={pageFeedSectionClassName}>
+          <EntitySectionHeading>
+            All posts from {source.name}
+          </EntitySectionHeading>
+          <Feed
+            feedName={OtherFeedPage.Squad}
+            feedQueryKey={[
+              'sourceFeed',
+              user?.id ?? 'anonymous',
+              Object.values(queryVariables),
+            ]}
+            query={SOURCE_FEED_QUERY}
+            variables={queryVariables}
+            className={pageFeedClassName}
+          />
+        </div>
+      </FeedPageLayoutComponent>
+    </>
+  );
+};
+
+SourcePage.getLayout = getLayout;
+SourcePage.layoutProps = {
+  ...mainFeedLayoutProps,
+  customBanner: <CustomAuthBanner />,
+};
+export default SourcePage;
+
+export async function getStaticPaths(): Promise<GetStaticPathsResult> {
+  return { paths: [], fallback: 'blocking' };
+}
+
+interface SourcePageParams extends ParsedUrlQuery {
+  source: string;
+}
+
+export async function getStaticProps({
+  params,
+}: GetStaticPropsContext<SourcePageParams>): Promise<
+  GetStaticPropsResult<SourcePageProps>
+> {
+  try {
+    const res = await gqlClient.request<SourceData>(SOURCE_QUERY, {
+      id: params?.source,
+    });
+
+    if (isSourceUserSource(res.source)) {
+      return {
+        redirect: {
+          destination: `/${res.source.id}`,
+          permanent: false,
+        },
+      };
+    }
+
+    if (res.source?.type === SourceType.Squad) {
+      return {
+        redirect: {
+          destination: `/squads/${params?.source}`,
+          permanent: false,
+        },
+      };
+    }
+
+    const { source } = res;
+    const [relatedTagsResult, sourceTopPostsResult] = await Promise.all([
+      gqlClient
+        .request<{ relatedTags: TagsData }>(SOURCE_RELATED_TAGS_QUERY, {
+          sourceId: source.id,
+        })
+        .catch(() => null),
+      gqlClient
+        .request<TopPostsData>(SOURCE_TOP_POSTS_QUERY, {
+          source: source.id,
+          first: 10,
+        })
+        .catch(() => null),
+    ]);
+    const relatedTags = relatedTagsResult?.relatedTags?.tags ?? [];
+    const topPosts =
+      sourceTopPostsResult?.page?.edges
+        ?.map((edge) => edge.node)
+        .filter((post) => !!post.title) ?? [];
+    const seoTitles = getPageSeoTitles(`${source.name} posts`);
+    const seo: NextSeoProps = {
+      ...defaultSeo,
+      ...seoTitles,
+      openGraph: {
+        ...defaultOpenGraph,
+        ...seoTitles.openGraph,
+        images: [
+          {
+            url: getShareImageUrl('sources', source.id ?? ''),
+            width: 1200,
+            height: 630,
+          },
+        ],
+      },
+      description: source?.description || defaultSeo.description,
+    };
+
+    return {
+      props: {
+        source: res.source,
+        relatedTags,
+        topPosts,
+        seo,
+      },
+      revalidate: 3600,
+    };
+  } catch (err) {
+    const error = err as GraphQLError;
+    if (
+      [ApiError.NotFound, ApiError.Forbidden].includes(
+        error?.response?.errors?.[0]?.extensions?.code,
+      )
+    ) {
+      return {
+        notFound: true,
+        revalidate: 3600,
+      };
+    }
+    throw err;
+  }
+}

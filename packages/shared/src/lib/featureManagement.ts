@@ -1,0 +1,350 @@
+import type { FeedAdTemplate } from './feed';
+import type { FeedSettingsKeys } from '../contexts/FeedContext';
+import type { PlusItemStatus } from '../components/plus/PlusListItem';
+import { isDevelopment } from './constants';
+import { BriefingType } from '../graphql/posts';
+import type { HeroCardsConfig } from '../types';
+import { PostType } from '../types';
+import { Feature } from './feature';
+
+export { Feature } from './feature';
+
+const feature = {
+  showError: new Feature('show_error', false),
+  feedVersion: new Feature('feed_version', 15),
+  feedAdSpot: new Feature('feed_ad_spot', 2),
+  searchVersion: new Feature('search_version2', 3),
+  featureTheme: new Feature('feature_theme', {}),
+  showRoadmap: new Feature('show_roadmap', true),
+  showCodeSnippets: new Feature('show_code_snippets', false),
+};
+
+export const followingFeedVersion = new Feature('following_feed_version', 2);
+export const popularFeedVersion = new Feature('popular_feed_version', 2);
+export const upvotedFeedVersion = new Feature('upvoted_feed_version', 2);
+export const discussedFeedVersion = new Feature('discussed_feed_version', 2);
+export const latestFeedVersion = new Feature('latest_feed_version', 2);
+export const customFeedVersion = new Feature('custom_feed_version', 2);
+export const featurePostPageHighlights = new Feature(
+  'post_page_highlights',
+  false,
+);
+export const featurePostRedesign = new Feature('post_redesign', false);
+
+// @ts-expect-error stale feature without default
+export const plusTakeoverContent = new Feature<{
+  title: string;
+  description: string;
+  features: Array<{ label: string; status: PlusItemStatus }>;
+  cta: string;
+  shouldShowRefund: boolean;
+  shouldShowReviews: boolean;
+}>('plus_takeover_content');
+
+export const featurePlusCtaCopy = new Feature('plus_cta_copy', {
+  full: 'Level Up with Plus',
+  short: 'Upgrade',
+});
+
+export const featureLuckyButton = new Feature('lucky_button', false);
+
+export const featureJobsUI = new Feature('jobs_ui', false);
+
+export const featureAutorotateAds = new Feature('autorotate_ads', 0);
+
+export const featureFeedAdTemplate = new Feature('feed_ad_template', {
+  default: {
+    adStart: 2,
+  },
+} as Record<FeedSettingsKeys, FeedAdTemplate>);
+
+export const featureValidLanguages = new Feature('valid_languages', {
+  en: 'English',
+  es: 'Spanish',
+  de: 'German',
+  fr: 'French',
+  it: 'Italian',
+  'zh-Hans': 'Chinese (Simplified)',
+  'pt-BR': 'Portuguese (Brazil)',
+  'pt-PT': 'Portuguese (Portugal)',
+  ja: 'Japanese',
+  ko: 'Korean',
+});
+
+export const featurePlusEntryMobile = new Feature('plus_entry_mobile', false);
+
+export const featureReadingReminderHeroCopy = new Feature(
+  'reading_reminder_hero_copy',
+  {
+    title: 'Never miss a learning day',
+    subtitle: 'Turn on your daily reading reminder and keep your routine.',
+  },
+);
+
+export const clickbaitTriesMax = new Feature('clickbait_tries_max', 5);
+
+// Experiment: show the clickbait shield to free users even while they have
+// intro quests, to measure the effect on D1 retention.
+export const featureClickbaitShieldIntroQuests = new Feature(
+  'clickbait_shield_intro_quests',
+  false,
+);
+
+export { feature };
+
+export const featureCores = new Feature('cores', isDevelopment);
+
+// automated streak freeze: auto-apply purchased freezes on missed reading days
+export const featureStreakFreeze = new Feature('streak_freeze', isDevelopment);
+
+// Experiment: sponsored partner offers (via Encore) presented as the reward
+// moment once the day's daily quests are all claimed. Enrollment is
+// conditional on the popup actually being eligible, so users who never finish
+// their quests don't dilute the split.
+export const featureQuestOffers = new Feature('quest_offers', isDevelopment);
+
+// whether the user will see post boost ads
+// does not necessarily mean they can't boost a post if they have access to cores
+export const featurePostBoostAds = new Feature('post_boost_ads', isDevelopment);
+
+export const briefCardFeedFeature = new Feature(
+  'brief_card_feed',
+  isDevelopment,
+);
+
+export const profileCompletionCardFeature = new Feature(
+  'profile_completion_card',
+  isDevelopment,
+);
+
+export const briefGeneratePricing = new Feature<Record<BriefingType, number>>(
+  'brief_generate_pricing',
+  {
+    [BriefingType.Daily]: 300,
+    [BriefingType.Weekly]: 500,
+  },
+);
+
+export const briefFeedEntrypointPage = new Feature<false | number>(
+  'brief_feed_banner_page',
+  0,
+);
+
+export const briefUIFeature = new Feature('brief_ui', isDevelopment);
+export const boostSettingsFeature = new Feature('boost_settings', {
+  min: 1000,
+  max: 100000,
+  step: 1000,
+  default_cores: 5000,
+  default_days: 7,
+});
+
+export const adImprovementsV3Feature = new Feature('ad_improvements_v3', false);
+
+// Experiment: ad disclosure wording. Control names the advertiser ("Promoted by
+// Vercel"); the treatments drop the advertiser and disclose with a plain "Ad",
+// with the strictest arm also removing the "Advertise here" self-promo so the
+// card carries a single disclosure. Measured on ad CTR (see `adLogEvent`).
+// Default MUST stay Control — GrowthBook ramps the arms.
+export enum AdLabelVariant {
+  Control = 'control',
+  Ad = 'ad',
+  AdOnly = 'ad_only',
+}
+export const featureAdLabel = new Feature<AdLabelVariant>(
+  'ad_label',
+  AdLabelVariant.Control,
+);
+
+export const featureYearInReview = new Feature('year_in_review_2025', false);
+
+export const featureProfileCompletionIndicator = new Feature(
+  'profile_completion_indicator',
+  0,
+);
+
+export const questsFeature = new Feature('quests', true);
+
+export const achievementTrackingWidgetFeature = new Feature(
+  'achievement_tracking_widget',
+  false,
+);
+
+export const sharedPostPreviewFeature = new Feature(
+  'shared_post_preview',
+  false,
+);
+
+export const featureOnboardingTagRecommender = new Feature(
+  'onboarding_tag_recommender',
+  false,
+);
+
+export const featureOnboardingPersonas = new Feature(
+  'onboarding_personas',
+  false,
+);
+
+export const featurePostSignupWidget = new Feature('post_signup_widget', false);
+
+export const featureShortcutsHub = new Feature('shortcuts_hub_v2', false);
+
+export const featureCompanionDemoWidget = new Feature(
+  'companion_demo_widget',
+  false,
+);
+
+export const swipeOnboardingFeature = new Feature('swipe_onboarding', false);
+
+// Experiment: the horizon signup wall against the served one, measured on
+// signup completion. Remove once Freyja can serve `background: 'horizon'`
+// itself. Default MUST stay `false` — it is the control.
+export const featureSignupWallHorizon = new Feature(
+  'signup_wall_horizon',
+  false,
+);
+
+export const featureUpvoteCountThreshold = new Feature<{
+  threshold: number;
+  belowThresholdLabel: string;
+  newWindowHours: number;
+}>('upvote_count_threshold', {
+  threshold: 0,
+  belowThresholdLabel: '',
+  newWindowHours: 24,
+});
+
+export enum FeedChipsVariant {
+  None = 'none',
+  V2 = 'v2',
+  V3 = 'v3',
+}
+export const featureFeedChips = new Feature<FeedChipsVariant>(
+  'feed_chips',
+  FeedChipsVariant.V2,
+);
+
+export enum HijackingVariant {
+  Default = 'default',
+  CTA = 'cta',
+  Auth = 'auth',
+  /** Homepage cover art behind centered copy and a pair of CTAs. */
+  Cover = 'cover',
+}
+export const featureHijackingVariants = new Feature<HijackingVariant>(
+  'hijacking_variants3',
+  HijackingVariant.Default,
+);
+
+export enum OnboardingChromeVariant {
+  /** Control: the flat page surface, no progress dots. */
+  Control = 'control',
+  /** Variant: the animated edge-aura frame plus dots under the CTA. */
+  Aura = 'aura',
+}
+export const featureOnboardingChrome = new Feature<OnboardingChromeVariant>(
+  'onboarding_chrome',
+  OnboardingChromeVariant.Control,
+);
+
+/**
+ * Experiment: the sponsor strip — a logo wall docked under the main feeds with
+ * a trending ticker under it. The ticker carries the popular half of
+ * `statuslineFeed`; the feed keeps its own Happening Now card and owns the
+ * curated headlines, so the two rows cannot show the same story.
+ *
+ * On in development and off everywhere else, the way `cores`, `quest_offers`
+ * and `post_boost_ads` are: `isDevelopment` is false in a production build, so
+ * this cannot ship the experiment to anyone — GrowthBook ramps it — while a
+ * local session still gets the strip without anybody forcing a flag.
+ */
+export const featureSponsorStrip = new Feature('sponsor_strip', isDevelopment);
+
+export const featureLayoutV2 = new Feature('layout_v2_2', false);
+
+export const featureEngagementBarV2 = new Feature('engagement_bar_v2', false);
+
+export const featureHeroCards = new Feature<HeroCardsConfig>('hero_cards', {
+  enabled: false,
+  minSpacing: 10,
+  startIndex: 4,
+  chipLabels: {
+    breaking: 'Breaking',
+    major: 'Major',
+    notable: 'Notable',
+    breakout: 'Breaking out',
+    evergreen: 'Evergreen',
+  },
+  allowedPostTypes: {
+    [PostType.Article]: true,
+    [PostType.VideoYouTube]: true,
+    [PostType.Share]: false,
+    [PostType.Freeform]: false,
+    [PostType.Collection]: false,
+  },
+});
+
+// Experiment: skip layout/paint for off-screen feed cards via CSS
+// `content-visibility: auto` to keep long feeds responsive.
+export const featureFeedContentVisibility = new Feature(
+  'feed_content_visibility',
+  false,
+);
+
+export const featurePublicSignupBanner = new Feature(
+  'public_signup_banner',
+  false,
+);
+
+// Surfaces a per-post impressions stat on the feed card action bar and the
+// post page stats strip, sourced from the public `analytics.impressions`
+// field. Control hides it entirely. Keep the default `false` — GrowthBook
+// ramps it.
+export const featureCardImpressions = new Feature('card_impressions', false);
+
+// Gates every agent surface; control hides all of them. Keep the default
+// `false`, GrowthBook ramps it.
+export const featureInterestAgent = new Feature('interest_agent', false);
+
+export type PlusSaleConfig = {
+  /** Paddle discount id (`dsc_...`). Empty means no sale is running. */
+  discountId: string;
+  /** Coupon code shown as marketing copy; it is applied automatically. */
+  code: string;
+  label: string;
+  headline: string;
+  description: string;
+  /** ISO date. The sale expires here even if the flag is left on. */
+  endDate: string;
+};
+
+// The advertised discount, code and expiry travel with the id they describe, so
+// the copy can't outlive or contradict what Paddle applies. The committed
+// default is the off state; its copy is never reachable without a discount id.
+export const featurePlusSale = new Feature<PlusSaleConfig>(
+  'plus_sale_campaign',
+  {
+    discountId: '',
+    code: 'SUMMER50',
+    label: '50% off',
+    headline: 'Summer sale: 50% off Plus',
+    description: 'Code SUMMER50 is already applied. Offer ends August 31.',
+    endDate: '2026-09-01T00:00:00.000Z',
+  },
+);
+
+// Emergency kill switch for the /read template's ads — NOT an experiment, so
+// the true default is deliberate: the surface ships always-on (it is only
+// reachable through paid placements), and the flag exists solely so a policy
+// warning, bad creative or revenue anomaly can be stopped without a deploy
+// and an ISR revalidation cycle. Never ramp or target with this flag.
+export const featureReadAdsense = new Feature('read_adsense', true);
+
+export const featureCommentFirstAction = new Feature(
+  'comment_first_action',
+  false,
+);
+
+// Kill switch for the batched GraphQL transport (`graphql/batch.ts`). Off is
+// the control: the API only accepts batched bodies once its own change ships.
+export const featureGqlBatching = new Feature('gql_batching', false);

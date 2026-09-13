@@ -1,0 +1,273 @@
+import type { ReactElement } from 'react';
+import React from 'react';
+import classNames from 'classnames';
+import type { IconType } from '../buttons/Button';
+import { Button, ButtonSize, ButtonVariant } from '../buttons/Button';
+import { MedalBadgeIcon } from '../icons';
+import { AlertColor, AlertDot } from '../AlertDot';
+import { useAuthContext } from '../../contexts/AuthContext';
+import { useSettingsContext } from '../../contexts/SettingsContext';
+import { useConditionalFeature } from '../../hooks/useConditionalFeature';
+import { useProfileAchievements } from '../../hooks/profile/useProfileAchievements';
+import { useTrackedAchievement } from '../../hooks/profile/useTrackedAchievement';
+import { useAchievementTracker } from '../../hooks/profile/useAchievementTracker';
+import { getTargetCount } from '../../graphql/user/achievements';
+import { useViewSize, ViewSize } from '../../hooks';
+import { useLayoutVariant } from '../../hooks/layout/useLayoutVariant';
+import { useLazyModal } from '../../hooks/useLazyModal';
+import { achievementTrackingWidgetFeature } from '../../lib/featureManagement';
+import { shouldShowAchievementTracker } from '../../lib/achievements';
+import { LazyImage } from '../LazyImage';
+import { LazyModal } from '../modals/common/types';
+import HoverCard from '../cards/common/HoverCard';
+import { AchievementCard } from '../../features/profile/components/achievements/AchievementCard';
+import { Tooltip } from '../tooltip/Tooltip';
+import { ElementPlaceholder } from '../ElementPlaceholder';
+
+function AchievementIcon({
+  imgSrc,
+  imgAlt,
+  hasLabel,
+}: {
+  imgSrc: string;
+  imgAlt: string;
+  hasLabel: boolean;
+}): ReactElement {
+  return (
+    <LazyImage
+      imgSrc={imgSrc}
+      imgAlt={imgAlt}
+      className={classNames('size-5 rounded-6 object-cover', {
+        'mr-2': hasLabel,
+      })}
+    />
+  );
+}
+
+export function AchievementTrackerPanel(): ReactElement | null {
+  const { user } = useAuthContext();
+  const { value: isAchievementTrackingWidgetEnabled } = useConditionalFeature({
+    feature: achievementTrackingWidgetFeature,
+    shouldEvaluate: !!user,
+  });
+  const { trackedAchievement } = useTrackedAchievement(
+    undefined,
+    isAchievementTrackingWidgetEnabled === true,
+  );
+
+  if (!user || isAchievementTrackingWidgetEnabled !== true) {
+    return null;
+  }
+
+  if (!trackedAchievement || trackedAchievement.unlockedAt) {
+    return null;
+  }
+
+  return (
+    <div className="px-3 pt-1">
+      <div className="overflow-hidden rounded-12 bg-background-popover">
+        <AchievementCard userAchievement={trackedAchievement} />
+      </div>
+    </div>
+  );
+}
+
+export function AchievementTrackerButton(): ReactElement | null {
+  const { openModal, closeModal } = useLazyModal();
+  const { user } = useAuthContext();
+  const { optOutAchievements } = useSettingsContext();
+  const isLaptop = useViewSize(ViewSize.Laptop);
+  const { isV2 } = useLayoutVariant();
+  const {
+    value: isAchievementTrackingWidgetEnabled,
+    isLoading: isAchievementTrackingWidgetLoading,
+  } = useConditionalFeature({
+    feature: achievementTrackingWidgetFeature,
+    shouldEvaluate: !!user,
+  });
+  const isExperimentEnabled = isAchievementTrackingWidgetEnabled === true;
+  const { isSettled } = useAchievementTracker(
+    isExperimentEnabled && !isAchievementTrackingWidgetLoading,
+  );
+  const {
+    achievements,
+    unlockedCount,
+    totalCount,
+    isPending: isAchievementsPending,
+  } = useProfileAchievements(user, isExperimentEnabled && isSettled);
+
+  const shouldRender = shouldShowAchievementTracker({
+    isExperimentEnabled,
+    unlockedCount,
+    totalCount,
+  });
+  const shouldQueryTrackedAchievement =
+    !!user &&
+    isSettled &&
+    !isAchievementTrackingWidgetLoading &&
+    (!isExperimentEnabled || !isAchievementsPending) &&
+    shouldRender;
+  const {
+    trackedAchievement,
+    trackAchievement,
+    untrackAchievement,
+    isPending: isTrackedAchievementPending,
+    isTrackPending,
+    isUntrackPending,
+  } = useTrackedAchievement(undefined, shouldQueryTrackedAchievement);
+
+  const isTrackingAchievement =
+    !!trackedAchievement && !trackedAchievement.unlockedAt;
+  const targetCount = isTrackingAchievement
+    ? getTargetCount(trackedAchievement.achievement)
+    : 1;
+  const progressValue = isTrackingAchievement
+    ? Math.min(trackedAchievement.progress, targetCount)
+    : 0;
+  const showAttentionDot =
+    !isTrackedAchievementPending && !isTrackingAchievement;
+  const isTrackerUpdating = isTrackPending || isUntrackPending;
+
+  const buttonLabel = (() => {
+    if (!isTrackingAchievement) {
+      return undefined;
+    }
+
+    if (targetCount <= 1) {
+      return trackedAchievement.achievement?.unit;
+    }
+
+    const { unit } = trackedAchievement.achievement;
+
+    return unit
+      ? `${progressValue} of ${targetCount} ${unit}`
+      : `${progressValue} of ${targetCount}`;
+  })();
+  const hasButtonLabel = !!buttonLabel;
+
+  const handleTrack = async (achievementId: string) => {
+    await trackAchievement(achievementId);
+    closeModal();
+  };
+
+  const handleUntrack = async () => {
+    await untrackAchievement();
+    closeModal();
+  };
+
+  const handleClick = () => {
+    openModal({
+      type: LazyModal.AchievementPicker,
+      props: {
+        achievements: achievements ?? [],
+        trackedAchievementId: trackedAchievement?.achievement.id,
+        onTrack: handleTrack,
+        onUntrack: handleUntrack,
+      },
+    });
+  };
+
+  if (!user || isAchievementTrackingWidgetLoading || optOutAchievements) {
+    return null;
+  }
+
+  if (!isExperimentEnabled) {
+    return null;
+  }
+
+  if (isAchievementsPending) {
+    return (
+      <ElementPlaceholder
+        data-testid="achievement-tracker-skeleton"
+        className={
+          isV2
+            ? 'h-8 w-8 animate-pulse rounded-10'
+            : 'h-10 w-10 animate-pulse rounded-12'
+        }
+      />
+    );
+  }
+
+  if (!shouldRender) {
+    return null;
+  }
+
+  if (isTrackedAchievementPending) {
+    return (
+      <ElementPlaceholder
+        data-testid="achievement-tracker-skeleton"
+        className={
+          isV2
+            ? 'h-8 w-8 animate-pulse rounded-10'
+            : 'h-10 w-10 animate-pulse rounded-12'
+        }
+      />
+    );
+  }
+
+  const buttonContent = (
+    <div className="relative">
+      <Button
+        size={isV2 ? ButtonSize.Small : ButtonSize.Medium}
+        variant={(() => {
+          if (isV2) {
+            return ButtonVariant.Tertiary;
+          }
+          return isLaptop ? ButtonVariant.Float : ButtonVariant.Tertiary;
+        })()}
+        className={(() => {
+          if (!isV2) {
+            return undefined;
+          }
+          return hasButtonLabel
+            ? '!h-8 !rounded-10 !border-transparent !bg-transparent !px-3 hover:!bg-surface-hover'
+            : '!size-8 !rounded-10 !border-transparent !bg-transparent !p-0 hover:!bg-surface-hover';
+        })()}
+        icon={
+          (isTrackingAchievement ? (
+            <AchievementIcon
+              imgSrc={trackedAchievement.achievement.image}
+              imgAlt={trackedAchievement.achievement.name}
+              hasLabel={hasButtonLabel}
+            />
+          ) : (
+            <MedalBadgeIcon />
+          )) as unknown as IconType
+        }
+        onClick={handleClick}
+        disabled={isTrackerUpdating}
+        aria-label={
+          isTrackingAchievement
+            ? `${trackedAchievement.achievement.name}${
+                targetCount > 1 ? ` (${progressValue} of ${targetCount})` : ''
+              }`
+            : 'Track an achievement'
+        }
+      >
+        {buttonLabel || undefined}
+      </Button>
+      {showAttentionDot && (
+        <AlertDot
+          color={AlertColor.Bun}
+          className="pointer-events-none right-2 top-2 border border-background-default"
+        />
+      )}
+    </div>
+  );
+
+  if (!isTrackingAchievement) {
+    return (
+      <Tooltip content="Track achievement" side="bottom">
+        {buttonContent}
+      </Tooltip>
+    );
+  }
+
+  return (
+    <HoverCard openDelay={300} sideOffset={8} trigger={buttonContent}>
+      <div className="w-80 overflow-hidden rounded-16 bg-background-popover">
+        <AchievementCard userAchievement={trackedAchievement} />
+      </div>
+    </HoverCard>
+  );
+}

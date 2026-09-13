@@ -1,0 +1,437 @@
+import { withSerwist } from '@serwist/turbopack';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import withBundleAnalyzerInit from '@next/bundle-analyzer';
+import { readFileSync } from 'fs';
+import type { NextConfig } from 'next';
+import type { Rewrite } from 'next/dist/lib/load-custom-routes';
+import { getMarkdownRewrites } from './lib/markdownRoutes';
+
+const { version } = JSON.parse(
+  readFileSync('../extension/package.json', 'utf8'),
+);
+
+const withBundleAnalyzer = withBundleAnalyzerInit({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+const svgrOptions = {
+  icon: true,
+  svgo: true,
+  replaceAttrValues: {
+    '#fff': 'currentcolor',
+    '#FFF': 'currentcolor',
+    '#FFFFFF': 'currentcolor',
+  },
+  svgProps: {
+    className: 'icon',
+  },
+};
+
+type NextSvgFileLoaderRule = {
+  test?: { test?: (value: string) => boolean };
+  issuer?: unknown;
+  resourceQuery?: { not?: RegExp[] };
+  exclude?: RegExp;
+};
+
+const securityHeaders = [
+  {
+    key: 'X-Frame-Options',
+    value: 'DENY',
+  },
+];
+
+const noindexHeaders = [
+  {
+    key: 'X-Robots-Tag',
+    value: 'noindex, nofollow',
+  },
+];
+
+const nextConfig: NextConfig = {
+  transpilePackages: ['@dailydotdev/shared'],
+  allowedDevOrigins: [
+    'app.local.fylla.dev',
+    'app.staging.daily.dev',
+    'devcore.tr',
+    'www.devcore.tr',
+    '142.93.104.78',
+    'localhost',
+    '127.0.0.1',
+  ],
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: [
+          {
+            loader: '@svgr/webpack',
+            options: svgrOptions,
+          },
+        ],
+        as: '*.js',
+      },
+    },
+  },
+  experimental: {
+    turbopackFileSystemCacheForDev: false,
+  },
+  ...withBundleAnalyzer({
+    compiler: {
+      reactRemoveProperties: { properties: ['^data-testid$'] },
+    },
+    webpack: (config) => {
+      // Grab the existing rule that handles SVG imports
+      const fileLoaderRule = config.module.rules.find(
+        (rule: NextSvgFileLoaderRule) => rule.test?.test?.('.svg'),
+      );
+
+      if (!fileLoaderRule?.issuer || !fileLoaderRule.resourceQuery?.not) {
+        throw new Error('Expected Next.js SVG file loader rule to exist');
+      }
+
+      config.module.rules.push(
+        // Convert all other *.svg imports to React components
+        {
+          test: /\.svg$/i,
+          issuer: fileLoaderRule.issuer,
+          resourceQuery: {
+            not: [...fileLoaderRule.resourceQuery.not, /url/],
+          }, // exclude if *.svg?url
+          use: [
+            {
+              loader: '@svgr/webpack',
+              options: svgrOptions,
+            },
+          ],
+        },
+      );
+
+      // Modify the file loader rule to ignore *.svg, since we have it handled now.
+      fileLoaderRule.exclude = /\.svg$/i;
+      config.module.rules.push({
+        test: /\.m?js/,
+        resolve: {
+          fullySpecified: false,
+        },
+      });
+
+      // we don't need cross-fetch in our bundle since we are using the native fetch
+      // cross-fetch is here due to graphql-request dependency
+      // it was removedi n graphql-request@7.x but due to a lot of breaking changes
+      // for now we apply https://github.com/graffle-js/graffle/pull/296
+      // as patch graphql-request manually through pnpm
+      // eslint-disable-next-line no-param-reassign
+      config.resolve.alias['cross-fetch'] = false;
+
+      return config;
+    },
+    env: {
+      CURRENT_VERSION: version,
+      // If both CHROME and EDGE IDs are present (e.g. in a shared CI environment),
+      // Chrome silently takes precedence. Since the ID is baked into the build and
+      // getBrowserExtensionInstallId cannot distinguish the user's browser, this is expected.
+      NEXT_PUBLIC_DAILY_EXTENSION_ID:
+        process.env.NEXT_PUBLIC_DAILY_EXTENSION_ID ||
+        process.env.EXTENSION_ID_CHROME ||
+        process.env.EXTENSION_ID_EDGE ||
+        '',
+    },
+    assetPrefix: process.env.NEXT_PUBLIC_CDN_ASSET_PREFIX,
+    rewrites: async () => {
+      const rewrites: Rewrite[] = [
+        {
+          source: '/api/sitemaps/:path*',
+          destination: `${process.env.NEXT_PUBLIC_API_URL}/sitemaps/:path*`,
+        },
+        {
+          source: '/search',
+          destination: '/search/posts',
+        },
+        {
+          source: '/posts/:id',
+          destination: '/posts/:id/share',
+          has: [
+            {
+              type: 'query',
+              key: 'userid',
+            },
+          ],
+        },
+      ];
+
+      // Proxy /r/:path* redirector requests to daily-api
+      rewrites.unshift({
+        source: '/r/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/r/:path*`,
+      });
+
+      // to avoid CORS issues and proxy API requests to backend
+      rewrites.unshift({
+        source: '/api/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
+      });
+
+      // Proxy /api/backoffice/:path* to backoffice daemon (takes precedence over /api/:path*)
+      rewrites.unshift({
+        source: '/api/backoffice/:path*',
+        destination: `${process.env.BACKOFFICE_API_URL || 'http://172.25.0.1:5005'}/api/:path*`,
+      });
+
+      // Proxy /api/v1/a and /api/v1/a/* to backoffice daemon custom ad-feed
+      rewrites.unshift({
+        source: '/api/v1/a',
+        destination: `${process.env.BACKOFFICE_API_URL || 'http://172.25.0.1:5005'}/api/ad-feed`,
+      });
+      rewrites.unshift({
+        source: '/api/v1/a/:path*',
+        destination: `${process.env.BACKOFFICE_API_URL || 'http://172.25.0.1:5005'}/api/ad-feed`,
+      });
+
+      return {
+        beforeFiles: [
+          {
+            source: '/.well-known/security.txt',
+            destination: '/api/files/security',
+          },
+          {
+            source: '/plus',
+            destination: '/plus/gift',
+            has: [
+              {
+                type: 'query',
+                key: 'gift',
+              },
+            ],
+          },
+          // Markdown versions of pages for AI agents (llms.txt spec)
+          // These enable direct URL access (e.g., /sources.md).
+          ...getMarkdownRewrites(),
+        ],
+        // regular rewrites
+        afterFiles: rewrites,
+        fallback: [],
+      };
+    },
+    redirects: async () => {
+      const oldPublicAssets = [
+        'dailydev.svg',
+        'google.svg',
+        'maskable_icon.png',
+        'mstile-150x150.png',
+      ];
+
+      return [
+        // The webapp's old /assets files moved to public/app/assets (served at
+        // /app/assets, which the daily.dev router proxies to the app origin). New webapp
+        // assets go in public/app/assets/; this wildcard redirect keeps old /assets URLs
+        // working for backward compatibility.
+        {
+          source: '/assets/:path*',
+          destination: '/app/assets/:path*',
+          permanent: true,
+        },
+        {
+          source: '/daily',
+          destination: '/',
+          permanent: false,
+        },
+        {
+          source: '/mobile',
+          destination: '/',
+          permanent: true,
+        },
+        {
+          source: '/brand',
+          destination: '/',
+          permanent: true,
+        },
+        {
+          source: '/about',
+          destination: '/',
+          permanent: true,
+        },
+        {
+          source: '/premium',
+          destination: '/plus',
+          permanent: true,
+        },
+        {
+          source: '/monthly-prize',
+          destination: '/',
+          permanent: true,
+        },
+        {
+          source: '/submit-a-guest-post',
+          destination: '/',
+          permanent: true,
+        },
+        {
+          source: '/giveaway',
+          destination: '/',
+          permanent: true,
+        },
+        {
+          source: '/topic/:path*',
+          destination: '/tags/:path*',
+          permanent: true,
+        },
+        {
+          source: '/posts/release-notes-updates-live-jp5x9el1t',
+          destination: '/posts/release-notes-updates-live--jp5x9el1t',
+          permanent: true,
+        },
+        ...oldPublicAssets.map((asset) => ({
+          source: `/${asset}`,
+          destination: `${
+            process.env.NEXT_PUBLIC_CDN_ASSET_PREFIX || ''
+          }/app/assets/${asset}`,
+          permanent: true,
+        })),
+        {
+          source: '/posts/finder',
+          destination: '/search?provider=posts',
+          permanent: false,
+        },
+        {
+          source: '/signup',
+          destination: '/onboarding',
+          permanent: false,
+        },
+        // so we can't access /share route directly
+        {
+          source: '/posts/:id/share',
+          destination: '/posts/:id',
+          permanent: false,
+        },
+        {
+          source: '/posts/:id/read',
+          destination: '/articles/:id',
+          permanent: false,
+        },
+        // the layout v2 mirror is reachable through the proxy rewrite only
+        {
+          source: '/layout-v2/:path*',
+          destination: '/:path*',
+          permanent: false,
+        },
+        // so we can't access /plus/gift route directly
+        {
+          source: '/plus/gift',
+          destination: '/plus',
+          permanent: false,
+        },
+        // well-known redirect for change password
+        {
+          source: '/.well-known/change-password',
+          destination: '/settings/security',
+          permanent: false,
+        },
+        {
+          source: '/devcard',
+          destination: '/settings/customization/devcard',
+          permanent: true,
+        },
+        {
+          source: '/account/notifications',
+          destination: '/settings/customization/streaks',
+          permanent: true,
+          has: [
+            {
+              type: 'query',
+              key: 's',
+              value: 'timezone',
+            },
+          ],
+        },
+        {
+          source: '/account/:path*',
+          destination: '/settings/:path*',
+          permanent: true,
+        },
+        {
+          source: '/sources/briefing',
+          destination: '/briefing',
+          permanent: false,
+        },
+        {
+          source: '/opportunity/:path*',
+          destination: '/jobs/:path*',
+          permanent: true,
+        },
+        {
+          source: '/jobs/welcome',
+          destination: '/jobs',
+          permanent: true,
+        },
+        {
+          source: '/em/t/c',
+          destination: `${process.env.NEXT_PUBLIC_API_URL}/em/t/c`,
+          permanent: false,
+        },
+      ];
+    },
+    headers: async () => {
+      // NEXT_PUBLIC_DAILY_EXTENSION_ID is the build-time fallback in case the
+      // runtime env misses the raw ids.
+      const extensionIds = [
+        process.env.EXTENSION_ID_CHROME ||
+          process.env.NEXT_PUBLIC_DAILY_EXTENSION_ID,
+        process.env.EXTENSION_ID_EDGE,
+        process.env.EXTENSION_ID_OPERA,
+      ].filter(Boolean);
+      const embedFrameAncestors = [
+        "'self'",
+        ...extensionIds.map((id) => `chrome-extension://${id}`),
+      ].join(' ');
+
+      return [
+        {
+          source: '/:path*',
+          headers: [
+            ...securityHeaders,
+            {
+              key: 'X-Recruiting',
+              value:
+                'We are hiring! Check https://daily.dev/careers for more info!',
+            },
+            // AI agent discovery headers (llms.txt spec)
+            { key: 'Link', value: '</llms.txt>; rel="llms-txt"' },
+            { key: 'X-Llms-Txt', value: '/llms.txt' },
+          ],
+        },
+        {
+          source: '/.well-known/apple-app-site-association',
+          headers: [
+            { key: 'Content-Type', value: 'application/json' },
+            { key: 'Cache-Control', value: 'no-cache' },
+          ],
+        },
+        {
+          source: '/articles/:path*',
+          headers: noindexHeaders,
+        },
+        {
+          source: '/posts/:id/read',
+          headers: noindexHeaders,
+        },
+        {
+          // Static page (headers can't come from the page itself); framing is
+          // limited to our own origin and our extensions. This CSP takes
+          // precedence over the global X-Frame-Options in modern browsers.
+          source: '/embed/mf',
+          headers: [
+            {
+              key: 'Content-Security-Policy',
+              value: `frame-ancestors ${embedFrameAncestors}`,
+            },
+          ],
+        },
+      ];
+    },
+    poweredByHeader: false,
+    reactStrictMode: false,
+    productionBrowserSourceMaps: process.env.SOURCE_MAPS === 'true',
+  }),
+};
+
+export default withSerwist(nextConfig);

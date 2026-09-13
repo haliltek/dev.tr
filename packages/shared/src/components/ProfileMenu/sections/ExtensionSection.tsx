@@ -1,0 +1,51 @@
+import React from 'react';
+import type { ReactElement } from 'react';
+
+import { HorizontalSeparator } from '../../utilities';
+import { ProfileSection } from '../ProfileSection';
+import { useDndContext } from '../../../contexts/DndContext';
+import { useSettingsContext } from '../../../contexts/SettingsContext';
+import { PauseIcon, PlayIcon, ShortcutsIcon, StoryIcon } from '../../icons';
+import { useLazyModal } from '../../../hooks/useLazyModal';
+import { LazyModal } from '../../modals/common/types';
+import { checkIsExtension } from '../../../lib/func';
+import { useIsShortcutsHubEnabled } from '../../../features/shortcuts/hooks/useIsShortcutsHubEnabled';
+
+export const ExtensionSection = (): ReactElement | null => {
+  const { openModal } = useLazyModal();
+  const { isActive: isDndActive, setShowDnd } = useDndContext();
+  const { optOutCompanion, toggleOptOutCompanion } = useSettingsContext();
+  const hubEnabled = useIsShortcutsHubEnabled();
+  const shortcutsModal = hubEnabled
+    ? LazyModal.ShortcutsManage
+    : LazyModal.CustomLinks;
+
+  if (!checkIsExtension()) {
+    return null;
+  }
+
+  return (
+    <>
+      <HorizontalSeparator />
+      <ProfileSection
+        items={[
+          {
+            title: 'Shortcuts',
+            icon: ShortcutsIcon,
+            onClick: () => openModal({ type: shortcutsModal }),
+          },
+          {
+            title: `${isDndActive ? 'Resume' : 'Pause'} new tab`,
+            icon: isDndActive ? PlayIcon : PauseIcon,
+            onClick: () => setShowDnd?.(true),
+          },
+          {
+            title: `${optOutCompanion ? 'Enable' : 'Disable'} companion widget`,
+            icon: () => <StoryIcon secondary={!optOutCompanion} />,
+            onClick: () => toggleOptOutCompanion(),
+          },
+        ]}
+      />
+    </>
+  );
+};

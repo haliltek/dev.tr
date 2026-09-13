@@ -1,0 +1,438 @@
+import type { ReactElement, ChangeEvent } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import type { LazyModalCommonProps, ModalProps } from './common/Modal';
+import { Modal } from './common/Modal';
+import { ModalSize } from './common/types';
+import { Button, ButtonVariant, ButtonSize } from '../buttons/Button';
+import Textarea from '../fields/Textarea';
+import { useToastNotification } from '../../hooks/useToastNotification';
+import { FeedbackCategory, submitFeedback } from '../../graphql/feedback';
+import type { FeedbackInput } from '../../graphql/feedback';
+import { uploadContentImage } from '../../graphql/posts';
+import {
+  Typography,
+  TypographyType,
+  TypographyColor,
+} from '../typography/Typography';
+import { CameraIcon } from '../icons/Camera';
+import { EditIcon } from '../icons/Edit';
+import { ImageIcon } from '../icons/Image';
+import { TrashIcon } from '../icons/Trash';
+import type { CropRect } from '../../lib/screenshot';
+import {
+  captureScreenshot,
+  createPreviewUrl,
+  cropImageFile,
+  revokePreviewUrl,
+  isValidImageType,
+  isValidFileSize,
+  getImageFileFromClipboard,
+  MAX_SCREENSHOT_SIZE,
+} from '../../lib/screenshot';
+import { ScreenshotCropper } from '../feedback/ScreenshotCropper';
+import { useSettingsContext } from '../../contexts/SettingsContext';
+import { useEventListener } from '../../hooks/useEventListener';
+
+const FEEDBACK_MAX_LENGTH = 2000;
+type FeedbackModalProps = Omit<ModalProps, 'onRequestClose'> & {
+  onRequestClose?: LazyModalCommonProps['onRequestClose'];
+};
+
+const categoryOptions: { value: FeedbackCategory; label: string }[] = [
+  { value: FeedbackCategory.BugReport, label: 'Bug Report' },
+  { value: FeedbackCategory.FeatureRequest, label: 'Feature Request' },
+  { value: FeedbackCategory.UxIssue, label: 'UX Issue' },
+  { value: FeedbackCategory.PerformanceComplaint, label: 'Performance' },
+  { value: FeedbackCategory.ContentQuality, label: 'Content Quality' },
+];
+
+const FeedbackModal = ({
+  onRequestClose,
+  ...props
+}: FeedbackModalProps): ReactElement => {
+  const { displayToast } = useToastNotification();
+  const { themeMode } = useSettingsContext();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const hasSubmitted = useRef(false);
+
+  const [category, setCategory] = useState<FeedbackCategory>(
+    FeedbackCategory.BugReport,
+  );
+  const [description, setDescription] = useState('');
+  const [screenshot, setScreenshot] = useState<File | null>(null);
+  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(
+    null,
+  );
+  const [isCapturing, setIsCapturing] = useState(false);
+  const [isCropping, setIsCropping] = useState(false);
+
+  // Clean up preview URL when component unmounts or screenshot changes
+  useEffect(() => {
+    return () => {
+      if (screenshotPreview) {
+        revokePreviewUrl(screenshotPreview);
+      }
+    };
+  }, [screenshotPreview]);
+
+  // Validate the incoming file BEFORE revoking the current preview URL, so
+  // a rejected replacement (or an oversized crop result) leaves the existing
+  // attachment and its preview intact.
+  const handleScreenshotChange = useCallback(
+    (file: File | null) => {
+      if (file && !isValidImageType(file)) {
+        displayToast('Invalid image type. Use PNG, JPG, WebP, or GIF.');
+        return;
+      }
+
+      if (file && !isValidFileSize(file)) {
+        displayToast(
+          `File too large. Maximum size is ${
+            MAX_SCREENSHOT_SIZE / 1024 / 1024
+          }MB.`,
+        );
+        return;
+      }
+
+      if (screenshotPreview) {
+        revokePreviewUrl(screenshotPreview);
+      }
+
+      setIsCropping(false);
+      setScreenshot(file);
+      setScreenshotPreview(file ? createPreviewUrl(file) : null);
+    },
+    [screenshotPreview, displayToast],
+  );
+
+  const handleCaptureScreenshot = useCallback(async () => {
+    setIsCapturing(true);
+
+    // Hide modal during capture by setting opacity to 0
+    const modalOverlay = document.querySelector(
+      '.ReactModal__Overlay',
+    ) as HTMLElement | null;
+    const originalOpacity = modalOverlay?.style.opacity;
+
+    try {
+      if (modalOverlay) {
+        modalOverlay.style.opacity = '0';
+        // Wait for repaint
+        await new Promise((resolve) => {
+          requestAnimationFrame(resolve);
+        });
+      }
+
+      const file = await captureScreenshot();
+      if (file) {
+        handleScreenshotChange(file);
+      }
+      // If file is null, user likely cancelled - no error toast needed
+    } catch {
+      displayToast('Failed to capture screenshot. Please try again.');
+    } finally {
+      // Restore modal visibility
+      if (modalOverlay) {
+        modalOverlay.style.opacity = originalOpacity || '';
+      }
+      setIsCapturing(false);
+    }
+  }, [handleScreenshotChange, displayToast]);
+
+  const handleFileUpload = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        handleScreenshotChange(file);
+      }
+      // Reset input so same file can be selected again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    },
+    [handleScreenshotChange],
+  );
+
+  const handleRemoveScreenshot = useCallback(() => {
+    handleScreenshotChange(null);
+  }, [handleScreenshotChange]);
+
+  const handleApplyCrop = useCallback(
+    async (rect: CropRect) => {
+      if (!screenshot) {
+        return;
+      }
+
+      try {
+        const cropped = await cropImageFile(screenshot, rect);
+        if (cropped) {
+          handleScreenshotChange(cropped);
+        } else {
+          displayToast('Failed to crop screenshot. Please try again.');
+        }
+      } catch {
+        displayToast('Failed to crop screenshot. Please try again.');
+      } finally {
+        setIsCropping(false);
+      }
+    },
+    [screenshot, handleScreenshotChange, displayToast],
+  );
+
+  const [isUploading, setIsUploading] = useState(false);
+
+  const { mutate: submitMutation, isPending } = useMutation({
+    mutationFn: (input: FeedbackInput) => submitFeedback(input),
+    onSuccess: () => {
+      displayToast('Thank you for your feedback!');
+      onRequestClose?.(undefined);
+    },
+    onError: () => {
+      hasSubmitted.current = false;
+      displayToast('Failed to submit feedback. Please try again.');
+    },
+  });
+
+  const handleSubmit = useCallback(async () => {
+    if (hasSubmitted.current) {
+      return;
+    }
+
+    if (!description.trim()) {
+      displayToast('Please enter your feedback');
+      return;
+    }
+
+    hasSubmitted.current = true;
+
+    let screenshotUrl: string | undefined;
+
+    if (screenshot) {
+      setIsUploading(true);
+      try {
+        screenshotUrl = await uploadContentImage(screenshot);
+      } catch {
+        hasSubmitted.current = false;
+        displayToast('Failed to upload screenshot. Please try again.');
+        setIsUploading(false);
+        return;
+      }
+      setIsUploading(false);
+    }
+
+    submitMutation({
+      category,
+      description: description.trim(),
+      pageUrl: typeof window !== 'undefined' ? window.location.href : undefined,
+      userAgent:
+        typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
+      clientInfo:
+        typeof window !== 'undefined'
+          ? {
+              viewport: `${window.innerWidth}x${window.innerHeight}`,
+              screen: `${window.screen?.width}x${window.screen?.height}`,
+              timezone: Intl?.DateTimeFormat?.()?.resolvedOptions?.()?.timeZone,
+              language: navigator?.language,
+              platform: navigator?.platform,
+              theme: themeMode,
+            }
+          : undefined,
+      screenshotUrl,
+    });
+  }, [
+    category,
+    description,
+    screenshot,
+    submitMutation,
+    displayToast,
+    themeMode,
+  ]);
+
+  const isOperationInProgress = isPending || isCapturing || isUploading;
+  const isSubmitDisabled =
+    !description.trim() || isOperationInProgress || isCropping;
+
+  // The modal owns the whole overlay while it is mounted, so listening on the
+  // document catches the paste wherever focus sits, textarea included. Only
+  // image pastes are swallowed; text still lands in the field it was aimed at.
+  useEventListener(globalThis?.document, 'paste', (event: ClipboardEvent) => {
+    if (isOperationInProgress || isCropping) {
+      return;
+    }
+
+    const file = getImageFileFromClipboard(event.clipboardData);
+    if (!file) {
+      return;
+    }
+
+    event.preventDefault();
+    handleScreenshotChange(file);
+  });
+
+  return (
+    <Modal
+      {...props}
+      onRequestClose={onRequestClose}
+      isDrawerOnMobile
+      size={ModalSize.Small}
+      shouldCloseOnOverlayClick={!isOperationInProgress}
+    >
+      <Modal.Header title="Send Feedback" />
+      <Modal.Body className="flex flex-col gap-4">
+        <Typography
+          type={TypographyType.Body}
+          color={TypographyColor.Secondary}
+        >
+          Help us improve by sharing your thoughts
+        </Typography>
+
+        {/* Category selector */}
+        <div className="flex flex-col gap-2">
+          <Typography
+            type={TypographyType.Footnote}
+            color={TypographyColor.Tertiary}
+            bold
+          >
+            Category
+          </Typography>
+          <div className="flex flex-wrap gap-2">
+            {categoryOptions.map((option) => (
+              <Button
+                key={option.value}
+                variant={
+                  category === option.value
+                    ? ButtonVariant.Primary
+                    : ButtonVariant.Float
+                }
+                size={ButtonSize.Small}
+                onClick={() => setCategory(option.value)}
+                disabled={isOperationInProgress}
+              >
+                {option.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Description textarea */}
+        <Textarea
+          inputId="feedback-description"
+          label="Your feedback"
+          placeholder="Tell us what's on your mind..."
+          value={description}
+          valueChanged={setDescription}
+          maxLength={FEEDBACK_MAX_LENGTH}
+          rows={6}
+          fieldType="tertiary"
+          disabled={isOperationInProgress}
+          className={{
+            baseField: 'min-h-[150px]',
+          }}
+        />
+
+        {/* Attachments section */}
+        <div className="flex flex-col gap-3">
+          <Typography
+            type={TypographyType.Footnote}
+            color={TypographyColor.Tertiary}
+            bold
+          >
+            Attachments (optional)
+          </Typography>
+
+          {/* Screenshot buttons */}
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant={ButtonVariant.Float}
+              size={ButtonSize.Small}
+              onClick={handleCaptureScreenshot}
+              disabled={isOperationInProgress || isCropping}
+              icon={<CameraIcon />}
+            >
+              {isCapturing ? 'Capturing...' : 'Capture Screenshot'}
+            </Button>
+            <Button
+              variant={ButtonVariant.Float}
+              size={ButtonSize.Small}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isOperationInProgress || isCropping}
+              icon={<ImageIcon />}
+            >
+              Upload Image
+            </Button>
+            {screenshotPreview && !isCropping && (
+              <Button
+                variant={ButtonVariant.Float}
+                size={ButtonSize.Small}
+                onClick={() => setIsCropping(true)}
+                disabled={isOperationInProgress}
+                icon={<EditIcon />}
+              >
+                Crop
+              </Button>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+              onChange={handleFileUpload}
+              className="hidden"
+              aria-label="Upload screenshot"
+            />
+          </div>
+
+          {!isCropping && (
+            <Typography
+              type={TypographyType.Footnote}
+              color={TypographyColor.Tertiary}
+            >
+              You can also paste an image straight from your clipboard.
+            </Typography>
+          )}
+
+          {/* Screenshot preview */}
+          {screenshotPreview && isCropping && (
+            <ScreenshotCropper
+              src={screenshotPreview}
+              onApply={handleApplyCrop}
+              onCancel={() => setIsCropping(false)}
+            />
+          )}
+          {screenshotPreview && !isCropping && (
+            <div className="relative inline-block w-fit">
+              <img
+                src={screenshotPreview}
+                alt="Screenshot preview"
+                className="max-h-32 rounded-8 border border-border-subtlest-tertiary object-contain"
+              />
+              <Button
+                variant={ButtonVariant.Float}
+                size={ButtonSize.XSmall}
+                onClick={handleRemoveScreenshot}
+                disabled={isPending}
+                icon={<TrashIcon />}
+                className="absolute -right-2 -top-2"
+                aria-label="Remove screenshot"
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Submit button */}
+        <Button
+          variant={ButtonVariant.Primary}
+          size={ButtonSize.Large}
+          onClick={handleSubmit}
+          loading={isPending || isUploading}
+          disabled={isSubmitDisabled}
+          className="w-full"
+        >
+          Submit Feedback
+        </Button>
+      </Modal.Body>
+    </Modal>
+  );
+};
+
+export default FeedbackModal;

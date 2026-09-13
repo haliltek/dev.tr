@@ -1,0 +1,497 @@
+const DAILY_MEDIA_HOST = 'media.daily.dev';
+const PLACEHOLDER_IMAGE_PATTERN = /placeholder/i;
+
+export const cloudinaryPostImageCoverPlaceholder =
+  'https://media.daily.dev/image/upload/s--P4t4XyoV--/f_auto/v1722860399/public/Placeholder%2001';
+
+export const isPlaceholderImage = (url?: string | null): boolean => {
+  if (!url) {
+    return false;
+  }
+
+  try {
+    const parsedUrl = new URL(url);
+    if (!parsedUrl.hostname.includes(DAILY_MEDIA_HOST)) {
+      return false;
+    }
+
+    return PLACEHOLDER_IMAGE_PATTERN.test(parsedUrl.pathname);
+  } catch {
+    return false;
+  }
+};
+
+export const cloudinaryFeedFiltersYourFeedDark =
+  'https://media.daily.dev/image/upload/s--_0r3L1f9--/v1689662930/Your_feed_dark_ord3s0.png';
+
+export const cloudinaryFeedFiltersYourFeedLight =
+  'https://media.daily.dev/image/upload/s--n6DmR1cJ--/v1689662930/Your_feed_light_iyrsva.png';
+
+export const cloudinaryFeedFiltersScrollDark =
+  'https://media.daily.dev/image/upload/v1671199935/public/scroll_feed_filters.svg';
+
+export const cloudinaryFeedFiltersScrollLight =
+  'https://media.daily.dev/image/upload/v1687252879/Categories-WV_dhrdcy.svg';
+
+export const cloudinaryNotificationsBig =
+  'https://media.daily.dev/image/upload/public/notification_big.svg';
+
+export const cloudinaryNotificationsBrowser =
+  'https://media.daily.dev/image/upload/v1670512489/public/notification_animated.gif';
+
+export const cloudinaryNotificationsBrowserEnabled =
+  'https://media.daily.dev/image/upload/v1672124926/public/notifications_enabled.gif';
+
+export const cloudinarySquadsDirectoryCardBannerDefault =
+  'https://media.daily.dev/image/upload/s--puRUea_K--/f_auto/v1690887143/cover-generic_blur_xny4yt';
+
+export const cloudinarySquadsImageFallback =
+  'https://media.daily.dev/image/upload/s--LrHsyt2T--/f_auto/v1692632054/squad_placeholder_sfwkmj';
+
+export const cloudinaryOrganizationImageFallback =
+  'https://media.daily.dev/image/upload/s--yc7EcfBs--/f_auto,q_auto/v1/public/organization_fallback';
+
+export const cloudinarySquadsCreateSquadBiggerThanMobile =
+  'https://media.daily.dev/image/upload/s--POqnH7nQ--/f_auto/v1722253758/Create_new_Squad_xe4jvz';
+
+export const cloudinarySquadsCreateSquadMobile =
+  'https://media.daily.dev/image/upload/s--m5ymoplf--/f_auto/v1722253758/Create_new_Squad_mobile_ciehql';
+
+export const cloudinarySquadsTourBanner0 =
+  'https://media.daily.dev/image/upload/f_auto/public/squad_tour0';
+
+export const cloudinarySquadsTourBanner1V2 =
+  'https://media.daily.dev/image/upload/f_auto/public/squad_tour1_v2';
+
+export const cloudinarySquadsTourBanner2 =
+  'https://media.daily.dev/image/upload/f_auto/public/squad_tour2';
+
+export const cloudinarySquadsTourBanner3 =
+  'https://media.daily.dev/image/upload/f_auto/public/squad_tour3';
+
+export const cloudinarySquadsTourBanner4V2 =
+  'https://media.daily.dev/image/upload/f_auto/public/squad_tour4_v2';
+
+export const cloudinarySquadsPromotionSettings =
+  'https://media.daily.dev/image/upload/s--t2gh6NPn--/f_auto/v1686119165/Customize_squad_settings_nepkhd';
+
+export const cloudinarySquadsPromotionRemove =
+  'https://media.daily.dev/image/upload/s--Eux3awhS--/f_auto/v1686120942/Remove_squad_members_jukf7z';
+
+export const cloudinarySquadsPromotionDelete =
+  'https://media.daily.dev/image/upload/s--wXug6Yop--/f_auto/v1686119164/Remove_posts_and_comments_pu3zjj';
+
+export const cloudinarySquadsPromotionBanner =
+  'https://media.daily.dev/image/upload/s--6v3E8go1--/f_auto/v1686119164/promoted-bg_k9jzgt';
+
+export const cloudinarySquadsPromotionInvite =
+  'https://media.daily.dev/image/upload/s--d3OMbTzl--/f_auto/v1686119165/Grow_your_squad_wtlbof';
+
+export const cloudinarySquadsPromotionPromote =
+  'https://media.daily.dev/image/upload/s--iMFoS7Pd--/f_auto/v1686119165/Manage_roles_and_permissions_om64cu';
+
+export const cloudinaryReferralCampaignGenericSad =
+  'https://media.daily.dev/image/upload/s--rMfJxJbl--/f_auto/v1697024846/ido_sad_xbe6p5';
+
+export const cloudinaryReferralCampaignGenericHappy =
+  'https://media.daily.dev/image/upload/s--gnompkBm--/f_auto/v1697024846/ido_happy_zfosbr';
+
+export const cloudinaryReferralCampaignSearchBg =
+  'https://media.daily.dev/image/upload/s--lYQL8anp--/f_auto/v1697393720/referral_bg_i261vi';
+
+export const cloudinaryReferralCampaignSearchBgMobile =
+  'https://media.daily.dev/image/upload/s--pvdAKlaQ--/f_auto/v1697393719/referral_bg_mobile_on0esi';
+
+export const cloudinaryReferralCampaignSearchBgPopupMobile =
+  'https://media.daily.dev/image/upload/s--19oBvNgw--/f_auto/v1697393719/referral_bg_popup_mobile_on7ss5';
+
+export const cloudinaryReferralCampaignGenericReferralBackgroundDark =
+  'https://media.daily.dev/image/upload/s--GBy6n7jn--/f_auto/v1685961531/public/background_Image';
+
+export const cloudinaryReferralCampaignGenericReferralAppScreenshot =
+  'https://media.daily.dev/image/upload/s--m_DzIlz0--/f_auto/v1698844735/platform_bjdgxm';
+
+export const cloudinaryReferralCampaignGenericReferralPlayButton =
+  'https://media.daily.dev/image/upload/v1698844736/play_button_h38ezx.svg';
+
+export const cloudinaryReferralCampaignGenericReferralPurpleEdgeGlowTablet =
+  'https://media.daily.dev/image/upload/v1698922944/glow_mobile_tablet_lsou4j.svg';
+
+export const cloudinaryOnboardingGlow =
+  'https://media.daily.dev/image/upload/v1694596741/Glow_o9ehvn.svg';
+
+export const cloudinaryReadingReminderCat =
+  'https://media.daily.dev/image/upload/s--r_3VGfdy--/f_auto,q_auto/v1776087908/public/reading-reminder-cat';
+
+export const cloudinaryOnboardingFullBackgroundMobile =
+  'https://media.daily.dev/image/upload/s--EwsBTBt6--/f_auto/v1716969841/dailydev_where_developers_suffer_together_mobile_shkn1w';
+
+export const cloudinaryOnboardingFullBackgroundDesktop =
+  'https://media.daily.dev/image/upload/s--r2ffZPB4--/f_auto/v1716969841/dailydev_where_developers_suffer_together_sfvfog';
+
+export const cloudinaryOnboardingLoginBackground =
+  'https://media.daily.dev/image/upload/s--r4MiKjLD--/f_auto/v1743601527/public/login%20background';
+
+export const cloudinaryOnboardingHeroDesk = {
+  default:
+    'https://media.daily.dev/image/upload/s--h3RZdBFS--/f_auto,q_auto/v1780929680/webapp/onboarding-hero-desk',
+  '1280':
+    'https://media.daily.dev/image/upload/s--RlKNSbe2--/f_auto,q_auto/v1780929680/webapp/onboarding-hero-desk-1280',
+  '1920':
+    'https://media.daily.dev/image/upload/s--ts3hGn3Z--/f_auto,q_auto/v1780929680/webapp/onboarding-hero-desk-1920',
+  '2560':
+    'https://media.daily.dev/image/upload/s--opbsGDUn--/f_auto,q_auto/v1780929680/webapp/onboarding-hero-desk-2560',
+};
+
+// The hero cover for the signup wall — the dev and their dog at their tent,
+// looking out over a glowing valley. Square (1254x1254) with the pair low and
+// left in the frame, so wide crops have to bias downwards to keep them.
+export const signupWallCover =
+  'https://media.daily.dev/image/upload/s--a8E1hVet--/f_auto,q_auto/v1785059413/public/daily.dev%20-%20signup%20wall';
+
+// No width variants: the signature covers the transformation, so `w_768` 404s
+// rather than resizing. Sized derivatives must be exported and signed upstream
+// before a srcSet can exist.
+export const signupWallHorizon =
+  'https://media.daily.dev/image/upload/s--NCILTqRq--/f_auto,q_auto/v1785661216/public/daily.dev%20-%20main%20image';
+
+export const cloudinaryStreakSplash =
+  'https://media.daily.dev/image/upload/v1705386465/Splash_v1lxjk.svg';
+
+export const cloudinaryStreakFire =
+  'https://media.daily.dev/image/upload/v1705386465/Hot_nrqvv5.svg';
+
+export const cloudinaryStreakMigrate =
+  'https://media.daily.dev/image/upload/s--ntYOqtL9--/f_auto/v1713196616/Goodbye_weekly_goals_Welcome_reading_streaks_yslqlp';
+
+export const cloudinaryStreakLost =
+  'https://media.daily.dev/image/upload/v1724664713/streak-broken_x1nno4.svg';
+
+export const cloudinaryDevcardDefaultCoverImage =
+  'https://media.daily.dev/image/upload/s--VMbOMIjj--/f_auto/v1710057765/public/DevCard-cover';
+
+export const cloudinaryReputationPrivilegesUnlocked =
+  'https://media.daily.dev/image/upload/s--6sO7fJKh--/v1709136797/image_epr7dz.svg';
+
+export const cloudinaryShortcutsIconsGmail =
+  'https://media.daily.dev/image/upload/s--QYLzNTIV--/f_auto/v1717506847/public/Gmail%20Shortcut';
+
+export const cloudinaryShortcutsIconsGithubLight =
+  'https://media.daily.dev/image/upload/s--M5XOonZ3--/f_auto/v1717513011/public/GitHub%20Shortcut%20-%20Light%20mode';
+
+export const cloudinaryShortcutsIconsGithubDark =
+  'https://media.daily.dev/image/upload/s--qyAG2NPK--/f_auto/v1717513011/public/GitHub%20Shortcut%20-%20Dark%20mode';
+
+export const cloudinaryShortcutsIconsReddit =
+  'https://media.daily.dev/image/upload/s--9UfrZdCc--/f_auto/v1717506847/public/Reddit%20Shortcut';
+
+export const cloudinaryShortcutsIconsOpenai =
+  'https://media.daily.dev/image/upload/s--D__WRZ3a--/f_auto/v1717506847/public/ChatGPT%20Shortcut';
+
+export const cloudinaryShortcutsIconsStackoverflow =
+  'https://media.daily.dev/image/upload/s--B_87VDub--/f_auto/v1717506847/public/Stackoverflow%20Shortcut';
+
+export const cloudinarySourceRoadmap =
+  'https://media.daily.dev/image/upload/s--91LSaHRW--/f_auto,q_auto/v1717766368/roadmap_iambav';
+
+export const cloudinaryWelcomePageHeaderMainImage =
+  'https://media.daily.dev/image/upload/s--jn7-qwCj--/f_auto,q_auto/v1721136180/public/daily-to-dev-suffer-together';
+
+export const cloudinaryIntegrationsSlackHeaderLight =
+  'https://media.daily.dev/image/upload/s--5PV2NbVq--/f_auto,q_auto/v1721634746/public/Connection%20image%20-%20Light';
+
+export const cloudinaryIntegrationsSlackHeaderDark =
+  'https://media.daily.dev/image/upload/s--zzudPNtR--/f_auto,q_auto/v1721634746/public/Connection%20image%20-%20Dark';
+
+export const cloudinaryTopReaderBadgeBackground =
+  'https://media.daily.dev/image/upload/v1730888952/webapp/topReaderBadgeBackground.svg';
+export const cloudinaryPlusBackground =
+  'https://media.daily.dev/image/upload/s--yGWFYjgW--/f_auto/v1731589143/Upgrade_to_plus_4_1_rketmz';
+
+export const cloudinaryAuthBannerBackground =
+  'https://media.daily.dev/image/upload/s--lf8LUJjq--/f_auto/v1732012913/login-popover-dailydev_mxb7lw';
+export const cloudinaryAuthBannerBackground1920w =
+  'https://media.daily.dev/image/upload/s--lf8LUJjq--/c_auto,g_center,w_1920/f_auto//v1732012913/login-popover-dailydev_mxb7lw';
+
+export const cloudinaryAuthBannerBackground1440w =
+  'https://media.daily.dev/image/upload/s--lf8LUJjq--/c_auto,g_center,w_1440/f_auto//v1732012913/login-popover-dailydev_mxb7lw';
+
+export const cloudinaryPWA =
+  'https://media.daily.dev/image/upload/s--_kFKAft3--/f_auto/v1735045791/web_-_safari_j52hcx';
+
+export const cloudinaryMobilePWAChrome =
+  'https://media.daily.dev/image/upload/s--6ajr-Fje--/f_auto/v1735045791/web_-_chrome_we4vak';
+
+export const cloudinaryPWAVideo =
+  'https://media.daily.dev/video/upload/s--gN1-dqeq--/v1735029367/web_-_safari_e3wes4.mp4';
+
+export const cloudinaryPWAVideoChrome =
+  'https://media.daily.dev/video/upload/s--RD5n9hm9--/v1735044247/web_-_chrome_xavter.mp4';
+
+const APP_ICON_BASE_URL =
+  'https://media.daily.dev/image/upload/f_auto/v1770141925/webapp';
+
+export const cloudinaryAppIcons = [
+  { name: 'main', url: `${APP_ICON_BASE_URL}/main` },
+  { name: 'v2', url: `${APP_ICON_BASE_URL}/v2` },
+  { name: 'v3', url: `${APP_ICON_BASE_URL}/v3` },
+  { name: 'v4', url: `${APP_ICON_BASE_URL}/v4` },
+  { name: 'v5', url: `${APP_ICON_BASE_URL}/v5` },
+  { name: 'v6', url: `${APP_ICON_BASE_URL}/v6` },
+  { name: 'v7', url: `${APP_ICON_BASE_URL}/v7` },
+  { name: 'v8', url: `${APP_ICON_BASE_URL}/v8` },
+  { name: 'v9', url: `${APP_ICON_BASE_URL}/v9` },
+  { name: 'v10', url: `${APP_ICON_BASE_URL}/v10` },
+  { name: 'v11', url: `${APP_ICON_BASE_URL}/v11` },
+  { name: 'v12', url: `${APP_ICON_BASE_URL}/v12` },
+] as const;
+
+export const cloudinaryAppIconMain = cloudinaryAppIcons[0].url;
+export const cloudinaryAppIconV2 = cloudinaryAppIcons[1].url;
+export const cloudinaryAppIconV3 = cloudinaryAppIcons[2].url;
+export const cloudinaryAppIconV4 = cloudinaryAppIcons[3].url;
+export const cloudinaryAppIconV5 = cloudinaryAppIcons[4].url;
+export const cloudinaryAppIconV6 = cloudinaryAppIcons[5].url;
+export const cloudinaryAppIconV7 = cloudinaryAppIcons[6].url;
+export const cloudinaryAppIconV8 = cloudinaryAppIcons[7].url;
+export const cloudinaryAppIconV9 = cloudinaryAppIcons[8].url;
+export const cloudinaryAppIconV10 = cloudinaryAppIcons[9].url;
+export const cloudinaryAppIconV11 = cloudinaryAppIcons[10].url;
+export const cloudinaryAppIconV12 = cloudinaryAppIcons[11].url;
+
+// 1920×1080 VP9/WebM. Only the original derivative is available on the CDN
+// (strict transformations), so there is no mp4 fallback or generated poster.
+// The extension step only renders on desktop Chrome/Brave/Edge, which all
+// play VP9.
+export const cloudinaryOnboardingExtensionVideo =
+  'https://media.daily.dev/video/upload/v1783942037/1_3_nljcyu.webm';
+
+export const cloudinaryOnboardingActivationDemo =
+  'https://media.daily.dev/video/upload/v1780303637/daily.dev_-_Keep_it_acphx8.mp4';
+
+// 720x720 H.264. Square, so the coach card can reserve its box up front and not
+// reflow once the file arrives, which would strand the card's pointer.
+export const cloudinarySidebarTourDockDrag =
+  'https://media.daily.dev/video/upload/v1788775899/720_lszftn.mp4';
+
+export const bookmarkFolderSoonImage =
+  'https://media.daily.dev/image/upload/s--_jM3zDSE--/f_auto/v1733239852/daily_dev_bookmarks_folders_fsughm';
+
+export const clickbaitShieldModalImage =
+  'https://media.daily.dev/image/upload/s--GWqpMG8r--/f_auto/v1732802237/Streak_together_with_a_friend_1_1_pwoill';
+
+export const cloudinaryGiftedPlusModalImage = `https://media.daily.dev/image/upload/s--JNm5gqXz--/f_auto/v1733838699/daily-dev-plus-gift_qosjrm`;
+export const smallPostImage = (url: string): string => {
+  if (!url) {
+    return cloudinaryPostImageCoverPlaceholder;
+  }
+
+  return url.replace('/f_auto,q_auto/', '/c_fill,f_auto,q_auto,w_192/');
+};
+
+export const plusFeaturesImage =
+  'https://media.daily.dev/image/upload/s--c4as3Quw--/f_auto/v1738509922/public/daily.dev%20Plus%20-%20Default';
+
+export const plusRedBackgroundImage =
+  'https://media.daily.dev/image/upload/s--agAC5L3c--/f_auto/v1738509922/public/Plus%20bg%20Image';
+
+export const purchaseCoinsCheckoutVideo =
+  'https://media.daily.dev/video/upload/s--1p9Qw5ey--/v1741849174/videos/daily.dev_-_get_cores.mp4';
+
+export const purchaseCoinsCheckoutVideoPoster =
+  'https://media.daily.dev/image/upload/s--A_4rXIh7--/f_auto/v1741779750/public/Giving%20cores';
+
+export const featuredAwardImage =
+  'https://media.daily.dev/image/upload/s--10Rf2kyK--/f_auto/v1743595864/public/Default';
+
+export const disabledCoreImage =
+  'https://media.daily.dev/image/upload/s--kTMWrmJV--/f_auto/v1743599810/public/Core-disabled';
+
+export const coreImage =
+  'https://media.daily.dev/image/upload/s--YAvJnCmq--/f_auto/v1743599810/public/Core-front';
+
+export const buyCoreStarField =
+  'https://media.daily.dev/image/upload/s--W4W5Gmjh--/f_auto,q_auto/v1744197985/webapp/Stars';
+
+const coreValueMap = [
+  {
+    maxValue: 200,
+    image:
+      'https://media.daily.dev/image/upload/s--9IXwSmB---/f_auto/v1743599811/public/Core1',
+  },
+  {
+    maxValue: 1_000,
+    image:
+      'https://media.daily.dev/image/upload/s--ybFIBUnx--/f_auto/v1743599810/public/Core2',
+  },
+  {
+    maxValue: 10_000,
+    image:
+      'https://media.daily.dev/image/upload/s--kai_mE1u--/f_auto/v1743599810/public/Core3',
+  },
+  {
+    maxValue: 20_000,
+    image:
+      'https://media.daily.dev/image/upload/s--bSCtv96n--/f_auto/v1743599810/public/Core4',
+  },
+  {
+    maxValue: Infinity,
+    image:
+      'https://media.daily.dev/image/upload/s--54JYAftK--/f_auto/v1743599810/public/Core5',
+  },
+];
+
+export const getCoreCurrencyImage = (value: number): string => {
+  return (
+    coreValueMap.find((core) => core.maxValue > value)?.image ??
+    coreValueMap[coreValueMap.length - 1].image
+  );
+};
+
+export const creditCardsImage =
+  'https://media.daily.dev/image/upload/s--GG1rD-wP--/f_auto/v1743491782/public/credit';
+
+export const opportunityLiveIllustration =
+  'https://media.daily.dev/image/upload/s--W8sKt3tn--/f_auto,q_auto/v1759426186/webapp/opportunity-live-illustration';
+
+/**
+ * Plus showcase video/images
+ */
+export const plusShowcaseTeamImage =
+  'https://media.daily.dev/image/upload/s--FM6ekBTf--/f_auto/v1741698925/public/team';
+export const plusShowcaseTeamVideo =
+  'https://media.daily.dev/video/upload/v1741698572/videos/team.mp4';
+export const plusShowcaseCustomFeedsImage =
+  'https://media.daily.dev/image/upload/s--OU22D-Xf--/f_auto/v1741690961/public/customfeed';
+export const plusShowcaseCustomFeedsVideo =
+  'https://media.daily.dev/video/upload/v1741698572/videos/customfeeds.webm';
+export const plusShowcaseShieldImage =
+  'https://media.daily.dev/image/upload/s--UlKSWTvF--/f_auto/v1741698925/public/shield';
+export const plusShowcaseShieldVideo =
+  'https://media.daily.dev/video/upload/v1741698572/videos/shield.webm';
+export const plusShowcaseBookmarkImage =
+  'https://media.daily.dev/image/upload/s--PZk2a1PY--/f_auto/v1741690961/public/bookmark';
+export const plusShowcaseBookmarkVideo =
+  'https://media.daily.dev/video/upload/v1741698572/videos/bookmark.webm';
+export const plusShowcaseKeywordImage =
+  'https://media.daily.dev/image/upload/s--r2BZKWPk--/f_auto/v1741690961/public/Keyword filters';
+export const plusShowcaseAdFreeImage =
+  'https://media.daily.dev/image/upload/s--jlfaLYq_--/f_auto/v1741690961/public/Ad-free experience';
+export const plusShowcaseSquadImage =
+  'https://media.daily.dev/image/upload/s--LKIr_f6r--/f_auto/v1741698925/public/Members-only Squad';
+
+export const boostSuccessCover =
+  'https://media.daily.dev/image/upload/s--1ayRTI4g--/f_auto/v1758532937/public/Boost%20-%20Live%20Cover%20image%20(1)';
+
+export const plusShowcaseTranslateImage =
+  'https://media.daily.dev/image/upload/s--eHjHLYpQ--/f_auto/v1748954125/public/auto-translate';
+
+export const plusShowcasePresidentialBriefImage =
+  'https://media.daily.dev/image/upload/s--7I74Yy6r--/f_auto/v1752495221/public/Personalized%20digest';
+
+export const uploadCvBgLaptop =
+  'https://media.daily.dev/image/upload/s--5Ttdly-p--/f_auto/v1752576001/public/job_main_web';
+
+export const uploadCvBgTablet =
+  'https://media.daily.dev/image/upload/s--1QIY44IL--/f_auto/v1752668628/public/job_main_ipad';
+
+export const uploadCvBgMobile =
+  'https://media.daily.dev/image/upload/s--Y_qhm3Tw--/f_auto/v1752576066/public/job_main_mobile';
+
+export const uploadCvModalSuccessMobile =
+  'https://media.daily.dev/image/upload/s--boUrIf1e--/f_auto/v1752576157/public/cv_uploaded_mobile';
+export const uploadCvModalSuccess =
+  'https://media.daily.dev/image/upload/s--nLoTY15O--/f_auto/v1752576263/public/CV%20uploaded%20successfully%20popover';
+
+export const exportLinkedInMobile =
+  'https://media.daily.dev/image/upload/s--PqONkeKS--/f_auto/v1752576240/public/linkedin_cv_mobile';
+export const exportLinkedIn =
+  'https://media.daily.dev/image/upload/s--UpRCf8h5--/f_auto/v1753166816/public/Export%20from%20LinkedIn%20popover%20web';
+
+export const boostNewPostBanner =
+  'https://media.daily.dev/image/upload/s--_UEbmtDg--/f_auto/v1753703398/public/booststrip';
+
+export const boostNewPostBannerLight =
+  'https://media.daily.dev/image/upload/s--7CGTLpY_--/f_auto/v1754295928/public/boost-wv';
+
+export const jobsWelcomeDarkMode =
+  'https://media.daily.dev/image/upload/s--iK8V4i-t--/f_auto/v1754903868/public/darkbg-Super%20Career%20Connector';
+export const jobsWelcomeLightMode =
+  'https://media.daily.dev/image/upload/s--OwPStCCF--/f_auto/v1754903896/public/lightbg-Super%20Career%20Connector-1';
+
+export const jobsHowItWorksOne =
+  'https://media.daily.dev/image/upload/s--oBG_2HMq--/f_auto/v1755256487/public/recruiting%20system-landing%20page-1';
+export const jobsHowItWorksTwo =
+  'https://media.daily.dev/image/upload/s--1iphOt2P--/f_auto/v1755256487/public/recruiting%20system-landing%20page-2';
+export const jobsHowItWorksThree =
+  'https://media.daily.dev/image/upload/s--470GU2QS--/f_auto/v1755256487/public/recruiting%20system-landing%20page-3';
+export const recruiterSpamCampaign =
+  'https://media.daily.dev/image/upload/s--mFR-ciac--/f_auto/v1759242948/public/Recruiter%20-%202';
+export const recruiterSpamCampaignSEO =
+  'https://media.daily.dev/image/upload/s--PBa-49xs--/f_auto/v1759245831/public/Recruiter%20-%206';
+
+export const locationProfileImage =
+  'https://media.daily.dev/image/upload/s--RYwMw9py--/f_auto/v1726486879/company_bdage_xwzrnh';
+
+export const adFaviconPlaceholder =
+  'https://media.daily.dev/image/upload/s--SOLIE7Bc--/f_auto/v1761801782/webapp/daily.dev_-_Boost_Icon';
+export const jobOfferDarkDesktop =
+  'https://media.daily.dev/image/upload/s--s5wQXzyd--/f_auto/v1762845657/public/jobmatch-web-dark';
+export const jobOfferLightDesktop =
+  'https://media.daily.dev/image/upload/s--owB1BPLg--/f_auto/v1762845657/public/jobmatch-web-light';
+export const jobOfferDarkMobile =
+  'https://media.daily.dev/image/upload/s--GadTanSG--/f_auto/v1762845821/public/jobmatch-mobile-dark';
+export const jobOfferLightMobile =
+  'https://media.daily.dev/image/upload/s--woqk56k5--/f_auto/v1762845946/public/jobmatch-mobile-light';
+export const opportunityBriefcase =
+  'https://media.daily.dev/image/upload/s--6n-4BFXP--/f_auto/v1763884475/public/dailydev.hire';
+export const opportunityBriefcaseDone =
+  'https://media.daily.dev/image/upload/s--rWk2SCPQ--/f_auto/v1763884475/public/dailydev.hire.allset';
+
+// Charm mascot illustrations for emotional product moments (empty states, milestones, etc.)
+export const cloudinaryCharmNoComments =
+  'https://media.daily.dev/image/upload/s--9T4IIRt7--/f_auto,q_auto/v1781528637/public/daily.dev%20Charm%20-%20no%20comment';
+
+export const cloudinaryCharmBookmarks =
+  'https://media.daily.dev/image/upload/s--LnFPuTT7--/f_auto,q_auto/v1781528637/public/daily.dev%20Charm%20-%20bookmark';
+
+export const cloudinaryCharmSearchNoResults =
+  'https://media.daily.dev/image/upload/s--HZdPG0L1--/f_auto,q_auto/v1781528637/public/daily.dev%20Charm%20-%20no%20seach%20result';
+
+export const cloudinaryCharmReadLater =
+  'https://media.daily.dev/image/upload/s--RGUXYEF---/f_auto,q_auto/v1781528637/public/daily.dev%20Charm%20-%20Read%20later';
+
+export const cloudinaryCharmSomethingWentWrong =
+  'https://media.daily.dev/image/upload/s--NThDL7xq--/f_auto,q_auto/v1781528637/public/daily.dev%20Charm%20-%20Something%20went%20wrong';
+
+export const cloudinaryCharm404 =
+  'https://media.daily.dev/image/upload/s--7RbaM_Ro--/f_auto,q_auto/v1781528637/public/daily.dev%20Charm%20-%20404';
+
+export const cloudinaryCharmEmptyProfile =
+  'https://media.daily.dev/image/upload/s--ulSOVWbq--/f_auto,q_auto/v1781528637/public/daily.dev%20Charm%20-%20empty%20profile';
+
+export const cloudinaryCharmEmptySquads =
+  'https://media.daily.dev/image/upload/s--J9OZk_3w--/f_auto,q_auto/v1781528637/public/daily.dev%20Charm%20-%20empty%20squads';
+
+export const cloudinaryCharmInviteFriends =
+  'https://media.daily.dev/image/upload/s--RaAyR83N--/f_auto,q_auto/v1781528637/public/daily.dev%20Charm%20-%20Invite%20friends';
+
+export const cloudinaryCharmNoPosts =
+  'https://media.daily.dev/image/upload/s--JbsZvCUt--/f_auto,q_auto/v1781528637/public/daily.dev%20Charm%20-%20no%20post';
+
+export const cloudinaryCharmNotEnoughTags =
+  'https://media.daily.dev/image/upload/s--0PIPx07_--/f_auto,q_auto/v1781529338/public/daily.dev%20Charm%20-%20no%20enoght%20tags%20(1)';
+
+// The Giveback charm (genie-themed). Artwork sits on solid black — render with
+// `mix-blend-screen` on a dark surface so the black drops out.
+export const cloudinaryCharmGiveback =
+  'https://media.daily.dev/image/upload/s--d1dldAty--/f_auto,q_auto/v1780848838/public/daily.dev%20Charm%20-%20Giveback%20(1)';
+
+// Dedicated Open Graph / social share image for the giveback pages (1280×800).
+export const cloudinaryGivebackOpenGraph =
+  'https://media.daily.dev/image/upload/s--lQzU56yU--/f_auto,q_auto/v1783863597/public/daily.dev%20Givevback%20-%201280x800%20(1)';
+
+// The signature covers the transformation string, so a width cap cannot be
+// appended — serving this smaller than its 2072px source needs a re-sign.
+export const cloudinaryHijackingCoverArt =
+  'https://media.daily.dev/image/upload/s--lCzzhJXe--/f_auto,q_auto/v1783981048/public/ChatGPT%20Image%20Jul%2014%2C%202026%2C%2001_17_08%20AM';

@@ -1,0 +1,129 @@
+import React from 'react';
+import { useAuthContext } from '../../contexts/AuthContext';
+import { useCanAwardUser } from '../../hooks/useCoresFeature';
+import { useLazyModal } from '../../hooks/useLazyModal';
+import type { ButtonSize } from '../buttons/Button';
+import { ButtonColor, ButtonVariant } from '../buttons/Button';
+import { QuaternaryButton } from '../buttons/QuaternaryButton';
+import type { IconSize } from '../Icon';
+import { iconSizeToClassName } from '../Icon';
+import { MedalBadgeIcon } from '../icons';
+import InteractionCounter from '../InteractionCounter';
+import { Tooltip } from '../tooltip/Tooltip';
+import type { Post } from '../../graphql/posts';
+import { Image } from '../image/Image';
+import { AuthTriggers } from '../../lib/auth';
+import { LazyModal } from '../modals/common/types';
+import type { LoggedUser } from '../../lib/user';
+import { useEngagementBarV2 } from '../../hooks/useEngagementBarV2';
+import type { CardActionDensity } from '../buttons/CardAction';
+import {
+  actionCounterClassName,
+  actionCounterLabelClassName,
+  FEED_ACTION_BUTTON_SIZE,
+  FEED_ACTION_ICON_SIZE,
+} from '../cards/common/actionCounter';
+import PostAwardActionV2 from './PostAwardAction.v2';
+
+export interface PostAwardActionProps {
+  post: Post;
+  iconSize?: IconSize;
+  buttonSize?: ButtonSize;
+  density?: CardActionDensity;
+}
+
+const PostAwardActionV1 = ({
+  post,
+  iconSize = FEED_ACTION_ICON_SIZE,
+  buttonSize = FEED_ACTION_BUTTON_SIZE,
+}: PostAwardActionProps) => {
+  const { openModal } = useLazyModal();
+  const { user, showLogin } = useAuthContext();
+  const isSameUser = !!user?.id && user.id === post?.author?.id;
+  const canAward = useCanAwardUser({
+    sendingUser: user,
+    receivingUser: post?.author as LoggedUser,
+  });
+
+  if (!canAward && !isSameUser) {
+    return null;
+  }
+  const awardEntity = {
+    id: post.id,
+    receiver: post.author,
+    numAwards: post.numAwards,
+  };
+
+  const openAwardModal = () => {
+    if (!user) {
+      return showLogin({ trigger: AuthTriggers.GiveAward });
+    }
+
+    if (isSameUser || post.userState?.awarded) {
+      return openModal({
+        type: LazyModal.ListAwards,
+        props: {
+          queryProps: { id: post.id, type: 'POST' },
+        },
+      });
+    }
+
+    return openModal({
+      type: LazyModal.GiveAward,
+      props: {
+        type: 'POST',
+        entity: awardEntity,
+        post,
+      },
+    });
+  };
+
+  return (
+    <Tooltip
+      content={
+        post.userState?.awarded
+          ? 'You already awarded this post!'
+          : 'Award this post'
+      }
+    >
+      <QuaternaryButton
+        id={`post-${post.id}-award-btn`}
+        pressed={!!post.userState?.awarded}
+        onClick={openAwardModal}
+        size={buttonSize}
+        className="btn-tertiary-cabbage pointer-events-auto"
+        variant={ButtonVariant.Tertiary}
+        labelClassName={actionCounterLabelClassName}
+        color={ButtonColor.Cabbage}
+        icon={
+          post.userState?.awarded && post.featuredAward?.award?.image ? (
+            <Image
+              src={post?.featuredAward?.award?.image}
+              alt={post?.featuredAward?.award?.name}
+              className={iconSizeToClassName[iconSize]}
+            />
+          ) : (
+            <MedalBadgeIcon secondary size={iconSize} />
+          )
+        }
+      >
+        {post?.numAwards > 0 && (
+          <InteractionCounter
+            className={actionCounterClassName}
+            value={post.numAwards}
+          />
+        )}
+      </QuaternaryButton>
+    </Tooltip>
+  );
+};
+
+const PostAwardAction = (props: PostAwardActionProps) => {
+  const useV2 = useEngagementBarV2();
+  if (useV2) {
+    return <PostAwardActionV2 {...props} />;
+  }
+  return <PostAwardActionV1 {...props} />;
+};
+
+export default PostAwardAction;

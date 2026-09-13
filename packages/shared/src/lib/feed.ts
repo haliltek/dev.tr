@@ -1,0 +1,387 @@
+import { useCallback } from 'react';
+import type { FeedItem, PostItem } from '../hooks/useFeed';
+import type { PostHighlight } from '../graphql/highlights';
+import type { Ad, Post, ReadHistoryPost } from '../graphql/posts';
+import type { LogEvent } from '../hooks/log/useLogQueue';
+import type { PostBootData } from './boot';
+import { Origin, TargetType } from './log';
+import type { SearchLogExtra } from './searchLog';
+import { SharedFeedPage } from '../components/utilities';
+import type { AllFeedPages } from './query';
+import { OtherFeedPage } from './query';
+import { useFeedCardContext } from '../features/posts/FeedCardContext';
+
+export function optimisticPostUpdateInFeed(
+  items: FeedItem[],
+  updatePost: (page: number, index: number, post: Post) => void,
+  mutationFunction: (post: Post) => Partial<Post>,
+): ({ index }: { index: number }) => Promise<() => void> {
+  return async ({ index }) => {
+    const item = items[index] as PostItem;
+    const { post } = item;
+    updatePost(item.page, item.index, {
+      ...post,
+      ...mutationFunction(post),
+    });
+    return () => updatePost(item.page, item.index, post);
+  };
+}
+
+interface FeedItemLogEvent extends LogEvent {
+  event_name: string;
+  feed_grid_columns?: number;
+  feed_item_grid_column?: number;
+  feed_item_grid_row?: number;
+  feed_item_meta?: string;
+  feed_item_image?: string;
+  feed_item_target_url?: string;
+  feed_item_title?: string;
+  target_id?: string;
+  target_type?: string;
+}
+
+interface PostItemLogEvent extends FeedItemLogEvent {
+  post_author_id?: string;
+  post_scout_id?: string;
+  post_comments_count?: number;
+  post_created_at?: string;
+  post_read_time?: number;
+  post_source_id?: string;
+  post_tags?: string[];
+  post_trending_value?: number;
+  post_upvotes_count?: number;
+}
+
+interface AdItemLogEvent extends FeedItemLogEvent {
+  ad_provider_id?: string;
+}
+
+interface FeedLogExtra {
+  extra: {
+    origin: string;
+    feed: string;
+    ranking?: string;
+    variant?: string;
+    parent_id?: string;
+    search_id?: string;
+    search_version?: number;
+  };
+}
+
+export function feedLogExtra(
+  feedName: string,
+  ranking?: string,
+  extra?: {
+    scroll_y?: number;
+    gen_id?: string;
+  } & SearchLogExtra,
+  origin?: Origin,
+  variant?: string,
+  parent_id?: string,
+): FeedLogExtra {
+  return {
+    extra: {
+      origin: origin ?? Origin.Feed,
+      feed: feedName,
+      variant,
+      ...(ranking && { ranking }),
+      ...(extra && extra),
+      ...(parent_id && { parent_id }),
+    },
+  };
+}
+
+export interface FeedItemPosition {
+  columns?: number;
+  column?: number;
+  row?: number;
+}
+
+export type PostLogEventFnOptions = FeedItemPosition & {
+  extra?: Record<string, unknown>;
+  is_ad?: boolean;
+  /** Absolute position of the item in the feed, ads and placeholders included. */
+  index?: number;
+};
+
+const feedPathWithIdMatcher = /^\/feeds\/(?<feedId>[A-z0-9]{9})\/?$/;
+
+export function postLogEvent(
+  eventName: string,
+  post: Post | ReadHistoryPost | PostBootData,
+  opts?: PostLogEventFnOptions,
+): PostItemLogEvent {
+  // Lives in `extra` rather than top-level: unmapped top-level event fields are
+  // dropped at analytics ingest, while the `extra` blob is stored intact.
+  const extra: Record<string, unknown> = {
+    ...opts?.extra,
+    ...(opts?.is_ad && { is_ad: true }),
+    ...(typeof opts?.index === 'number' && { feed_item_index: opts.index }),
+  };
+
+  if (typeof window !== 'undefined') {
+    const currentUrl = new URL(window.location.href);
+
+    const feedPathMatch = currentUrl.pathname.match(feedPathWithIdMatcher);
+
+    if (feedPathMatch?.groups?.feedId) {
+      extra.feed_id = feedPathMatch.groups.feedId;
+    }
+  }
+
+  return {
+    event_name: eventName,
+    feed_grid_columns: opts?.columns,
+    feed_item_grid_column: opts?.column,
+    feed_item_grid_row: opts?.row,
+    feed_item_image: post.image,
+    feed_item_target_url: post.permalink,
+    feed_item_title: post.title,
+    feed_item_meta: (post as Post).feedMeta,
+    post_author_id: post.author?.id,
+    post_scout_id: post.scout?.id,
+    post_created_at: post.createdAt,
+    post_comments_count: post.numComments,
+    post_read_time: post.readTime,
+    post_tags: post.tags,
+    post_source_id: post.source?.id,
+    post_trending_value: post.trending,
+    post_upvotes_count: post.numUpvotes,
+    target_id: post.id,
+    target_type: 'post',
+    post_type: post.type,
+    post_source_type: post.source?.type,
+    extra: Object.keys(extra).length > 0 ? JSON.stringify(extra) : undefined,
+  };
+}
+
+export function adLogEvent(
+  eventName: string,
+  ad: Ad,
+  opts?: {
+    columns?: number;
+    column?: number;
+    row?: number;
+    extra?: Record<string, unknown>;
+  },
+): AdItemLogEvent {
+  return {
+    event_name: eventName,
+    feed_grid_columns: opts?.columns,
+    feed_item_grid_column: opts?.column,
+    feed_item_grid_row: opts?.row,
+    feed_item_image: ad.image,
+    feed_item_target_url: ad.link,
+    feed_item_title: ad.description,
+    ad_provider_id: ad.providerId,
+    target_id: ad.source,
+    target_type: 'ad',
+    extra: opts?.extra ? JSON.stringify(opts.extra) : undefined,
+  };
+}
+
+interface FeedHighlightsLogEventOptions extends FeedItemPosition {
+  feedName: string;
+  ranking?: string;
+  action?: string;
+  count?: number;
+  /** Only the fields this builder reads, so a caller need not hold a whole one. */
+  clickedHighlight?: Pick<PostHighlight, 'id' | 'headline'> & {
+    post: Pick<PostHighlight['post'], 'id' | 'commentsPermalink'>;
+  };
+  /**
+   * A clicked row that is a post rather than a highlight. Separate from
+   * `clickedHighlight` so `clicked_highlight_id` is never written with a post
+   * id: the sponsor-strip ticker carries both kinds, and one field holding two
+   * key spaces mis-joins downstream instead of failing loudly.
+   */
+  clickedPost?: { id: string; title: string; permalink: string };
+  highlightIds?: string[];
+  /** Post ids from a row that carries posts; never merged into `highlightIds`. */
+  postIds?: string[];
+  feedMeta?: string | null;
+  position?: number;
+  origin?: Origin;
+}
+
+export function feedHighlightsLogEvent(
+  eventName: string,
+  {
+    action,
+    columns,
+    column,
+    row,
+    feedName,
+    ranking,
+    count,
+    clickedHighlight,
+    clickedPost,
+    highlightIds,
+    postIds,
+    feedMeta,
+    position,
+    origin,
+  }: FeedHighlightsLogEventOptions,
+): FeedItemLogEvent {
+  const clicked = clickedHighlight
+    ? {
+        title: clickedHighlight.headline,
+        url: clickedHighlight.post.commentsPermalink,
+        postId: clickedHighlight.post.id,
+      }
+    : clickedPost && {
+        title: clickedPost.title,
+        url: clickedPost.permalink,
+        postId: clickedPost.id,
+      };
+
+  return {
+    event_name: eventName,
+    feed_grid_columns: columns,
+    feed_item_grid_column: column,
+    feed_item_grid_row: row,
+    feed_item_meta: feedMeta ?? undefined,
+    feed_item_target_url: clicked?.url,
+    feed_item_title: clicked?.title,
+    target_type: TargetType.HighlightsCard,
+    extra: JSON.stringify({
+      ...feedLogExtra(feedName, ranking, undefined, origin).extra,
+      ...(action ? { action } : {}),
+      ...(typeof count === 'number' ? { count } : {}),
+      ...(typeof position === 'number' ? { position } : {}),
+      ...(highlightIds?.length ? { highlight_ids: highlightIds } : {}),
+      ...(postIds?.length ? { post_ids: postIds } : {}),
+      ...(clickedHighlight
+        ? { clicked_highlight_id: clickedHighlight.id }
+        : {}),
+      ...(clicked ? { post_id: clicked.postId } : {}),
+    }),
+  };
+}
+
+export interface GetDefaultFeedProps {
+  hasFiltered?: boolean;
+  hasUser?: boolean;
+  isMyFeed?: boolean;
+}
+
+export const getDefaultFeed = ({
+  hasUser,
+}: GetDefaultFeedProps): SharedFeedPage => {
+  if (!hasUser) {
+    return SharedFeedPage.Popular;
+  }
+
+  return SharedFeedPage.MyFeed;
+};
+
+export const defaultFeedConditions = [null, 'default', '/', ''];
+
+export const getFeedName = (
+  path: string,
+  options: GetDefaultFeedProps = {},
+): AllFeedPages => {
+  const feed = path?.replaceAll?.('/', '') || '';
+
+  if (defaultFeedConditions.some((condition) => condition === feed)) {
+    return getDefaultFeed(options);
+  }
+  if (feed.startsWith('search')) {
+    return SharedFeedPage.Search;
+  }
+  if (feed === '[userId]upvoted') {
+    return OtherFeedPage.UserUpvoted;
+  }
+  if (feed === '[userId]posts') {
+    return OtherFeedPage.UserPosts;
+  }
+  if (feed.startsWith('feeds')) {
+    const isMyFeedEdit =
+      ['edit'].some((item) => feed.endsWith(item)) && options.isMyFeed;
+
+    return isMyFeedEdit ? SharedFeedPage.MyFeed : SharedFeedPage.Custom;
+  }
+
+  const [page] = feed.split('?');
+
+  return page.replace(/^\/+/, '') as SharedFeedPage;
+};
+
+export type FeedAdTemplate = {
+  adStart: number;
+  adRepeat?: number;
+  adJitter?: number;
+};
+
+/* eslint-disable no-bitwise -- intentional bitwise ops for FNV-1a hash */
+const hashSeed = (key: string, n: number): number => {
+  let h = 2166136261 >>> 0;
+  const s = `${key}:${n}`;
+  for (let i = 0; i < s.length; i += 1) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h;
+};
+/* eslint-enable no-bitwise */
+
+// Minimum index distance between two consecutive ads. A gap of 2 guarantees
+// at least one post between any two ads, so we never render `ad, ad` back-to-back.
+const MIN_AD_GAP = 2;
+
+export const getAdSlotIndex = ({
+  index,
+  adStart,
+  adRepeat,
+  adJitter = 0,
+  seed,
+}: {
+  index: number;
+  adStart: number;
+  adRepeat: number;
+  adJitter?: number;
+  seed: string;
+}): number | undefined => {
+  if (adRepeat <= 0) {
+    return undefined;
+  }
+  if (index < adStart) {
+    return undefined;
+  }
+  // Clamp jitter so each gap stays >= MIN_AD_GAP. With per-gap symmetric jitter
+  // in [-J, +J], the minimum gap is `adRepeat - J`, so J must be <= adRepeat - MIN_AD_GAP.
+  const safeJitter = Math.max(0, Math.min(adJitter, adRepeat - MIN_AD_GAP));
+  // Walk slots forward from 0, applying one independent jitter per gap, until
+  // we either hit `index` or pass it. The first slot uses one-sided jitter
+  // (0..+J) so the first ad never lands before `adStart`.
+  let pos =
+    adStart + (safeJitter === 0 ? 0 : hashSeed(seed, 0) % (safeJitter + 1));
+  let n = 0;
+  while (pos < index) {
+    n += 1;
+    const offset =
+      safeJitter === 0
+        ? 0
+        : (hashSeed(seed, n) % (safeJitter * 2 + 1)) - safeJitter;
+    pos += adRepeat + offset;
+  }
+  return pos === index ? n : undefined;
+};
+
+export function usePostLogEvent() {
+  const { boostedBy } = useFeedCardContext();
+
+  return useCallback(
+    (
+      eventName: string,
+      post: Post | ReadHistoryPost | PostBootData,
+      opts?: PostLogEventFnOptions,
+    ) => {
+      return postLogEvent(eventName, post, {
+        ...opts,
+        is_ad: !!boostedBy,
+      });
+    },
+    [boostedBy],
+  );
+}

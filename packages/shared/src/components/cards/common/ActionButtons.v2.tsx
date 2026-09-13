@@ -1,0 +1,279 @@
+import type { ReactElement } from 'react';
+import React, { useMemo } from 'react';
+import classNames from 'classnames';
+import type { Post } from '../../../graphql/posts';
+import { CardAction } from '../../buttons/CardAction';
+import { CardActionBar } from '../../buttons/CardActionBar';
+import {
+  AnalyticsIcon,
+  DiscussIcon as CommentIcon,
+  LinkIcon,
+  DownvoteIcon,
+} from '../../icons';
+import { ButtonColor } from '../../buttons/ButtonV2';
+import { useFeedPreviewMode } from '../../../hooks';
+import { UpvoteButtonIcon } from './UpvoteButtonIcon';
+import { BookmarkButton } from '../../buttons/BookmarkButton.v2';
+import { Tooltip } from '../../tooltip/Tooltip';
+import PostAwardAction from '../../post/PostAwardAction';
+import ConditionalWrapper from '../../ConditionalWrapper';
+import { PostTagsPanel } from '../../post/block/PostTagsPanel';
+import { LinkWithTooltip } from '../../tooltips/LinkWithTooltip';
+import { useCardActions } from '../../../hooks/cards/useCardActions';
+import { useBrandSponsorship } from '../../../hooks/useBrandSponsorship';
+import { usePostImpressions } from '../../../hooks/post/usePostImpressions';
+
+export type ActionButtonsVariant = 'grid' | 'list' | 'signal';
+
+export interface ActionButtonsProps {
+  post: Post;
+  onUpvoteClick?: (post: Post) => unknown;
+  onCommentClick?: (post: Post) => unknown;
+  onBookmarkClick?: (post: Post) => unknown;
+  onCopyLinkClick?: (event: React.MouseEvent, post: Post) => unknown;
+  className?: string;
+  onDownvoteClick?: (post: Post) => unknown;
+  variant?: ActionButtonsVariant;
+  showDownvoteAction?: boolean;
+  showAwardAction?: boolean;
+}
+
+const FEED_CARD_DENSITY = 'tight';
+
+const variantConfig = {
+  grid: {
+    // Matches the v1 bar: `py-1.5` holds the row at 36px around the h-6
+    // buttons, and the wider right edge gives the trailing number room.
+    containerClassName: 'py-1.5 pl-1 pr-2.5',
+    showTagsPanel: false,
+    useCommentLink: false,
+  },
+  list: {
+    containerClassName: '',
+    showTagsPanel: true,
+    useCommentLink: true,
+  },
+  signal: {
+    containerClassName: '',
+    showTagsPanel: false,
+    useCommentLink: true,
+  },
+} as const;
+
+const ActionButtons = ({
+  post,
+  onUpvoteClick,
+  onCommentClick,
+  onBookmarkClick,
+  onCopyLinkClick,
+  className,
+  onDownvoteClick,
+  variant = 'grid',
+  showDownvoteAction = true,
+  showAwardAction = true,
+}: ActionButtonsProps): ReactElement | null => {
+  const config = variantConfig[variant];
+  const isFeedPreview = useFeedPreviewMode();
+  const { getUpvoteAnimation } = useBrandSponsorship();
+
+  const {
+    isUpvoteActive,
+    isDownvoteActive,
+    showTagsPanel,
+    onToggleUpvote,
+    onToggleDownvote,
+    onToggleBookmark,
+    onCopyLink,
+  } = useCardActions({
+    post,
+    onUpvoteClick,
+    onDownvoteClick,
+    onBookmarkClick,
+    onCopyLinkClick,
+    closeTagsPanelOnUpvote: variant === 'list',
+  });
+
+  const brandAnimation = useMemo(() => {
+    const animationResult = getUpvoteAnimation(post.tags || []);
+    if (
+      !animationResult.shouldAnimate ||
+      !animationResult.colors ||
+      !animationResult.config
+    ) {
+      return null;
+    }
+    return {
+      colors: animationResult.colors,
+      config: animationResult.config,
+      brandLogo: animationResult.brandLogo,
+    };
+  }, [getUpvoteAnimation, post.tags]);
+
+  const {
+    enabled: impressionsEnabled,
+    showImpressions,
+    impressions,
+    onImpressionsClick,
+  } = usePostImpressions(post);
+
+  if (isFeedPreview) {
+    return null;
+  }
+
+  const commentCount = post.numComments ?? 0;
+  const upvoteCount = post.numUpvotes ?? 0;
+
+  const commentButton = config.useCommentLink ? (
+    <LinkWithTooltip
+      tooltip={{ content: 'Yorum' }}
+      href={post.commentsPermalink}
+    >
+      <CardAction
+        id={`post-${post.id}-comment-btn`}
+        href={post.commentsPermalink}
+        pressed={post.commented}
+        density={FEED_CARD_DENSITY}
+        icon={<CommentIcon />}
+        iconPressed={<CommentIcon secondary />}
+        label="Yorum"
+        count={commentCount}
+        color={ButtonColor.BlueCheese}
+        onClick={() => onCommentClick?.(post)}
+        buttonClassName="pointer-events-auto"
+      />
+    </LinkWithTooltip>
+  ) : (
+    <Tooltip content="Yorumlar" side="bottom">
+      <CardAction
+        id={`post-${post.id}-comment-btn`}
+        density={FEED_CARD_DENSITY}
+        icon={<CommentIcon />}
+        iconPressed={<CommentIcon secondary />}
+        label="Yorumlar"
+        count={commentCount}
+        pressed={post.commented}
+        onClick={() => onCommentClick?.(post)}
+        color={ButtonColor.BlueCheese}
+      />
+    </Tooltip>
+  );
+
+  const buttons = (
+    <div
+      className={classNames(
+        'flex flex-row items-center justify-between',
+        config.containerClassName,
+        className,
+      )}
+    >
+      <CardActionBar layout="feedCard">
+        <Tooltip
+          content={isUpvoteActive ? 'Upvote kaldır' : 'Upvote'}
+          side={variant === 'grid' ? 'bottom' : undefined}
+        >
+          <CardAction
+            id={`post-${post.id}-upvote-btn`}
+            density={FEED_CARD_DENSITY}
+            color={ButtonColor.Avocado}
+            pressed={isUpvoteActive}
+            onClick={onToggleUpvote}
+            icon={<UpvoteButtonIcon brandAnimation={brandAnimation} />}
+            iconPressed={
+              <UpvoteButtonIcon secondary brandAnimation={brandAnimation} />
+            }
+            label={isUpvoteActive ? 'Upvote kaldır' : 'Upvote'}
+            count={upvoteCount}
+            buttonClassName="pointer-events-auto"
+          />
+        </Tooltip>
+        {commentButton}
+        {showDownvoteAction && (
+          <Tooltip
+            content={isDownvoteActive ? 'Downvote kaldır' : 'Downvote'}
+            side={variant === 'grid' ? 'bottom' : undefined}
+          >
+            <CardAction
+              id={`post-${post.id}-downvote-btn`}
+              density={FEED_CARD_DENSITY}
+              color={ButtonColor.Ketchup}
+              icon={<DownvoteIcon />}
+              iconPressed={<DownvoteIcon secondary />}
+              label={isDownvoteActive ? 'Downvote kaldır' : 'Downvote'}
+              pressed={isDownvoteActive}
+              onClick={onToggleDownvote}
+              buttonClassName="pointer-events-auto"
+            />
+          </Tooltip>
+        )}
+        {showAwardAction && !impressionsEnabled && (
+          <PostAwardAction post={post} density={FEED_CARD_DENSITY} />
+        )}
+        <BookmarkButton
+          tooltipSide={variant === 'grid' ? 'bottom' : undefined}
+          post={post}
+          density={FEED_CARD_DENSITY}
+          id={`post-${post.id}-bookmark-btn`}
+          onClick={onToggleBookmark}
+          buttonClassName={classNames(
+            variant === 'list' && 'pointer-events-auto',
+          )}
+        />
+        <Tooltip
+          content="Copy link"
+          side={variant === 'grid' ? 'bottom' : undefined}
+        >
+          <CardAction
+            id={`post-${post.id}-copy-btn`}
+            density={FEED_CARD_DENSITY}
+            icon={<LinkIcon />}
+            label="Copy link"
+            onClick={onCopyLink}
+            color={ButtonColor.Cabbage}
+            buttonClassName={classNames(
+              variant === 'list' && 'pointer-events-auto',
+            )}
+          />
+        </Tooltip>
+        {showImpressions && (
+          <Tooltip
+            content="Impressions"
+            side={variant === 'grid' ? 'bottom' : undefined}
+          >
+            <CardAction
+              id={`post-${post.id}-impressions-btn`}
+              density={FEED_CARD_DENSITY}
+              icon={<AnalyticsIcon />}
+              label="Impressions"
+              count={impressions}
+              onClick={onImpressionsClick}
+              color={ButtonColor.Cheese}
+              buttonClassName={classNames(
+                variant === 'list' && 'pointer-events-auto',
+              )}
+            />
+          </Tooltip>
+        )}
+      </CardActionBar>
+    </div>
+  );
+
+  if (variant === 'list' && config.showTagsPanel) {
+    return (
+      <ConditionalWrapper
+        condition={showTagsPanel}
+        wrapper={(children) => (
+          <div className="flex flex-col">
+            {children}
+            <PostTagsPanel post={post} className="pointer-events-auto mt-4" />
+          </div>
+        )}
+      >
+        {buttons}
+      </ConditionalWrapper>
+    );
+  }
+
+  return buttons;
+};
+
+export default ActionButtons;

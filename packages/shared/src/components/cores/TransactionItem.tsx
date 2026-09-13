@@ -1,0 +1,143 @@
+import type { ReactElement, ReactNode } from 'react';
+import React from 'react';
+import {
+  CoreIcon,
+  CreditCardIcon,
+  InfoIcon,
+  MinusIcon,
+  PlusIcon,
+} from '../icons';
+import {
+  Typography,
+  TypographyColor,
+  TypographyType,
+} from '../typography/Typography';
+import type { UserImageProps } from '../ProfilePicture';
+import { ProfileImageSize, ProfilePicture } from '../ProfilePicture';
+import { Separator } from '../cards/common/common';
+import { DateFormat } from '../utilities/DateFormat';
+import { TimeFormatType } from '../../lib/dateFormat';
+import { IconSize } from '../Icon';
+import type { TransactionItemType } from '../../lib/transaction';
+import { formatCoresCurrency } from '../../lib/utils';
+import type { UserShortProfile } from '../../lib/user';
+import { ProfileLink } from '../profile/ProfileLink';
+import { ProfileTooltip } from '../profile/ProfileTooltip';
+
+export type TransactionItemProps = {
+  type: TransactionItemType;
+  user: UserImageProps;
+  profileUser?: UserShortProfile;
+  date: Date;
+  amount: number;
+  label: ReactNode;
+  extraLabel?: ReactNode;
+  note?: ReactNode;
+};
+
+const TransactionTypeToIcon: Record<
+  TransactionItemProps['type'],
+  ReactElement
+> = {
+  receive: (
+    <div className="size-4 rounded-10 bg-action-upvote-float text-accent-avocado-default">
+      <PlusIcon size={IconSize.Size16} />
+    </div>
+  ),
+  send: (
+    <div className="size-4 rounded-10 bg-action-downvote-float text-accent-ketchup-default">
+      <MinusIcon size={IconSize.Size16} />
+    </div>
+  ),
+  purchase: (
+    <div className="size-4 rounded-10 bg-action-bookmark-float text-accent-bun-default">
+      <CreditCardIcon size={IconSize.Size16} />
+    </div>
+  ),
+  unknown: (
+    <div className="size-4 rounded-10 bg-action-bookmark-float text-accent-bun-default">
+      <InfoIcon size={IconSize.Size16} />
+    </div>
+  ),
+};
+
+export const TransactionItem = ({
+  type,
+  user,
+  profileUser,
+  date,
+  amount,
+  label,
+  extraLabel,
+  note,
+}: TransactionItemProps): ReactElement => {
+  const linkToProfile = (children: ReactElement): ReactElement => {
+    if (!profileUser) {
+      return children;
+    }
+
+    return (
+      <ProfileTooltip userId={profileUser.id} initialUser={profileUser}>
+        <ProfileLink className="w-fit" href={profileUser.permalink}>
+          {children}
+        </ProfileLink>
+      </ProfileTooltip>
+    );
+  };
+
+  return (
+    <li className="flex">
+      <div className="flex flex-1 items-center gap-2">
+        {TransactionTypeToIcon[type]}
+        {linkToProfile(
+          <ProfilePicture size={ProfileImageSize.Medium} user={user} />,
+        )}{' '}
+        <div className="flex flex-col gap-1">
+          {linkToProfile(
+            <Typography type={TypographyType.Subhead} bold>
+              {user.name}
+            </Typography>,
+          )}
+          <div className="flex flex-col flex-wrap">
+            <Typography
+              className="line-clamp-2 max-w-[200px] tablet:max-w-[360px]"
+              type={TypographyType.Subhead}
+              color={TypographyColor.Tertiary}
+            >
+              {extraLabel}
+            </Typography>
+            <div className="flex flex-wrap items-center gap-1 text-text-tertiary typo-footnote tablet:gap-0">
+              <Typography
+                className="line-clamp-2 max-w-[200px] tablet:max-w-[360px]"
+                type={TypographyType.Footnote}
+              >
+                {label}
+              </Typography>
+              <div className="flex w-full items-end tablet:w-auto">
+                <Separator className="hidden tablet:inline" />
+                <DateFormat date={date} type={TimeFormatType.Transaction} />
+              </div>
+            </div>
+            {!!note && (
+              <Typography
+                className="line-clamp-2 max-w-[200px] tablet:max-w-[360px]"
+                type={TypographyType.Footnote}
+                color={TypographyColor.Tertiary}
+              >
+                {note}
+              </Typography>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center gap-1">
+        <CoreIcon secondary={amount < 0} />
+        <Typography type={TypographyType.Callout} bold>
+          {amount === 0 && 'Free'}
+          {amount !== 0 &&
+            `${amount > 0 ? '+' : ''}${formatCoresCurrency(amount)}`}
+        </Typography>
+      </div>
+    </li>
+  );
+};

@@ -1,0 +1,60 @@
+import { detectPlatformFromUrl, USER_PLATFORMS } from './platforms';
+
+describe('detectPlatformFromUrl', () => {
+  it('should detect medium.com as medium, not mastodon', () => {
+    expect(
+      detectPlatformFromUrl('https://medium.com/@user', USER_PLATFORMS),
+    ).toBe('medium');
+  });
+
+  it('should detect known mastodon instances', () => {
+    expect(
+      detectPlatformFromUrl('https://mastodon.social/@user', USER_PLATFORMS),
+    ).toBe('mastodon');
+    expect(
+      detectPlatformFromUrl('https://hachyderm.io/@user', USER_PLATFORMS),
+    ).toBe('mastodon');
+  });
+
+  it('should detect unknown mastodon instances by /@ pattern', () => {
+    expect(
+      detectPlatformFromUrl(
+        'https://unknown-mastodon.xyz/@user',
+        USER_PLATFORMS,
+      ),
+    ).toBe('mastodon');
+  });
+
+  it('should detect substack.com as substack, not mastodon', () => {
+    expect(
+      detectPlatformFromUrl('https://substack.com/@devnp2007', USER_PLATFORMS),
+    ).toBe('substack');
+    expect(
+      detectPlatformFromUrl('https://www.substack.com/@user', USER_PLATFORMS),
+    ).toBe('substack');
+  });
+
+  it('should detect discord profile and invite URLs', () => {
+    expect(
+      detectPlatformFromUrl(
+        'https://discord.com/users/123456789012345678',
+        USER_PLATFORMS,
+      ),
+    ).toBe('discord');
+    expect(
+      detectPlatformFromUrl('https://discord.gg/inviteCode', USER_PLATFORMS),
+    ).toBe('discord');
+    expect(
+      detectPlatformFromUrl(
+        'https://discordapp.com/users/123456789012345678',
+        USER_PLATFORMS,
+      ),
+    ).toBe('discord');
+  });
+
+  it('should return null for unknown URLs', () => {
+    expect(
+      detectPlatformFromUrl('https://example.com/profile', USER_PLATFORMS),
+    ).toBeNull();
+  });
+});

@@ -1,0 +1,486 @@
+import type { ReactElement, ReactNode } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import type { AppProps } from 'next/app';
+import dynamic from 'next/dynamic';
+import Head from 'next/head';
+import 'focus-visible';
+import { useConsoleLogo } from '@dailydotdev/shared/src/hooks/useConsoleLogo';
+import { DefaultSeo, NextSeo } from 'next-seo';
+import type { DehydratedState } from '@tanstack/react-query';
+import {
+  HydrationBoundary,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
+import { useAuthContext } from '@dailydotdev/shared/src/contexts/AuthContext';
+import { useIubendaConsentMirror } from '@dailydotdev/shared/src/hooks/useIubendaConsentMirror';
+import { ProgressiveEnhancementContextProvider } from '@dailydotdev/shared/src/contexts/ProgressiveEnhancementContext';
+import { SubscriptionContextProvider } from '@dailydotdev/shared/src/contexts/SubscriptionContext';
+import { ShortcutsProvider } from '@dailydotdev/shared/src/features/shortcuts/contexts/ShortcutsProvider';
+import { canonicalFromRouter } from '@dailydotdev/shared/src/lib/canonical';
+import '@dailydotdev/shared/src/styles/globals.css';
+import '../styles/iubenda.css';
+import useLogPageView from '@dailydotdev/shared/src/hooks/log/useLogPageView';
+import { BootDataProvider } from '@dailydotdev/shared/src/contexts/BootProvider';
+import { ShellStateProvider } from '@dailydotdev/shared/src/contexts/ShellStateProvider';
+import { PostReferrerContextProvider } from '@dailydotdev/shared/src/contexts/PostReferrerContext';
+import useDeviceId from '@dailydotdev/shared/src/hooks/log/useDeviceId';
+import { useError } from '@dailydotdev/shared/src/hooks/useError';
+import { useIOSError } from '@dailydotdev/shared/src/hooks/useIOSError';
+import { BootApp } from '@dailydotdev/shared/src/lib/boot';
+import { useNotificationContext } from '@dailydotdev/shared/src/contexts/NotificationsContext';
+import { getUnreadText } from '@dailydotdev/shared/src/components/notifications/utils';
+import { useLazyModal } from '@dailydotdev/shared/src/hooks/useLazyModal';
+import { LazyModal } from '@dailydotdev/shared/src/components/modals/common/types';
+import { defaultQueryClientConfig } from '@dailydotdev/shared/src/lib/query';
+import { useWebVitals } from '@dailydotdev/shared/src/hooks/useWebVitals';
+import { LazyModalElement } from '@dailydotdev/shared/src/components/modals/LazyModalElement';
+import { useManualScrollRestoration } from '@dailydotdev/shared/src/hooks';
+import { useScrollbarWidth } from '@dailydotdev/shared/src/hooks/useScrollbarWidth';
+import { PushNotificationContextProvider } from '@dailydotdev/shared/src/contexts/PushNotificationContext';
+import { SerwistProvider } from '@serwist/turbopack/react';
+import { useThemedAsset } from '@dailydotdev/shared/src/hooks/utils';
+import { DndContextProvider } from '@dailydotdev/shared/src/contexts/DndContext';
+import { structuredCloneJsonPolyfill } from '@dailydotdev/shared/src/lib/structuredClone';
+import { fromCDN } from '@dailydotdev/shared/src/lib';
+import { useOnboardingActions } from '@dailydotdev/shared/src/hooks/auth';
+import { useCheckCoresRole } from '@dailydotdev/shared/src/hooks/useCheckCoresRole';
+import {
+  messageHandlerExists,
+  postWebKitMessage,
+  WebKitMessageHandlers,
+} from '@dailydotdev/shared/src/lib/ios';
+import { useCheckLocation } from '@dailydotdev/shared/src/hooks/useCheckLocation';
+import Seo, { defaultSeo, defaultSeoTitle, robotsProps } from '../next-seo';
+import useWebappVersion from '../hooks/useWebappVersion';
+import { getAppOrigin, getSiteOrigin } from '../lib/seo';
+import { getOnboardingRedirect } from '../lib/onboardingRedirect';
+import { PixelsProvider } from '../context/PixelsContext';
+import { Iubenda } from '../components/Iubenda';
+
+structuredCloneJsonPolyfill();
+
+const AuthModal = dynamic(
+  () =>
+    import(
+      /* webpackChunkName: "authModal" */ '@dailydotdev/shared/src/components/auth/AuthModal'
+    ),
+);
+
+const ReactQueryDevtools =
+  process.env.NODE_ENV === 'development'
+    ? dynamic(() =>
+        import('@tanstack/react-query-devtools').then(
+          (mod) => mod.ReactQueryDevtools,
+        ),
+      )
+    : (): null => null;
+
+interface ComponentGetLayout {
+  getLayout?: (
+    page: ReactNode,
+    pageProps: Record<string, unknown>,
+    layoutProps: Record<string, unknown>,
+  ) => ReactNode;
+  layoutProps?: Record<string, unknown>;
+}
+
+const getRedirectUri = () =>
+  `${window.location.origin}${window.location.pathname}`;
+
+const getPage = () => window.location.pathname;
+
+const hotAndColdModalQueryKey = 'openModal';
+const hotAndColdModalQueryValue = 'hottakes';
+const hotAndColdModalLegacyQueryValue = 'hotAndCold';
+
+const APP_ORIGIN = getAppOrigin();
+const SITE_ORIGIN = getSiteOrigin();
+
+const GLOBAL_SEO_JSON_LD = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${SITE_ORIGIN}/#organization`,
+      name: 'daily.dev',
+      url: SITE_ORIGIN,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${SITE_ORIGIN}/apple-touch-icon.png`,
+        width: 180,
+        height: 180,
+      },
+      sameAs: [
+        'https://twitter.com/dailydotdev',
+        'https://github.com/dailydotdev',
+        'https://www.linkedin.com/company/daily-dev-ltd',
+      ],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${APP_ORIGIN}/#website`,
+      url: APP_ORIGIN,
+      name: 'daily.dev',
+      publisher: { '@id': `${SITE_ORIGIN}/#organization` },
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: `${APP_ORIGIN}/search?q={search_term_string}`,
+        },
+        'query-input': 'required name=search_term_string',
+      },
+    },
+  ],
+});
+
+function InternalApp({ Component, pageProps, router }: AppProps): ReactElement {
+  const { isOnboardingActionsReady, isOnboardingComplete } =
+    useOnboardingActions();
+  const openedHotAndColdFromQueryRef = useRef(false);
+  const installReferralRoutedRef = useRef(false);
+
+  const { unreadCount } = useNotificationContext();
+  const unreadText = getUnreadText(unreadCount);
+  const {
+    user,
+    trackingId,
+    isFunnel,
+    shouldShowLogin,
+    closeLogin,
+    loginState,
+  } = useAuthContext();
+  // Users arriving from the extension install link land on `/?ref=install`.
+  const isComingFromInstall = router.query.ref === 'install';
+  useIubendaConsentMirror();
+  useWebVitals();
+  useLogPageView();
+  const { modal, closeModal, openModal } = useLazyModal();
+  useConsoleLogo();
+  useIOSError();
+
+  useCheckCoresRole();
+  useCheckLocation();
+
+  const activeModalType = modal?.type;
+  const hotAndColdModalQuery = router.query[hotAndColdModalQueryKey];
+  const shouldOpenHotAndColdFromQuery =
+    hotAndColdModalQuery === hotAndColdModalQueryValue ||
+    hotAndColdModalQuery === hotAndColdModalLegacyQueryValue ||
+    (Array.isArray(hotAndColdModalQuery) &&
+      (hotAndColdModalQuery.includes(hotAndColdModalQueryValue) ||
+        hotAndColdModalQuery.includes(hotAndColdModalLegacyQueryValue)));
+
+  useEffect(() => {
+    if (!shouldOpenHotAndColdFromQuery) {
+      openedHotAndColdFromQueryRef.current = false;
+      return;
+    }
+
+    if (activeModalType === LazyModal.HotAndCold) {
+      openedHotAndColdFromQueryRef.current = true;
+      return;
+    }
+
+    if (activeModalType) {
+      return;
+    }
+
+    if (!openedHotAndColdFromQueryRef.current) {
+      openModal({ type: LazyModal.HotAndCold });
+      return;
+    }
+
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has(hotAndColdModalQueryKey)) {
+      return;
+    }
+
+    url.searchParams.delete(hotAndColdModalQueryKey);
+    const nextPath = `${url.pathname}${url.search}${url.hash}`;
+
+    router.replace(nextPath, undefined, { shallow: true });
+  }, [activeModalType, openModal, router, shouldOpenHotAndColdFromQuery]);
+
+  useEffect(() => {
+    const redirect = getOnboardingRedirect({
+      pathname: router.pathname,
+      isRouterReady: router.isReady,
+      hasRoutedInstallReferral: installReferralRoutedRef.current,
+      isComingFromInstall,
+      isFunnel,
+      isOnboardingActionsReady,
+      isOnboardingComplete,
+    });
+
+    if (!redirect) {
+      return;
+    }
+
+    if (redirect.isInstallReferral) {
+      installReferralRoutedRef.current = true;
+    }
+
+    router.replace(redirect.destination);
+    // `router.pathname` is depended on explicitly because the `router` ref is
+    // stable across in-app navigations.
+  }, [
+    isFunnel,
+    isOnboardingActionsReady,
+    router,
+    router.pathname,
+    router.isReady,
+    isOnboardingComplete,
+    isComingFromInstall,
+  ]);
+
+  useEffect(() => {
+    const id = user?.id || trackingId;
+    if (id && messageHandlerExists(WebKitMessageHandlers.UpdateUserId)) {
+      postWebKitMessage(WebKitMessageHandlers.UpdateUserId, id);
+    }
+  }, [user?.id, trackingId]);
+
+  useEffect(() => {
+    if (
+      user?.subscriptionFlags?.appAccountToken &&
+      messageHandlerExists(WebKitMessageHandlers.IAPSetAppAccountToken)
+    ) {
+      postWebKitMessage(
+        WebKitMessageHandlers.IAPSetAppAccountToken,
+        user.subscriptionFlags.appAccountToken,
+      );
+    }
+  }, [user?.subscriptionFlags?.appAccountToken]);
+
+  useEffect(() => {
+    if (!modal) {
+      return undefined;
+    }
+
+    const onRouteChange = () => {
+      if (!modal.persistOnRouteChange) {
+        closeModal();
+      }
+    };
+
+    router.events.on('routeChangeStart', onRouteChange);
+
+    return () => {
+      router.events.off('routeChangeStart', onRouteChange);
+    };
+  }, [modal, closeModal, router.events]);
+
+  const getLayout =
+    (Component as ComponentGetLayout).getLayout || ((page) => page);
+  const { layoutProps } = Component as ComponentGetLayout;
+
+  const { themeColor } = useThemedAsset();
+  const seo = (pageProps?.seo || layoutProps?.seo) as Record<string, unknown>;
+
+  const showAppStoreBanner = !router.pathname.startsWith('/helloworld');
+  const isImageGenerator = router.pathname.startsWith('/image-generator');
+  const canonical = canonicalFromRouter(router);
+
+  return (
+    <SerwistProvider
+      swUrl="/serwist/sw.js"
+      disable={!user}
+      register={!!user}
+      reloadOnOnline={false}
+    >
+      <>
+        <Head>
+          <meta
+            name="viewport"
+            content="initial-scale=1.0, width=device-width, viewport-fit=cover"
+          />
+          <meta name="theme-color" content={themeColor} />
+          <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content={themeColor}
+          />
+
+          <meta name="application-name" content="daily.dev" />
+          <meta name="apple-mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-title" content="daily.dev" />
+          <meta name="format-detection" content="telephone=no" />
+          <meta name="mobile-web-app-capable" content="yes" />
+          <meta name="slack-app-id" content="A07AM7XC529" />
+          {showAppStoreBanner && (
+            <meta name="apple-itunes-app" content="app-id=6740634400" />
+          )}
+          <meta
+            name="facebook-domain-verification"
+            content="78sk2yqe8k6z8uznxwj6q82gklhy42"
+          />
+
+          <link
+            rel="apple-touch-icon"
+            sizes="180x180"
+            href={fromCDN('/apple-touch-icon.png')}
+          />
+          <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href={fromCDN('/favicon-32x32.png')}
+          />
+          <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href={fromCDN('/favicon-16x16.png')}
+          />
+          <link rel="manifest" href="/manifest.json" />
+          <link
+            rel="sitemap"
+            type="application/xml"
+            title="Sitemap"
+            href="/sitemap.xml"
+          />
+          <link rel="llms-txt" href="/llms.txt" />
+          <link
+            rel="alternate"
+            type="text/plain"
+            href="/llms.txt"
+            title="LLM-friendly site directory"
+          />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: GLOBAL_SEO_JSON_LD }}
+          />
+
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.addEventListener('load', () => { window.windowLoaded = true; }, {
+      once: true,
+    });`,
+            }}
+          />
+
+          <link rel="preconnect" href="https://api.daily.dev" />
+          <link rel="preconnect" href="https://media.daily.dev" />
+          <link rel="dns-prefetch" href="https://connect.facebook.net" />
+          <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+          <link rel="dns-prefetch" href="https://static.hotjar.com" />
+          <link rel="dns-prefetch" href="https://static.ads-twitter.com" />
+          <link rel="dns-prefetch" href="https://www.redditstatic.com" />
+          <link rel="dns-prefetch" href="https://analytics.tiktok.com" />
+        </Head>
+        <DefaultSeo
+          {...Seo}
+          {...defaultSeo}
+          title={defaultSeoTitle}
+          canonical={canonical}
+          openGraph={{
+            ...Seo.openGraph,
+            url: canonical,
+          }}
+          titleTemplate={unreadCount ? `(${unreadText}) %s` : '%s'}
+          robotsProps={robotsProps}
+        />
+        {!!seo && <NextSeo robotsProps={robotsProps} {...seo} />}
+        <LazyModalElement />
+        <DndContextProvider>
+          {getLayout(<Component {...pageProps} />, pageProps, layoutProps)}
+        </DndContextProvider>
+        {shouldShowLogin && (
+          <AuthModal
+            isOpen={shouldShowLogin}
+            onRequestClose={closeLogin}
+            contentLabel="Login Modal"
+            trigger={loginState?.trigger}
+          />
+        )}
+        {!isImageGenerator && <Iubenda />}
+        <div className="award-easter-egg-container" />
+      </>
+    </SerwistProvider>
+  );
+}
+
+/**
+ * Pages under `/dev/*` are internal review surfaces that don't need the
+ * full app shell (BootDataProvider, Serwist offline page, auth, etc.).
+ * They hit production APIs that won't accept localhost cookies, so we
+ * short-circuit to a minimal QueryClient-only tree.
+ */
+const isDevReviewRoute = (pathname: string | undefined): boolean =>
+  !!pathname && pathname.startsWith('/dev/');
+
+/**
+ * `/embed/mf` is loaded as an iframe by the extension and must load as fast as
+ * possible. It needs none of the app shell (boot, auth, providers), so it
+ * shares the minimal short-circuit tree.
+ */
+const isBareEmbedRoute = (pathname: string | undefined): boolean =>
+  isDevReviewRoute(pathname) || pathname === '/embed/mf';
+
+export default function App(
+  props: AppProps<{ dehydratedState: DehydratedState }>,
+): ReactElement {
+  const [queryClient] = useState(
+    () => new QueryClient(defaultQueryClientConfig),
+  );
+  const version = useWebappVersion();
+  const deviceId = useDeviceId();
+  useError();
+  useManualScrollRestoration();
+  useScrollbarWidth();
+
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'development') {
+      return;
+    }
+
+    import('@dailydotdev/shared/src/lib/imageShare/devCaptureShareImage').then(
+      ({ installCaptureShareImage }) => installCaptureShareImage(),
+    );
+  }, []);
+
+  const { Component, pageProps, router } = props;
+  const { dehydratedState } = pageProps;
+
+  if (isBareEmbedRoute(router?.pathname)) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <HydrationBoundary state={dehydratedState}>
+          <Component {...pageProps} />
+        </HydrationBoundary>
+      </QueryClientProvider>
+    );
+  }
+
+  return (
+    <ProgressiveEnhancementContextProvider>
+      <QueryClientProvider client={queryClient}>
+        <HydrationBoundary state={dehydratedState}>
+          <BootDataProvider
+            app={BootApp.Webapp}
+            getRedirectUri={getRedirectUri}
+            getPage={getPage}
+            version={version}
+            deviceId={deviceId}
+          >
+            <ShellStateProvider>
+              <PixelsProvider>
+                <PushNotificationContextProvider>
+                  <SubscriptionContextProvider>
+                    <PostReferrerContextProvider>
+                      <ShortcutsProvider>
+                        <InternalApp {...props} />
+                      </ShortcutsProvider>
+                    </PostReferrerContextProvider>
+                  </SubscriptionContextProvider>
+                </PushNotificationContextProvider>
+              </PixelsProvider>
+            </ShellStateProvider>
+          </BootDataProvider>
+          <ReactQueryDevtools />
+        </HydrationBoundary>
+      </QueryClientProvider>
+    </ProgressiveEnhancementContextProvider>
+  );
+}

@@ -1,0 +1,111 @@
+import type { ReactElement } from 'react';
+import React, { useContext } from 'react';
+import { USER_COMMENTS_QUERY } from '@dailydotdev/shared/src/graphql/comments';
+import { Origin } from '@dailydotdev/shared/src/lib/log';
+import {
+  generateQueryKey,
+  RequestKey,
+} from '@dailydotdev/shared/src/lib/query';
+import AuthContext from '@dailydotdev/shared/src/contexts/AuthContext';
+import { MyProfileEmptyScreen } from '@dailydotdev/shared/src/components/profile/MyProfileEmptyScreen';
+import { ProfileEmptyScreen } from '@dailydotdev/shared/src/components/profile/ProfileEmptyScreen';
+import { cloudinaryCharmEmptyProfile } from '@dailydotdev/shared/src/lib/image';
+import CommentFeed from '@dailydotdev/shared/src/components/CommentFeed';
+import type { NextSeoProps } from 'next-seo/lib/types';
+import { NextSeo } from 'next-seo';
+import GoBackHeaderMobile from '@dailydotdev/shared/src/components/post/GoBackHeaderMobile';
+import {
+  Typography,
+  TypographyType,
+} from '@dailydotdev/shared/src/components/typography/Typography';
+import type { ProfileLayoutProps } from '../../components/layouts/ProfileLayout';
+import {
+  getStaticPaths as getProfileStaticPaths,
+  getStaticProps as getProfileStaticProps,
+  getLayout as getProfileLayout,
+  getProfileSeoDefaults,
+} from '../../components/layouts/ProfileLayout';
+import { getPageSeoTitles } from '../../components/layouts/utils';
+
+export const getStaticProps = getProfileStaticProps;
+export const getStaticPaths = getProfileStaticPaths;
+
+const commentClassName = {
+  container: 'rounded-none border-0 border-b',
+  commentBox: {
+    container: 'relative border-0 rounded-none',
+  },
+};
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const ProfileCommentsPage = ({
+  user,
+  noindex,
+}: ProfileLayoutProps): ReactElement | null => {
+  const { user: loggedUser } = useContext(AuthContext);
+
+  if (!user) {
+    return null;
+  }
+
+  const isSameUser = loggedUser?.id === user.id;
+  const userId = user.id;
+
+  const emptyScreen = isSameUser ? (
+    <MyProfileEmptyScreen
+      className="items-center px-4 py-6 text-center tablet:px-6"
+      image={cloudinaryCharmEmptyProfile}
+      imageAlt="daily.dev charm with an empty profile"
+      text="All tests have passed on the first try and you have no idea why? Time for a break. Browse the feed and join a discussion!"
+      cta="Explore posts"
+      buttonProps={{ tag: 'a', href: '/' }}
+    />
+  ) : (
+    <ProfileEmptyScreen
+      image={cloudinaryCharmEmptyProfile}
+      imageAlt="daily.dev charm with an empty profile"
+      title={`${user?.name ?? 'User'} hasn't replied to any post yet`}
+      text="Once they do, those replies will show up here."
+    />
+  );
+
+  const seo: NextSeoProps = {
+    ...getProfileSeoDefaults(
+      user,
+      {
+        ...getPageSeoTitles(
+          `Posts with replies by ${user.name} (@${user.username})`,
+        ),
+        noindex: true,
+        nofollow: true,
+      },
+      noindex,
+    ),
+  };
+
+  return (
+    <>
+      <NextSeo {...seo} />
+      <GoBackHeaderMobile>
+        <Typography bold type={TypographyType.Body}>
+          Replies
+        </Typography>
+      </GoBackHeaderMobile>
+      <CommentFeed
+        feedQueryKey={generateQueryKey(
+          RequestKey.UserComments,
+          undefined,
+          userId,
+        )}
+        query={USER_COMMENTS_QUERY}
+        logOrigin={Origin.Profile}
+        variables={{ userId }}
+        emptyScreen={emptyScreen}
+        commentClassName={commentClassName}
+      />
+    </>
+  );
+};
+
+ProfileCommentsPage.getLayout = getProfileLayout;
+export default ProfileCommentsPage;

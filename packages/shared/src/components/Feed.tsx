@@ -1,0 +1,908 @@
+import type { CSSProperties, ReactElement, ReactNode } from 'react';
+import React, {
+  useRef,
+  useEffect,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
+import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
+import type { QueryKey } from '@tanstack/react-query';
+import type { PostItem, UseFeedOptionalParams } from '../hooks/useFeed';
+import useFeed, { isBoostedPostAd } from '../hooks/useFeed';
+import type { Ad, Post } from '../graphql/posts';
+import { PostType } from '../graphql/posts';
+import AuthContext from '../contexts/AuthContext';
+import FeedContext from '../contexts/FeedContext';
+import SettingsContext from '../contexts/SettingsContext';
+import useFeedOnPostClick from '../hooks/feed/useFeedOnPostClick';
+import type { PostLocation } from '../hooks/feed/useFeedContextMenu';
+import useFeedContextMenu from '../hooks/feed/useFeedContextMenu';
+import useFeedInfiniteScroll, {
+  InfiniteScrollScreenOffset,
+} from '../hooks/feed/useFeedInfiniteScroll';
+import FeedItemComponent, { getFeedItemKey } from './FeedItemComponent';
+import type { FeaturedWideColSpan } from './cards/common/featuredWide';
+import { useLogContext } from '../contexts/LogContext';
+import { feedLogExtra, postLogEvent } from '../lib/feed';
+import type { SearchLogExtra } from '../lib/searchLog';
+import { usePostModalNavigation } from '../hooks/usePostModalNavigation';
+import { useSharePost } from '../hooks/useSharePost';
+import { LogEvent, Origin, TargetId } from '../lib/log';
+import { SharedFeedPage } from './utilities';
+import type { FeedContainerProps } from './feeds/FeedContainer';
+import { FeedContainer } from './feeds/FeedContainer';
+import { ActiveFeedContext } from '../contexts/ActiveFeedContext';
+import { useActions } from '../hooks/useActions';
+import { useBoot } from '../hooks/useBoot';
+import { useConditionalFeature } from '../hooks/useConditionalFeature';
+import { useFeedLayout } from '../hooks/useFeedLayout';
+import { useFeedVotePost } from '../hooks/vote/useFeedVotePost';
+import { useMutationSubscription } from '../hooks/mutationSubscription/useMutationSubscription';
+import { useProfileCompletionCard } from '../hooks/profile/useProfileCompletionCard';
+import type { AllFeedPages } from '../lib/query';
+import { OtherFeedPage, RequestKey } from '../lib/query';
+
+import { MarketingCtaVariant } from './marketing/cta/common';
+import { MarketingCtaCard } from './marketing/cta';
+import { MarketingCtaList } from './marketing/cta/MarketingCtaList';
+import { MarketingCtaBriefing } from './marketing/cta/MarketingCtaBriefing';
+import { MarketingCtaYearInReview } from './marketing/cta/MarketingCtaYearInReview';
+import { MarketingCtaVideo } from './marketing/cta/MarketingCtaVideo';
+import { AcquisitionFormGrid } from './cards/AcquisitionForm/AcquisitionFormGrid';
+import { AcquisitionFormList } from './cards/AcquisitionForm/AcquisitionFormList';
+import PlusGrid from './cards/plus/PlusGrid';
+import { isNullOrUndefined } from '../lib/func';
+import { useSearchResultsLayout } from '../hooks/search/useSearchResultsLayout';
+import { SearchResultsLayout } from './search/SearchResults/SearchResultsLayout';
+import { acquisitionKey } from './cards/AcquisitionForm/common/common';
+import type { PostClick } from '../lib/click';
+
+import { useFeedContentPreferenceMutationSubscription } from './feeds/useFeedContentPreferenceMutationSubscription';
+import { useFeedBookmarkPost } from '../hooks/bookmark/useFeedBookmarkPost';
+import usePlusEntry from '../hooks/usePlusEntry';
+import { FeedCardContext } from '../features/posts/FeedCardContext';
+import {
+  briefCardFeedFeature,
+  featureFeedAdTemplate,
+  featureFeedContentVisibility,
+} from '../lib/featureManagement';
+import { useHasIntroQuests } from '../hooks/useHasIntroQuests';
+import type { AwardProps } from '../graphql/njord';
+import { getProductsQueryOptions } from '../graphql/njord';
+import { useUpdateQuery } from '../hooks/useUpdateQuery';
+import { BriefBannerFeed } from './cards/brief/BriefBanner/BriefBannerFeed';
+import { EngagementFeedStrip } from './brand/EngagementFeedStrip';
+import { isEngagementAdFeed } from '../hooks/feed/useFeedName';
+import { ActionType } from '../graphql/actions';
+import ReadingReminderFeedHero from './marketing/banners/ReadingReminderFeedHero';
+import { useLayoutVariant } from '../hooks/layout/useLayoutVariant';
+import { useReaderModalEligibility } from './post/reader/hooks/useReaderModalEligibility';
+import { useQuestDashboard } from '../hooks/useQuestDashboard';
+
+const FeedErrorScreen = dynamic(
+  () => import(/* webpackChunkName: "feedErrorScreen" */ './FeedErrorScreen'),
+);
+
+export interface FeedProps<T>
+  extends Pick<UseFeedOptionalParams<T>, 'options' | 'excludePinnedPosts'>,
+    Pick<FeedContainerProps, 'shortcuts'> {
+  feedName: AllFeedPages;
+  feedQueryKey: QueryKey;
+  query?: string;
+  variables?: T;
+  className?: string;
+  onEmptyFeed?: () => unknown;
+  emptyScreen?: ReactNode;
+  header?: ReactNode;
+  inlineHeader?: boolean;
+  allowPin?: boolean;
+  showSearch?: boolean;
+  actionButtons?: ReactNode;
+  disableAds?: boolean;
+  staticAd?: { ad: Ad; index: number };
+  disableAdRefresh?: boolean;
+  allowFetchMore?: boolean;
+  pageSize?: number;
+  isHorizontal?: boolean;
+  feedContainerRef?: React.Ref<HTMLDivElement>;
+  disableListFrame?: boolean;
+  /**
+   * Single-source feeds (e.g. one squad) where repeating the source on every
+   * card is noise. Cards drop the source avatar and fall back to the author
+   * for their labels.
+   */
+  hideSource?: boolean;
+  /**
+   * Drop the tag chips (and the row they sit on) from every card.
+   */
+  hideTags?: boolean;
+  topContent?: ReactNode;
+  /**
+   * Search feeds only: correlation id for the query execution and the backend
+   * search version behind it. Both ride along on every engagement event so the
+   * search experiment can be measured per query.
+   */
+  searchId?: string;
+  searchVersion?: number;
+}
+
+interface RankVariables {
+  ranking?: string;
+}
+
+const ArticlePostModal = dynamic(
+  () =>
+    import(
+      /* webpackChunkName: "articlePostModal" */ './modals/ArticlePostModal'
+    ),
+);
+const SharePostModal = dynamic(
+  () =>
+    import(/* webpackChunkName: "sharePostModal" */ './modals/SharePostModal'),
+);
+const CollectionPostModal = dynamic(
+  () =>
+    import(
+      /* webpackChunkName: "collectionPostModal" */ './modals/CollectionPostModal'
+    ),
+);
+
+const BriefPostModal = dynamic(
+  () =>
+    import(/* webpackChunkName: "briefPostModal" */ './modals/BriefPostModal'),
+);
+
+const PollPostModal = dynamic(
+  () =>
+    import(/* webpackChunkName: "pollPostModal" */ './modals/PollPostModal'),
+);
+
+const SocialTwitterPostModal = dynamic(
+  () =>
+    import(
+      /* webpackChunkName: "socialTwitterPostModal" */ './modals/SocialTwitterPostModal'
+    ),
+);
+
+const BriefCardFeed = dynamic(
+  () =>
+    import(
+      /* webpackChunkName: "briefCardFeed" */ './cards/brief/BriefCard/BriefCardFeed'
+    ),
+);
+
+const ProfileCompletionCard = dynamic(
+  () =>
+    import(
+      /* webpackChunkName: "profileCompletionCard" */ './cards/ProfileCompletionCard'
+    ),
+);
+
+export const PostModalMap: Partial<Record<PostType, typeof ArticlePostModal>> =
+  {
+    [PostType.Article]: ArticlePostModal,
+    [PostType.Share]: SharePostModal,
+    [PostType.Welcome]: SharePostModal,
+    [PostType.Freeform]: SharePostModal,
+    [PostType.VideoYouTube]: ArticlePostModal,
+    [PostType.Collection]: CollectionPostModal,
+    [PostType.Brief]: BriefPostModal,
+    [PostType.Digest]: ArticlePostModal,
+    [PostType.Poll]: PollPostModal,
+    [PostType.SocialTwitter]: SocialTwitterPostModal,
+  };
+
+export default function Feed<T>({
+  feedName,
+  feedQueryKey,
+  query,
+  variables,
+  className,
+  header,
+  inlineHeader,
+  onEmptyFeed,
+  emptyScreen,
+  options,
+  allowPin,
+  showSearch = true,
+  shortcuts,
+  actionButtons,
+  disableAds,
+  staticAd,
+  disableAdRefresh = false,
+  allowFetchMore,
+  pageSize,
+  isHorizontal = false,
+  feedContainerRef,
+  disableListFrame = false,
+  excludePinnedPosts = false,
+  hideSource = false,
+  hideTags = false,
+  topContent: topContentProp,
+  searchId,
+  searchVersion,
+}: FeedProps<T>): ReactElement {
+  const origin = Origin.Feed;
+  const { logEvent } = useLogContext();
+  const currentSettings = useContext(FeedContext);
+  const { user } = useContext(AuthContext);
+  const { isFallback, query: routerQuery } = useRouter();
+  const { openNewTab, loadedSettings } = useContext(SettingsContext);
+  const { isListMode, shouldUseListFeedLayout } = useFeedLayout();
+  const numCards = currentSettings.numCards.eco;
+  const isSquadFeed = feedName === OtherFeedPage.Squad;
+  const trackedFeedFinish = useRef(false);
+  const isMyFeed = feedName === SharedFeedPage.MyFeed;
+  const showAcquisitionForm =
+    isMyFeed &&
+    (routerQuery?.[acquisitionKey] as string)?.toLocaleLowerCase() === 'true' &&
+    !user?.acquisitionChannel;
+  const { getMarketingCta } = useBoot();
+  const { isActionsFetched, checkHasCompleted } = useActions();
+  const marketingCta =
+    getMarketingCta(MarketingCtaVariant.Card) ||
+    getMarketingCta(MarketingCtaVariant.BriefCard) ||
+    getMarketingCta(MarketingCtaVariant.YearInReview) ||
+    getMarketingCta(MarketingCtaVariant.Video);
+  const { plusEntryFeed } = usePlusEntry();
+  const hasDismissBriefCta =
+    isActionsFetched && checkHasCompleted(ActionType.DisableBriefCardCta);
+  const showMarketingCta =
+    !!marketingCta &&
+    (marketingCta?.variant !== MarketingCtaVariant.BriefCard ||
+      !hasDismissBriefCta);
+  const { isSearchPageLaptop } = useSearchResultsLayout();
+  const hasNoBriefAction =
+    isActionsFetched && !checkHasCompleted(ActionType.GeneratedBrief);
+
+  const {
+    showProfileCompletionCard,
+    isLoading: isProfileCompletionCardLoading,
+  } = useProfileCompletionCard({ isMyFeed });
+
+  const hasDismissedBriefCard =
+    isActionsFetched && checkHasCompleted(ActionType.DismissBriefCard);
+
+  const shouldEvaluateBriefCard =
+    isMyFeed &&
+    hasNoBriefAction &&
+    !hasDismissedBriefCard &&
+    !showProfileCompletionCard &&
+    !isProfileCompletionCardLoading;
+  const { value: briefCardFeatureValue } = useConditionalFeature({
+    feature: briefCardFeedFeature,
+    shouldEvaluate: shouldEvaluateBriefCard,
+  });
+  const hasIntroQuests = useHasIntroQuests({
+    shouldEvaluate: shouldEvaluateBriefCard,
+  });
+  const { isPending: isPendingQuestDashboard } = useQuestDashboard({
+    enabled: shouldEvaluateBriefCard,
+  });
+  const showBriefCard =
+    shouldEvaluateBriefCard &&
+    briefCardFeatureValue &&
+    !isPendingQuestDashboard &&
+    !hasIntroQuests;
+  const [getProducts] = useUpdateQuery(getProductsQueryOptions());
+  const adTemplate = currentSettings.adTemplate ??
+    featureFeedAdTemplate.defaultValue?.default ?? { adStart: 1 };
+
+  const { isV2 } = useLayoutVariant();
+
+  const getFirstSlotCard = (): ReactElement | null => {
+    const canShowGrowthCta =
+      !disableAds &&
+      !isHorizontal &&
+      feedQueryKey?.[0] !== RequestKey.FeedPreview;
+    const canShowNonPlusCta = canShowGrowthCta && !user?.isPlus;
+
+    if (canShowNonPlusCta && plusEntryFeed) {
+      return <PlusGrid {...plusEntryFeed} />;
+    }
+    if (canShowGrowthCta && showMarketingCta && marketingCta) {
+      if (marketingCta.variant === MarketingCtaVariant.BriefCard) {
+        return <MarketingCtaBriefing {...marketingCta} />;
+      }
+      if (marketingCta.variant === MarketingCtaVariant.YearInReview) {
+        return <MarketingCtaYearInReview marketingCta={marketingCta} />;
+      }
+      if (marketingCta.variant === MarketingCtaVariant.Video) {
+        return <MarketingCtaVideo marketingCta={marketingCta} />;
+      }
+      const Component = shouldUseListFeedLayout
+        ? MarketingCtaList
+        : MarketingCtaCard;
+      return <Component marketingCta={marketingCta} />;
+    }
+    if (canShowNonPlusCta && showAcquisitionForm) {
+      const Component = shouldUseListFeedLayout
+        ? AcquisitionFormList
+        : AcquisitionFormGrid;
+      return <Component />;
+    }
+    if (showProfileCompletionCard) {
+      return <ProfileCompletionCard className={{ container: 'p-4 pt-0' }} />;
+    }
+    if (showBriefCard) {
+      return (
+        <BriefCardFeed
+          targetId={TargetId.Feed}
+          className={{ container: 'p-4 pt-0' }}
+        />
+      );
+    }
+    return null;
+  };
+
+  const eligibleFirstSlotCard = getFirstSlotCard();
+  const {
+    items,
+    placements: itemPlacements,
+    bannerInsertions,
+    updatePost,
+    removePost,
+    fetchPage,
+    canFetchMore: queryCanFetchMore,
+    emptyFeed,
+    isFetching,
+    isInitialLoading,
+    isError,
+    hasFirstSlotCard,
+    error: feedError,
+  } = useFeed(
+    feedQueryKey,
+    pageSize ?? currentSettings.pageSize,
+    isSquadFeed || shouldUseListFeedLayout
+      ? {
+          ...adTemplate,
+          adStart: 2, // always make adStart 2 for squads due to welcome and pinned posts
+        }
+      : adTemplate,
+    numCards,
+    {
+      onEmptyFeed,
+      query,
+      variables,
+      options,
+      isBriefBannerEligible: !user?.isPlus && isMyFeed,
+      engagementStripEligible: !isHorizontal && isEngagementAdFeed(feedName),
+      firstSlotOffset: Number(eligibleFirstSlotCard !== null),
+      disableTopHero: isV2,
+      isHorizontal,
+      excludePinnedPosts,
+      settings: {
+        disableAds,
+        staticAd,
+        adPostLength: isSquadFeed ? 2 : undefined,
+        feedName,
+        searchId,
+        searchVersion,
+      },
+    },
+  );
+  const canFetchMore = allowFetchMore ?? queryCanFetchMore;
+  const [postModalIndex, setPostModalIndex] = useState<PostLocation | null>(
+    null,
+  );
+  const { onMenuClick, postMenuIndex, postMenuLocation } = useFeedContextMenu();
+  const useList = isListMode && numCards > 1;
+  const virtualizedNumCards = useList ? 1 : numCards;
+
+  // Experiment: let the browser skip layout/paint for off-screen cards on long
+  // vertical feeds. Horizontal carousels are short and scroll on the other axis,
+  // so they get no benefit and are excluded from evaluation.
+  const { value: feedContentVisibility } = useConditionalFeature({
+    feature: featureFeedContentVisibility,
+    shouldEvaluate: !isHorizontal,
+  });
+  const useContentVisibility = feedContentVisibility && !isHorizontal;
+  // `contain-intrinsic-size: auto <estimate>` reserves height for skipped cards
+  // so the scrollbar stays stable; `auto` makes the browser remember each card's
+  // real size after its first paint, so the estimate only matters for cards not
+  // yet rendered. Grid cards use the `min-h-card` baseline; list cards are shorter.
+  const contentVisibilityStyle: CSSProperties | undefined = useContentVisibility
+    ? {
+        contentVisibility: 'auto',
+        containIntrinsicSize: shouldUseListFeedLayout
+          ? 'auto 12rem'
+          : 'auto 24rem',
+        // `content-visibility: auto` applies paint containment, which clips
+        // anything drawn outside the box — including the "Video" type label and
+        // the "Hot"/"Pinned" flag, which straddle the card's top edge with a
+        // negative offset. Extend the paint-clip region so those labels aren't
+        // truncated. Covers the tallest overhang (the grid flag, ~1.25rem)
+        // without any layout shift.
+        overflowClipMargin: '1.5rem',
+      }
+    : undefined;
+  const {
+    onOpenModal,
+    onCloseModal,
+    onPrevious,
+    onNext,
+    postPosition,
+    selectedPost,
+    selectedPostIsAd,
+  } = usePostModalNavigation({
+    items,
+    fetchPage,
+    updatePost,
+    canFetchMore,
+    feedName,
+  });
+  const { isReaderEnabled: isReaderModalOn } = useReaderModalEligibility();
+  const readerEligiblePostTypes = useMemo(
+    () =>
+      new Set<PostType>([
+        PostType.Article,
+        PostType.Digest,
+        PostType.VideoYouTube,
+      ]),
+    [],
+  );
+  const isReaderEligiblePost = useCallback(
+    (post: Post): boolean =>
+      isReaderModalOn && readerEligiblePostTypes.has(post.type),
+    [isReaderModalOn, readerEligiblePostTypes],
+  );
+  const {
+    showPromoBanner,
+    indexWhenShowingPromoBanner,
+    showEngagementStrip,
+    indexWhenShowingEngagementStrip,
+    engagementStripCreative,
+    hero: {
+      shouldShowTopHero,
+      title: readingReminderTitle,
+      subtitle: readingReminderSubtitle,
+      onEnable: onEnableHero,
+      onDismiss: onDismissHero,
+    },
+  } = bannerInsertions;
+
+  useMutationSubscription({
+    matcher: ({ mutation }) => {
+      const [requestKey] = Array.isArray(mutation.options.mutationKey)
+        ? mutation.options.mutationKey
+        : [];
+      return requestKey === 'awards';
+    },
+    callback: ({ variables: feedPostVars }) => {
+      const { entityId, type, productId } = feedPostVars as AwardProps;
+
+      if (type === 'POST') {
+        const postItem = items.find(
+          (item): item is PostItem =>
+            item.type === 'post' && item.post.id === entityId,
+        );
+
+        if (!postItem) {
+          return;
+        }
+
+        const currentPost = postItem.post;
+
+        const awardProduct = getProducts()?.edges.find(
+          (item) => item.node.id === productId,
+        )?.node;
+
+        if (!currentPost.userState || awardProduct?.value === undefined) {
+          return;
+        }
+
+        updatePost(postItem.page, postItem.index, {
+          ...currentPost,
+          userState: {
+            ...currentPost.userState,
+            awarded: true,
+          },
+          numAwards: (currentPost.numAwards || 0) + 1,
+          featuredAward:
+            !currentPost.featuredAward?.award?.value ||
+            awardProduct?.value > currentPost.featuredAward?.award?.value
+              ? {
+                  award: awardProduct,
+                }
+              : currentPost.featuredAward,
+        });
+      }
+    },
+  });
+
+  const logOpts = useMemo(() => {
+    const modalRow = postModalIndex?.row;
+    const modalColumn = postModalIndex?.column;
+
+    return {
+      columns: virtualizedNumCards,
+      row: !isNullOrUndefined(modalRow) ? modalRow : postMenuLocation?.row,
+      column: !isNullOrUndefined(modalColumn)
+        ? modalColumn
+        : postMenuLocation?.column,
+      is_ad: selectedPostIsAd ? true : undefined,
+    };
+  }, [postMenuLocation, virtualizedNumCards, postModalIndex, selectedPostIsAd]);
+
+  const onRemovePost = useCallback(
+    async (removePostIndex: number) => {
+      const item = items[removePostIndex] as PostItem;
+      removePost(item.page, item.index);
+    },
+    [items, removePost],
+  );
+
+  const feedContextValue = useMemo(() => {
+    return {
+      queryKey: feedQueryKey,
+      items,
+      logOpts,
+      allowPin,
+      origin,
+      onRemovePost,
+    };
+  }, [feedQueryKey, items, logOpts, allowPin, origin, onRemovePost]);
+
+  const { ranking } = (variables as RankVariables) || {};
+
+  const searchLogExtra = useMemo<SearchLogExtra | undefined>(() => {
+    if (!searchId && searchVersion === undefined) {
+      return undefined;
+    }
+
+    return { search_id: searchId, search_version: searchVersion };
+  }, [searchId, searchVersion]);
+
+  const infiniteScrollRef = useFeedInfiniteScroll({
+    fetchPage,
+    canFetchMore: canFetchMore && feedQueryKey?.[0] !== RequestKey.FeedPreview,
+  });
+
+  const { toggleUpvote, toggleDownvote } = useFeedVotePost({
+    feedName,
+    ranking: ranking ?? '',
+    items,
+    updatePost,
+    feedQueryKey,
+  });
+
+  const { toggleBookmark } = useFeedBookmarkPost({
+    feedName,
+    feedQueryKey,
+    ranking: ranking ?? '',
+    items,
+    updatePost,
+  });
+
+  useFeedContentPreferenceMutationSubscription({ feedQueryKey });
+
+  const onPostClick = useFeedOnPostClick({
+    items,
+    updatePost,
+    columns: virtualizedNumCards,
+    feedName,
+    ranking,
+    searchLogExtra,
+  });
+
+  const onReadArticleClick = useFeedOnPostClick({
+    items,
+    updatePost,
+    columns: virtualizedNumCards,
+    feedName,
+    ranking,
+    eventName: 'go to link',
+    searchLogExtra,
+  });
+
+  const trackFinishFeed = useCallback(() => {
+    if (!canFetchMore) {
+      logEvent({
+        event_name: LogEvent.FinishFeed,
+        extra: JSON.stringify(
+          feedLogExtra(feedName, ranking, searchLogExtra).extra,
+        ),
+        ...logOpts,
+      });
+    }
+  }, [canFetchMore, feedName, logEvent, logOpts, ranking, searchLogExtra]);
+
+  const { openSharePost, copyLink } = useSharePost(origin);
+
+  useEffect(() => {
+    if (!canFetchMore && !isFetching && !trackedFeedFinish.current) {
+      trackFinishFeed();
+      trackedFeedFinish.current = true;
+    }
+  }, [canFetchMore, isFetching, trackFinishFeed]);
+
+  useEffect(() => {
+    return () => {
+      document.body.classList.remove('hidden-scrollbar');
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!selectedPost) {
+      document.body.classList.remove('hidden-scrollbar');
+    }
+  }, [selectedPost]);
+
+  const onShareClick = useCallback(
+    (post: Post, row?: number, column?: number) =>
+      openSharePost({ post, columns: virtualizedNumCards, column, row }),
+    [openSharePost, virtualizedNumCards],
+  );
+
+  const PostModal = useMemo(() => {
+    if (!selectedPost) {
+      return undefined;
+    }
+    return PostModalMap[selectedPost.type];
+  }, [selectedPost]);
+
+  if (!loadedSettings || isFallback) {
+    return <></>;
+  }
+
+  const onPostModalOpen = ({
+    index,
+    callback,
+    row,
+    column,
+  }: {
+    index: number;
+    callback?: () => unknown;
+    row?: number;
+    column?: number;
+  }) => {
+    document.body.classList.add('hidden-scrollbar');
+    callback?.();
+    setPostModalIndex({ index, row, column });
+    onOpenModal(index);
+  };
+
+  const onPostModalClose = () => {
+    setPostModalIndex(null);
+    onCloseModal(false);
+  };
+
+  const onPostCardClick: PostClick = async (
+    post,
+    index,
+    row,
+    column,
+    isAuxClick,
+    event,
+  ) => {
+    const isMiddleClick = event?.type === 'auxclick' || event?.button === 1;
+    const isModifierClick = !!(event && (event.ctrlKey || event.metaKey));
+    const readerEligible = isReaderEligiblePost(post);
+    const shouldOpenModal =
+      !isAuxClick &&
+      !isMiddleClick &&
+      !isModifierClick &&
+      (!shouldUseListFeedLayout || readerEligible);
+    if (shouldOpenModal && shouldUseListFeedLayout && event) {
+      event.preventDefault();
+    }
+    await onPostClick(post, index, row, column, {
+      skipPostUpdate: true,
+    });
+    if (shouldOpenModal) {
+      onPostModalOpen({ index, row, column });
+    }
+  };
+
+  const onCopyLinkClickLogged = (
+    e: React.MouseEvent,
+    post: Post,
+    index: number,
+    row: number,
+    column: number,
+  ) => {
+    copyLink({ post, columns: virtualizedNumCards, row, column });
+  };
+
+  const onCommentClick = (
+    post: Post,
+    index: number,
+    row: number,
+    column: number,
+    isAd?: boolean,
+  ): void => {
+    logEvent(
+      postLogEvent(LogEvent.CommentsClick, post, {
+        columns: virtualizedNumCards,
+        column,
+        row,
+        index,
+        ...feedLogExtra(feedName, ranking, searchLogExtra),
+        is_ad: isAd,
+      }),
+    );
+    if (!shouldUseListFeedLayout || isReaderEligiblePost(post)) {
+      onPostModalOpen({ index, row, column });
+    }
+  };
+
+  if (isError) {
+    return <FeedErrorScreen error={feedError} />;
+  }
+
+  if (emptyScreen && emptyFeed && !isSearchPageLaptop) {
+    return <>{emptyScreen}</>;
+  }
+
+  const isValidFeed = Object.values(SharedFeedPage).includes(
+    feedName as SharedFeedPage,
+  );
+
+  const FeedWrapperComponent = isSearchPageLaptop
+    ? SearchResultsLayout
+    : FeedContainer;
+  const containerProps = isSearchPageLaptop
+    ? {}
+    : {
+        topContent:
+          topContentProp ??
+          (shouldShowTopHero ? (
+            <ReadingReminderFeedHero
+              className="pt-2"
+              title={readingReminderTitle}
+              subtitle={readingReminderSubtitle}
+              onCtaClick={onEnableHero}
+              onClose={onDismissHero}
+            />
+          ) : undefined),
+        header,
+        inlineHeader,
+        className,
+        showSearch: showSearch && isValidFeed,
+        shortcuts,
+        actionButtons,
+        isHorizontal,
+        feedContainerRef,
+        hasFirstSlotCard,
+        disableListFrame,
+      };
+
+  return (
+    <ActiveFeedContext.Provider value={feedContextValue}>
+      <FeedWrapperComponent {...containerProps}>
+        {isSearchPageLaptop && emptyScreen && emptyFeed ? (
+          <>{emptyScreen}</>
+        ) : (
+          <>
+            {hasFirstSlotCard && eligibleFirstSlotCard}
+            {items.map((item, index) => {
+              const placement = itemPlacements[index];
+              const { colSpan } = placement;
+              const isWidened = colSpan > 1;
+              const wideColSpan =
+                isWidened && (colSpan === 2 || colSpan === 3 || colSpan === 4)
+                  ? (colSpan as FeaturedWideColSpan)
+                  : undefined;
+              const itemNode: ReactElement = (
+                <FeedItemComponent
+                  item={item}
+                  index={index}
+                  row={placement.row}
+                  column={placement.column}
+                  columns={virtualizedNumCards}
+                  openNewTab={openNewTab}
+                  postMenuIndex={postMenuIndex}
+                  user={user}
+                  feedName={feedName}
+                  ranking={ranking}
+                  toggleBookmark={toggleBookmark}
+                  toggleUpvote={toggleUpvote}
+                  toggleDownvote={toggleDownvote}
+                  onPostClick={onPostCardClick}
+                  onShare={onShareClick}
+                  onMenuClick={onMenuClick}
+                  onCopyLinkClick={onCopyLinkClickLogged}
+                  onCommentClick={onCommentClick}
+                  onReadArticleClick={onReadArticleClick}
+                  virtualizedNumCards={virtualizedNumCards}
+                  disableAdRefresh={disableAdRefresh}
+                  wideColSpan={wideColSpan}
+                  searchLogExtra={searchLogExtra}
+                />
+              );
+
+              let renderedItem = itemNode;
+              if (isWidened) {
+                renderedItem = (
+                  <div
+                    className="flex h-full w-full [&>*]:h-full [&>*]:w-full"
+                    style={{
+                      gridColumn: `span ${colSpan}`,
+                      ...contentVisibilityStyle,
+                    }}
+                    data-testid="feedItemColSpanWrapper"
+                  >
+                    {itemNode}
+                  </div>
+                );
+              } else if (useContentVisibility) {
+                // List cards stack at natural height; grid cards must keep
+                // filling their equal-height row, so preserve the h-full pass-through.
+                // The overhanging card labels are handled by `overflowClipMargin`
+                // on `contentVisibilityStyle` (see above), so both branches are safe.
+                renderedItem = (
+                  <div
+                    className={
+                      shouldUseListFeedLayout
+                        ? 'w-full'
+                        : 'flex h-full w-full [&>*]:h-full [&>*]:w-full'
+                    }
+                    style={contentVisibilityStyle}
+                  >
+                    {itemNode}
+                  </div>
+                );
+              }
+
+              return (
+                <FeedCardContext.Provider
+                  key={getFeedItemKey(item, index)}
+                  value={{
+                    boostedBy: isBoostedPostAd(item)
+                      ? item.ad.data?.post?.author || item.ad.data?.post?.scout
+                      : undefined,
+                    hideSource,
+                    hideTags,
+                  }}
+                >
+                  {showPromoBanner && index === indexWhenShowingPromoBanner && (
+                    <BriefBannerFeed
+                      style={{
+                        gridColumn: !shouldUseListFeedLayout
+                          ? `span ${virtualizedNumCards}`
+                          : undefined,
+                      }}
+                    />
+                  )}
+                  {showEngagementStrip &&
+                    engagementStripCreative &&
+                    index === indexWhenShowingEngagementStrip && (
+                      <EngagementFeedStrip
+                        creative={engagementStripCreative}
+                        style={{
+                          gridColumn: !shouldUseListFeedLayout
+                            ? `span ${virtualizedNumCards}`
+                            : undefined,
+                        }}
+                      />
+                    )}
+                  {renderedItem}
+                </FeedCardContext.Provider>
+              );
+            })}
+            {!isFetching && !isInitialLoading && !isHorizontal && (
+              <InfiniteScrollScreenOffset ref={infiniteScrollRef} />
+            )}
+            {selectedPost &&
+              PostModal &&
+              (!shouldUseListFeedLayout ||
+                isReaderEligiblePost(selectedPost)) && (
+                <PostModal
+                  isOpen={!!selectedPost}
+                  id={selectedPost.id}
+                  onRequestClose={onPostModalClose}
+                  onPreviousPost={onPrevious}
+                  onNextPost={onNext}
+                  postPosition={postPosition}
+                  post={selectedPost}
+                />
+              )}
+          </>
+        )}
+      </FeedWrapperComponent>
+    </ActiveFeedContext.Provider>
+  );
+}

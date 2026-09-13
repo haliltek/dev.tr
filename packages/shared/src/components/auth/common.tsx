@@ -1,0 +1,170 @@
+import type { MutableRefObject } from 'react';
+import React from 'react';
+import { FacebookIcon, GoogleIcon, GitHubIcon, AppleIcon } from '../icons';
+import classed from '../../lib/classed';
+import type { IconType, ButtonProps } from '../buttons/Button';
+import type { CloseAuthModalFunc } from '../../hooks/useAuthForms';
+import type {
+  AnonymousUser,
+  LoggedUser,
+  ProfileExtraField,
+} from '../../lib/user';
+import type { AuthTriggersType } from '../../lib/auth';
+
+export interface Provider {
+  icon: IconType;
+  label: string;
+  value: string;
+}
+
+export const AFTER_AUTH_PARAM = 'after_auth';
+
+export enum SocialProvider {
+  Google = 'google',
+  GitHub = 'github',
+  Apple = 'apple',
+  Facebook = 'facebook',
+}
+
+type ProviderMap = Record<SocialProvider, Provider>;
+
+export const providerMap: ProviderMap = {
+  google: {
+    icon: <GoogleIcon className="socialIcon" secondary />,
+    label: 'Google',
+    value: 'google',
+  },
+  github: {
+    icon: <GitHubIcon className="socialIcon" />,
+    label: 'GitHub',
+    value: 'github',
+  },
+  apple: {
+    icon: <AppleIcon className="socialIcon" secondary />,
+    label: 'Apple',
+    value: 'apple',
+  },
+  facebook: {
+    icon: <FacebookIcon className="socialIcon" secondary />,
+    label: 'Facebook',
+    value: 'facebook',
+  },
+};
+
+export const providers: Provider[] = Object.values(providerMap);
+
+export const AuthModalText = classed('p', 'typo-body text-text-secondary');
+
+export interface AuthFormProps {
+  simplified?: boolean;
+}
+
+export const getFormEmail = (e: React.FormEvent): string => {
+  const form = e.currentTarget as HTMLFormElement;
+  const input = Array.from(form.elements).find((el) =>
+    ['email', 'traits.email'].includes(el.getAttribute('name') ?? ''),
+  ) as HTMLInputElement;
+
+  return input?.value?.trim() ?? '';
+};
+
+export enum AuthDisplay {
+  Default = 'default',
+  Registration = 'registration',
+  SocialRegistration = 'social_registration',
+  SignBack = 'sign_back',
+  ForgotPassword = 'forgot_password',
+  CodeVerification = 'code_verification',
+  ChangePassword = 'change_password',
+  OnboardingSignup = 'onboarding_signup',
+  EmailVerification = 'email_verification',
+}
+
+export enum OnboardingActions {
+  ChangePassword = 'changePassword',
+  Login = 'login',
+  Recover = 'recover',
+  Signup = 'signup',
+  /**
+   * Straight to the account-details form, skipping the provider choice.
+   *
+   * `Signup` lands on `AuthDisplay.Default`, which offers the social buttons
+   * again alongside an email field — right for a link that means "sign up",
+   * wrong for one that means "sign up with email". The marketing homepage's
+   * hero has its own provider buttons and its own "Continue with email"; that
+   * button had no address to send anyone to, so it used `Signup` and asked the
+   * visitor to choose a second time.
+   */
+  SignupEmail = 'signupEmail',
+  VerifyEmail = 'verify',
+}
+
+export const actionToAuthDisplay: Record<OnboardingActions, AuthDisplay> = {
+  [OnboardingActions.ChangePassword]: AuthDisplay.ChangePassword,
+  [OnboardingActions.Login]: AuthDisplay.Default,
+  [OnboardingActions.Recover]: AuthDisplay.ForgotPassword,
+  [OnboardingActions.Signup]: AuthDisplay.Default,
+  [OnboardingActions.SignupEmail]: AuthDisplay.Registration,
+  [OnboardingActions.VerifyEmail]: AuthDisplay.EmailVerification,
+} as const;
+
+/** Signup-wall treatment. Both values imply the split-column geometry and
+ * then differ in copy and CTA hierarchy. One name rather than independent
+ * booleans, so a caller cannot ask for a hierarchy without its geometry. */
+export type SignupStyle = 'splitCreateAccount' | 'singlePrimary';
+
+export interface AuthProps {
+  isAuthenticating: boolean;
+  isLoginFlow: boolean;
+  isLoading?: boolean;
+  email?: string;
+  defaultDisplay?: AuthDisplay;
+}
+
+interface ClassName {
+  container?: string;
+  onboardingSignup?: string;
+  onboardingForm?: string;
+  onboardingDivider?: string;
+}
+
+export interface AuthOptionsProps {
+  onClose?: CloseAuthModalFunc;
+  onAuthStateUpdate?: (props: Partial<AuthProps>) => void;
+  onSuccessfulLogin?: () => unknown;
+  onSuccessfulRegistration?: (user?: LoggedUser | AnonymousUser) => unknown;
+  formRef: MutableRefObject<HTMLFormElement>;
+  trigger: AuthTriggersType;
+  defaultDisplay?: AuthDisplay;
+  forceDefaultDisplay?: boolean;
+  className?: ClassName;
+  simplified?: boolean;
+  isLoginFlow?: boolean;
+  onDisplayChange?: (value: string) => void;
+  initialEmail?: string;
+  targetId?: string;
+  ignoreMessages?: boolean;
+  onboardingSignupButton?: ButtonProps<'button'>;
+  hideLoginLink?: boolean;
+  compact?: boolean;
+  signupStyle?: SignupStyle;
+  /** Order GitHub before Google in the OAuth provider list (developer-first). */
+  preferGithub?: boolean;
+  autoTriggerProvider?: string;
+  socialProviderScopes?: string[];
+  /** Extra profile fields to collect on the email registration form, driven
+   * by the onboarding funnel (campaign cohorts). */
+  registrationExtraFields?: ProfileExtraField[];
+  /** Hide the "The homepage developers deserve" headline on the email
+   * registration form (e.g. when the onboarding funnel already shows that copy
+   * on the signup wall). */
+  hideRegistrationHeadline?: boolean;
+  /** Hide the "By continuing, you agree to…" strip under the signup options. */
+  hideSignupDisclaimer?: boolean;
+  /**
+   * The funnel's headline scale and glass CTA. Explicit rather than read from
+   * `FunnelProgressContext`, because these screens render before the stepper
+   * mounts. Not folded into `simplified`, which eleven other surfaces set.
+   */
+  isOnboardingFunnel?: boolean;
+}

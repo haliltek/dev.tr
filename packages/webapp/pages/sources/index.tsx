@@ -1,0 +1,219 @@
+import type { ReactElement } from 'react';
+import React from 'react';
+import type { GetStaticPropsResult } from 'next';
+import Head from 'next/head';
+import type { NextSeoProps } from 'next-seo/lib/types';
+
+import {
+  Button,
+  ButtonSize,
+  ButtonVariant,
+} from '@dailydotdev/shared/src/components/buttons/Button';
+import { PlusIcon, SitesIcon } from '@dailydotdev/shared/src/components/icons';
+import { LazyModal } from '@dailydotdev/shared/src/components/modals/common/types';
+import { useLazyModal } from '@dailydotdev/shared/src/hooks/useLazyModal';
+import { useViewSize, ViewSize } from '@dailydotdev/shared/src/hooks';
+import { useLayoutVariant } from '@dailydotdev/shared/src/hooks/layout/useLayoutVariant';
+import type { Source } from '@dailydotdev/shared/src/graphql/sources';
+import { SOURCE_DIRECTORY_QUERY } from '@dailydotdev/shared/src/graphql/sources';
+import { IconSize } from '@dailydotdev/shared/src/components/Icon';
+import { ApiError, gqlClient } from '@dailydotdev/shared/src/graphql/common';
+import { useRouter } from 'next/router';
+import { BreadCrumbs } from '@dailydotdev/shared/src/components/header/BreadCrumbs';
+import type { GraphQLError } from '@dailydotdev/shared/src/lib/errors';
+import { ExploreHubHeader } from '@dailydotdev/shared/src/components/header/ExploreHubHeader';
+import { PageWrapperLayout } from '@dailydotdev/shared/src/components/layout/PageWrapperLayout';
+import { SourceTopList } from '@dailydotdev/shared/src/components/cards/Leaderboard';
+import { PublicPageSignupBanner } from '@dailydotdev/shared/src/components/auth/PublicPageSignupBanner';
+import { ExploreSignupStrip } from '@dailydotdev/shared/src/components/auth/ExploreSignupStrip';
+import { getLayout } from '../../components/layouts/MainLayout';
+import { getLayout as getFooterNavBarLayout } from '../../components/layouts/FooterNavBarLayout';
+import { defaultOpenGraph } from '../../next-seo';
+import { getPageSeoTitles } from '../../components/layouts/utils';
+
+const seoTitles = getPageSeoTitles('Top sources for developer content');
+const seo: NextSeoProps = {
+  title: seoTitles.title,
+  openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
+  description:
+    'Explore the top sources for developer content on daily.dev. Find trending blogs, publications, YouTube channels and more from our trusted developer network.',
+};
+
+interface SourcesPageProps {
+  mostRecentSources: Source[];
+  trendingSources: Source[];
+  popularSources: Source[];
+  topVideoSources: Source[];
+}
+
+const getSourcesSchemas = (sources: Source[]): string =>
+  JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': 'https://daily.dev/sources#collection',
+        url: 'https://daily.dev/sources',
+        name: 'Top sources for developer content',
+        description:
+          'Explore the top sources for developer content on daily.dev.',
+      },
+      {
+        '@type': 'ItemList',
+        '@id': 'https://daily.dev/sources#items',
+        itemListElement: sources.map((source, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          item: {
+            '@type': 'Thing',
+            name: source.name,
+            url: source.permalink,
+          },
+        })),
+      },
+    ],
+  });
+
+const SourcesPage = ({
+  mostRecentSources,
+  trendingSources,
+  popularSources,
+  topVideoSources,
+}: SourcesPageProps): ReactElement => {
+  const { isFallback: isLoading } = useRouter();
+  const { openModal } = useLazyModal();
+  const isLaptop = useViewSize(ViewSize.Laptop);
+  const { isV2 } = useLayoutVariant();
+  const isV2Laptop = isV2;
+
+  if (isLoading) {
+    return <></>;
+  }
+
+  const allSources = [
+    ...trendingSources,
+    ...popularSources,
+    ...mostRecentSources,
+    ...topVideoSources,
+  ];
+  const uniqueSources = Array.from(
+    new Map(allSources.map((source) => [source.id, source])).values(),
+  ).slice(0, 100);
+  let suggestSourceVariant = ButtonVariant.Float;
+  if (isLaptop) {
+    suggestSourceVariant = ButtonVariant.Secondary;
+  }
+  if (isV2Laptop) {
+    suggestSourceVariant = ButtonVariant.Tertiary;
+  }
+
+  const suggestSourceButton = (
+    <Button
+      icon={<PlusIcon />}
+      variant={suggestSourceVariant}
+      size={isV2Laptop ? ButtonSize.Small : undefined}
+      className={
+        isV2Laptop ? undefined : 'mb-6 ml-4 tablet:ml-0 laptop:float-right'
+      }
+      onClick={() => openModal({ type: LazyModal.NewSource })}
+    >
+      Suggest new source
+    </Button>
+  );
+
+  return (
+    <>
+      {isV2Laptop && <ExploreHubHeader>{suggestSourceButton}</ExploreHubHeader>}
+      <PageWrapperLayout className="py-6">
+        <Head>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: getSourcesSchemas(uniqueSources),
+            }}
+          />
+        </Head>
+        <ExploreSignupStrip className="mb-6" />
+        {!isV2Laptop && (
+          <div className="flex justify-between">
+            <BreadCrumbs>
+              <SitesIcon size={IconSize.XSmall} secondary /> Sources
+            </BreadCrumbs>
+            {suggestSourceButton}
+          </div>
+        )}
+        <div className="grid grid-cols-1 gap-6 tablet:grid-cols-2 laptopXL:grid-cols-4">
+          <SourceTopList
+            containerProps={{ title: 'Trending sources' }}
+            items={trendingSources}
+            isLoading={isLoading}
+          />
+          <SourceTopList
+            containerProps={{ title: 'Popular sources' }}
+            items={popularSources}
+            isLoading={isLoading}
+          />
+          <SourceTopList
+            containerProps={{ title: 'Recently added sources' }}
+            items={mostRecentSources}
+            isLoading={isLoading}
+          />
+          <SourceTopList
+            containerProps={{ title: 'Top video sources' }}
+            items={topVideoSources}
+            isLoading={isLoading}
+          />
+        </div>
+      </PageWrapperLayout>
+      <PublicPageSignupBanner />
+    </>
+  );
+};
+
+const getSourcesPageLayout: typeof getLayout = (...props) =>
+  getFooterNavBarLayout(getLayout(...props));
+
+SourcesPage.getLayout = getSourcesPageLayout;
+SourcesPage.layoutProps = {
+  screenCentered: false,
+  seo,
+};
+export default SourcesPage;
+
+export async function getStaticProps(): Promise<
+  GetStaticPropsResult<SourcesPageProps>
+> {
+  try {
+    const res = await gqlClient.request<SourcesPageProps>(
+      SOURCE_DIRECTORY_QUERY,
+    );
+
+    return {
+      props: {
+        mostRecentSources: res.mostRecentSources,
+        trendingSources: res.trendingSources,
+        popularSources: res.popularSources,
+        topVideoSources: res.topVideoSources,
+      },
+      revalidate: 60,
+    };
+  } catch (err) {
+    const error = err as GraphQLError;
+    if (
+      [ApiError.NotFound, ApiError.Forbidden].includes(
+        error?.response?.errors?.[0]?.extensions?.code,
+      )
+    ) {
+      return {
+        props: {
+          mostRecentSources: [],
+          trendingSources: [],
+          popularSources: [],
+          topVideoSources: [],
+        },
+        revalidate: 60,
+      };
+    }
+    throw err;
+  }
+}

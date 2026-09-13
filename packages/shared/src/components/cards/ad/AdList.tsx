@@ -1,0 +1,133 @@
+import type { AnchorHTMLAttributes, ReactElement } from 'react';
+import React, { forwardRef } from 'react';
+import {
+  CardContent,
+  CardImage,
+  CardTextContainer,
+  CardTitle,
+} from '../common/list/ListCard';
+import FeedItemContainer from '../common/list/FeedItemContainer';
+import type { AdCardProps } from './common/common';
+import { AdImage } from './common/AdImage';
+import { AdPixel } from './common/AdPixel';
+import { AdMeasurement } from './common/AdMeasurement';
+import { AdViewability } from './common/AdViewability';
+import { useAdClickUrl } from '../../../features/monetization/useAdClickUrl';
+import type { Ad } from '../../../graphql/posts';
+import { combinedClicks } from '../../../lib/click';
+
+import { RemoveAd } from './common/RemoveAd';
+import { usePlusSubscription } from '../../../hooks/usePlusSubscription';
+import type { InViewRef } from '../../../hooks/feed/useAutoRotatingAds';
+import { useAutoRotatingAds } from '../../../hooks/feed/useAutoRotatingAds';
+import { Button } from '../../buttons/Button';
+import { ButtonSize, ButtonVariant } from '../../buttons/common';
+import { AdFavicon } from './common/AdFavicon';
+import PostTags from '../common/PostTags';
+import { useFeature } from '../../GrowthBookProvider';
+import { adImprovementsV3Feature } from '../../../lib/featureManagement';
+import { TargetId } from '../../../lib/log';
+import { AdvertiseLink } from './common/AdvertiseLink';
+import { useAdLabel } from '../../../features/monetization/useAdLabel';
+import AdAttribution, { adAttributionSpacing } from './common/AdAttribution';
+import { anchorSponsoredRel } from '../../../lib/strings';
+
+const getLinkProps = ({
+  ad,
+  href,
+  onLinkClick,
+}: {
+  ad: Ad;
+  href: string;
+  onLinkClick: (ad: Ad) => unknown;
+}): AnchorHTMLAttributes<HTMLAnchorElement> => {
+  return {
+    href,
+    target: '_blank',
+    rel: anchorSponsoredRel,
+    title: ad.description,
+    ...combinedClicks(() => onLinkClick?.(ad)),
+  };
+};
+
+export const AdList = forwardRef<HTMLElement, AdCardProps>(function AdCard(
+  { ad, onLinkClick, onViewable, domProps, index, feedIndex },
+  forwardedRef,
+): ReactElement {
+  const { isPlus } = usePlusSubscription();
+  const adImprovementsV3 = useFeature(adImprovementsV3Feature);
+  const { showAdvertiseLink } = useAdLabel();
+  const { ref } = useAutoRotatingAds(
+    ad,
+    index,
+    feedIndex,
+    forwardedRef as InViewRef,
+  );
+  const matchingTags = ad?.matchingTags ?? [];
+  const clickUrl = useAdClickUrl(ad);
+
+  return (
+    <FeedItemContainer
+      domProps={domProps ?? {}}
+      ref={ref}
+      data-testid="adItem"
+      linkProps={getLinkProps({
+        ad,
+        href: clickUrl,
+        onLinkClick: onLinkClick ?? (() => undefined),
+      })}
+    >
+      <CardContent>
+        <CardTextContainer className="mr-4 flex-1">
+          <CardTitle className="!mt-0 typo-title3">
+            <AdFavicon ad={ad} className="mx-0 !mt-0 mb-2" />
+            {ad.description}
+          </CardTitle>
+          {adImprovementsV3 && matchingTags.length > 0 ? (
+            <PostTags post={{ tags: matchingTags.slice(0, 6) }} />
+          ) : null}
+          <AdAttribution
+            ad={ad}
+            className={{ main: `${adAttributionSpacing} block font-normal` }}
+          />
+        </CardTextContainer>
+        <AdImage ad={ad} ImageComponent={CardImage} />
+      </CardContent>
+
+      <div className="z-1 flex items-center pt-2">
+        {!!ad.callToAction && (
+          <Button
+            tag="a"
+            href={clickUrl}
+            target="_blank"
+            rel={anchorSponsoredRel}
+            variant={ButtonVariant.Primary}
+            size={ButtonSize.Small}
+            {...combinedClicks(() => onLinkClick?.(ad))}
+          >
+            {ad.callToAction}
+          </Button>
+        )}
+        {showAdvertiseLink && (
+          <AdvertiseLink
+            targetId={TargetId.AdCard}
+            buttonStyle
+            size={ButtonSize.Small}
+          />
+        )}
+        <div className="ml-auto">
+          {!isPlus && (
+            <RemoveAd
+              variant={ButtonVariant.Tertiary}
+              size={ButtonSize.Small}
+              className="!font-normal typo-footnote"
+            />
+          )}
+        </div>
+      </div>
+      <AdPixel pixel={ad.pixel} />
+      <AdMeasurement ad={ad} />
+      <AdViewability ad={ad} onViewable={(data) => onViewable?.(ad, data)} />
+    </FeedItemContainer>
+  );
+});

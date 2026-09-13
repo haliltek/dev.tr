@@ -1,0 +1,496 @@
+import type { HTMLAttributes, ReactElement, ReactNode } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
+import PromotionalBanner from './PromotionalBanner';
+import useSidebarRendered from '../hooks/useSidebarRendered';
+import { useLogContext } from '../contexts/LogContext';
+import SettingsContext from '../contexts/SettingsContext';
+import Toast from './notifications/Toast';
+import type { MainLayoutHeaderProps } from './layout/MainLayoutHeader';
+import MainLayoutHeader from './layout/MainLayoutHeader';
+import { InAppNotificationElement } from './notifications/InAppNotification';
+import { QuestUpdatesListener } from './quest/QuestUpdatesListener';
+import { useNotificationContext } from '../contexts/NotificationsContext';
+import { LogEvent, NotificationTarget, TargetType } from '../lib/log';
+import { PromptElement } from './modals/Prompt';
+import { useNotificationParams } from '../hooks/useNotificationParams';
+import { useAuthContext } from '../contexts/AuthContext';
+import { SharedFeedPage } from './utilities';
+import { isTesting, onboardingUrl } from '../lib/constants';
+import { isOnboardingFeedPathname } from '../lib/onboarding';
+import { useBanner } from '../hooks/useBanner';
+import { useSidebarCompact } from '../hooks/useSidebarCompact';
+import { useGrowthBookContext } from './GrowthBookProvider';
+import {
+  ActiveFeedNameContextProvider,
+  useActiveFeedNameContext,
+} from '../contexts';
+import { useFeedLayout, useViewSize, ViewSize } from '../hooks';
+import { BootPopups } from './modals/BootPopups';
+import { StreakMilestonePopup } from './modals/streaks/StreakMilestonePopup';
+import { QuestOffersPopup } from './modals/quests/QuestOffersPopup';
+import { useFeedName } from '../hooks/feed/useFeedName';
+import { AuthTriggers } from '../lib/auth';
+import PlusMobileEntryBanner from './marketing/banners/PlusMobileEntryBanner';
+import usePlusEntry from '../hooks/usePlusEntry';
+import { SearchProvider } from '../contexts/search/SearchContext';
+import { SpotlightProvider } from './spotlight/SpotlightContext';
+import { SpotlightHost } from './spotlight/SpotlightHost';
+import { FeedbackWidget } from './feedback/FeedbackWidget';
+import { useFeedbackShortcut } from '../hooks/useFeedbackShortcut';
+import { isExtension } from '../lib/func';
+import { isLocalhost } from '../lib/config';
+import { useLayoutVariant } from '../hooks/layout/useLayoutVariant';
+import { useLayoutVariantCookie } from '../hooks/layout/useLayoutVariantCookie';
+import { LayoutVariantContext } from '../contexts/LayoutVariantContext';
+import type { LayoutVariant } from '../lib/layoutVariant';
+import { LAYOUT_FRAME_CLASS } from '../lib/layoutVariant';
+import { useRecordRecentPages } from '../hooks/useRecentPages';
+import { isSidebarSettingsPath } from './sidebar/sidebarCategory';
+import {
+  HomepageTopBanners,
+  useHomepageTopBannersVisibility,
+} from './marketing/banners/HomepageTopBanners';
+import { RouteProgressBar } from './RouteProgressBar';
+
+const GoBackHeaderMobile = dynamic(
+  () =>
+    import(
+      /* webpackChunkName: "goBackHeaderMobile" */ './post/GoBackHeaderMobile'
+    ),
+  { ssr: false },
+);
+
+const Sidebar = dynamic(() =>
+  import(/* webpackChunkName: "sidebar" */ './sidebar/Sidebar').then(
+    (mod) => mod.Sidebar,
+  ),
+);
+
+export interface MainLayoutProps
+  extends Omit<MainLayoutHeaderProps, 'onMobileSidebarToggle'>,
+    HTMLAttributes<HTMLDivElement> {
+  mainPage?: boolean;
+  activePage?: string;
+  isNavItemsButton?: boolean;
+  screenCentered?: boolean;
+  customBanner?: ReactNode;
+  showSidebar?: boolean;
+  onNavTabClick?: (tab: string) => void;
+  canGoBack?: string;
+  hideBackButton?: boolean;
+  hideFeedbackWidget?: boolean;
+  /** Set by the mirrored `/layout-v2` routes only. */
+  layoutVariant?: LayoutVariant;
+  /**
+   * Layout v2 only. Rendered above the floating feed card, alongside the
+   * built-in reading-reminder TopHero. Pages can pass dynamic banners
+   * (e.g. the extension's onboarding hero row) and the whole strip
+   * collapses to nothing if neither the reminder nor the banner has
+   * anything to show.
+   */
+  topBanner?: ReactNode;
+}
+
+export const feeds = Object.values(SharedFeedPage);
+
+function MainLayoutComponent({
+  children,
+  activePage,
+  isNavItemsButton,
+  customBanner,
+  additionalButtons,
+  screenCentered = true,
+  showSidebar = true,
+  className,
+  onLogoClick,
+  onNavTabClick,
+  canGoBack,
+  hideFeedbackWidget = false,
+  topBanner,
+}: MainLayoutProps): ReactElement | null {
+  const router = useRouter();
+  const { logEvent } = useLogContext();
+  const { user, isAuthReady, isLoggedIn, showLogin } = useAuthContext();
+  const { growthbook } = useGrowthBookContext();
+  const { sidebarRendered } = useSidebarRendered();
+  const { isAvailable: isBannerAvailable } = useBanner();
+  const { sidebarExpanded, autoDismissNotifications, loadedSettings } =
+    useContext(SettingsContext);
+  const { value: isSidebarCompact } = useSidebarCompact();
+  const v2CollapsedPadding = isSidebarCompact
+    ? 'tablet:pl-16 laptop:pl-16'
+    : 'tablet:pl-16 laptop:pl-20';
+  const v2ExpandedPadding = isSidebarCompact
+    ? 'laptop:!pl-[19rem]'
+    : 'laptop:!pl-[20rem]';
+  const [hasLoggedImpression, setHasLoggedImpression] = useState(false);
+  const { feedName } = useActiveFeedNameContext();
+  const page = router?.route?.substring(1).trim() as SharedFeedPage;
+  const currentFeedName = feedName ?? page ?? SharedFeedPage.Popular;
+  const { isCustomFeed, isExploreTag } = useFeedName({
+    feedName: currentFeedName,
+  });
+  const { plusEntryAnnouncementBar } = usePlusEntry();
+  const isLaptop = useViewSize(ViewSize.Laptop);
+  const isLaptopXL = useViewSize(ViewSize.LaptopXL);
+  const { screenCenteredOnMobileLayout } = useFeedLayout();
+  const { isNotificationsReady, unreadCount } = useNotificationContext();
+  const { isV2, isLoading: isLayoutVariantLoading } = useLayoutVariant();
+  const hasServerShell = useContext(LayoutVariantContext) === 'v2';
+  useLayoutVariantCookie();
+  useRecordRecentPages(isV2);
+  useNotificationParams();
+  useFeedbackShortcut();
+
+  // Settings pages render their navigation only inside the v2 context panel,
+  // so the sidebar force-expands there regardless of the stored preference.
+  // Mirror that here so the floating content keeps its expanded-width padding
+  // and never slides under the panel. Matches the `activePage` resolution the
+  // Sidebar receives below.
+  const forceSidebarExpanded =
+    isV2 &&
+    isSidebarSettingsPath(activePage ?? router.asPath ?? router.pathname ?? '');
+
+  // The main content's left padding settles from the rail width to the
+  // expanded-sidebar width once auth, settings, and the layout-variant flag
+  // resolve on the client. Without gating, the `transition-[padding]` below
+  // animates that initial settle on every hard refresh, sliding all content
+  // sideways. The layout is "settled" only once all three are resolved
+  // (`isLayoutVariantLoading` stays true until both auth and GrowthBook are
+  // ready, so it also covers the window where `isV2` hasn't reached its
+  // final value yet).
+  const layoutSettled =
+    isAuthReady && loadedSettings && !isLayoutVariantLoading;
+  const [contentTransitionsEnabled, setContentTransitionsEnabled] =
+    useState(false);
+  useEffect(() => {
+    if (layoutSettled) {
+      setContentTransitionsEnabled(true);
+    }
+  }, [layoutSettled]);
+  // The v2 page uses a tinted background; the document root stays
+  // `background-default`, so overscroll past the feed reveals a darker strip.
+  // Flag the root while v2 is active so it can paint the same tint (laptop+,
+  // matching where the tinted page background applies — see base.css).
+  useEffect(() => {
+    if (!isV2) {
+      return undefined;
+    }
+    const root = globalThis.document?.documentElement;
+    root?.classList.add('layout-v2');
+    return () => root?.classList.remove('layout-v2');
+  }, [isV2]);
+  // v2 (experiment) snaps the initial settle into place (transitions enable
+  // one commit later, so only genuine toggles animate). The control variant
+  // keeps animating on `layoutSettled` exactly as before.
+  const animateContentPadding = isV2
+    ? contentTransitionsEnabled
+    : layoutSettled;
+
+  const isPageReady =
+    ((Boolean(growthbook?.ready) || isLocalhost) && router?.isReady && isAuthReady) || isTesting;
+
+  // Everything that isn't feed-shaped (post, tag, source, profile) prerenders
+  // real data through `getStaticProps`, but `isPageReady` can never be true on
+  // the server. Unmounting the layout until boot therefore shipped an empty
+  // `<div id="__next">`, so every crawler that doesn't run JS (including the
+  // answer engines `PostSEOSchema` targets) saw nothing but meta tags.
+  //
+  // Keep variant-specific chrome hidden until boot resolves, while allowing
+  // the prerendered page content itself to paint immediately.
+  const isHoldingChrome = !isPageReady && showSidebar;
+
+  // On laptop the v1 and v2 chrome (sidebar + global header) look different,
+  // so rendering before the experiment resolves makes v2 users flash the v1
+  // layout and then swap. Hold the variant-specific chrome until the flag has
+  // resolved so the correct layout paints once. Below laptop there is no v2
+  // chrome and `isLayoutVariantLoading` never resolves (the flag isn't
+  // evaluated there), so treat non-laptop as always resolved.
+  //
+  // The held render must also stay viewport-independent: `useMedia` seeds its
+  // state from `window.matchMedia`, so the first client render already knows
+  // the real breakpoint while the server assumed mobile. Leaving the header to
+  // `isLaptop` alone made the server emit one and the client skip it, which
+  // shifted `<main>` and broke hydration.
+  const isLayoutChromeResolved =
+    !isHoldingChrome && (!isLaptop || !isLayoutVariantLoading);
+
+  // The dual-sidebar layout takes ownership of the global header chrome
+  // (logo + search + user actions) on laptop+ for authenticated users
+  // (and for extension new tab regardless of auth state). When that's
+  // the case the global header is hidden, the main content gets the
+  // floating-card treatment, and the global feedback widget is suppressed
+  // because the rail provides its own.
+  //
+  // `isLoggedIn` and `sidebarRendered` are client-only, so until boot lands
+  // they would suppress the shell the server just painted.
+  const ownsHeaderAudience = isAuthReady
+    ? isLoggedIn || isExtension
+    : hasServerShell;
+  const sidebarOwnsHeader =
+    isV2 &&
+    ownsHeaderAudience &&
+    showSidebar &&
+    (isAuthReady ? sidebarRendered : hasServerShell);
+
+  // Extension new tab mounts its own `ExtensionTopBanners` strip, so
+  // the webapp strip is suppressed there to avoid duplicate cards. The strip
+  // only renders inside the sidebar-owned header, so the visibility hook is
+  // evaluated there too instead of on every shell mount.
+  const showHomepageTopBanners = !isExtension;
+  const { hasAny: hasTopBanners } = useHomepageTopBannersVisibility({
+    enabled: showHomepageTopBanners && sidebarOwnsHeader,
+  });
+
+  let stickyHeaderOffset = 'laptop:[--sticky-header-offset:4rem]';
+  if (sidebarOwnsHeader) {
+    stickyHeaderOffset = isBannerAvailable
+      ? 'laptop:[--sticky-header-offset:2rem]'
+      : 'laptop:[--sticky-header-offset:0rem]';
+  } else if (isBannerAvailable) {
+    stickyHeaderOffset = 'laptop:[--sticky-header-offset:6rem]';
+  }
+
+  useEffect(() => {
+    if (!isNotificationsReady || unreadCount === 0 || hasLoggedImpression) {
+      return;
+    }
+
+    logEvent({
+      event_name: LogEvent.Impression,
+      target_type: NotificationTarget.Icon,
+      extra: JSON.stringify({ notifications_number: unreadCount }),
+    });
+    setHasLoggedImpression(true);
+    // @NOTE see https://dailydotdev.atlassian.net/l/cp/dK9h1zoM
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isNotificationsReady, unreadCount, hasLoggedImpression]);
+
+  // Feed-shaped pages hold their paint until boot so the resolved chrome
+  // renders once. Broader than the onboarding gate below on purpose: this is
+  // about layout stability, not about forcing onboarding.
+  const isFeedShapedPage =
+    !page || feeds.includes(page) || isCustomFeed || isExploreTag;
+  const shouldRedirectOnboarding =
+    !isLocalhost &&
+    !isExtension &&
+    !user &&
+    isPageReady &&
+    // Same set the webapp's `getOnboardingRedirect` uses for signed-in users,
+    // so a given URL doesn't force onboarding for one audience and not the
+    // other.
+    isOnboardingFeedPathname(router?.pathname) &&
+    // Install referrals (`?ref=install`) are routed by `_app` (to `/activate`).
+    // Redirecting here too would race that and bounce the user off `/activate`.
+    router?.query?.ref !== 'install' &&
+    !isTesting;
+
+  useEffect(() => {
+    if (!shouldRedirectOnboarding) {
+      return;
+    }
+
+    const entries = Object.entries(router.query);
+
+    if (entries.length === 0) {
+      router.push(onboardingUrl);
+      return;
+    }
+
+    const params = new URLSearchParams();
+
+    entries.forEach(([key, value]) => {
+      params.append(key, value as string);
+    });
+
+    router.push(`${onboardingUrl}?${params.toString()}`);
+  }, [shouldRedirectOnboarding, router]);
+
+  const ignoredUtmMediumForLogin = ['slack'];
+  const utmSource = router?.query?.utm_source;
+  const utmMedium = router?.query?.utm_medium;
+  const shouldShowLogin =
+    !user &&
+    isAuthReady &&
+    utmSource === 'notification' &&
+    !ignoredUtmMediumForLogin.includes(utmMedium as string);
+
+  useEffect(() => {
+    if (!shouldShowLogin) {
+      return;
+    }
+
+    showLogin({
+      trigger: AuthTriggers.FromNotification,
+      options: { isLogin: true },
+    });
+  }, [shouldShowLogin, showLogin]);
+
+  // Feed-shaped pages have nothing prerendered worth showing (the feed is
+  // fetched on the client) and anonymous visitors may still bounce to
+  // onboarding, so they keep bailing out entirely.
+  if (shouldRedirectOnboarding || (!isPageReady && isFeedShapedPage)) {
+    return null;
+  }
+
+  const isScreenCentered =
+    isLaptopXL && screenCenteredOnMobileLayout ? true : screenCentered;
+
+  return (
+    <div
+      className={classNames(
+        'antialiased',
+        isV2 &&
+          'laptop:bg-[color-mix(in_srgb,var(--theme-surface-secondary)_3%,var(--theme-background-default))]',
+      )}
+    >
+      {canGoBack && <GoBackHeaderMobile />}
+      {customBanner}
+      {isBannerAvailable && <PromotionalBanner />}
+      <InAppNotificationElement />
+      <QuestUpdatesListener />
+      <PromptElement />
+      <Toast autoDismissNotifications={autoDismissNotifications} />
+      <BootPopups />
+      <SpotlightHost />
+      <StreakMilestonePopup />
+      <QuestOffersPopup />
+      {plusEntryAnnouncementBar && (
+        <PlusMobileEntryBanner
+          className="relative"
+          {...plusEntryAnnouncementBar}
+          targetType={TargetType.PlusEntryAnnouncementBar}
+        />
+      )}
+
+      {/* Temporary while layout v2 is experimental: production users are on
+          v1, so render its header in the initial HTML instead of waiting for
+          feature resolution and delaying the post page's LCP. */}
+      {!sidebarOwnsHeader && (
+        <MainLayoutHeader
+          hasBanner={isBannerAvailable}
+          sidebarRendered={sidebarRendered}
+          additionalButtons={additionalButtons}
+          onLogoClick={onLogoClick}
+        />
+      )}
+      <main
+        className={classNames(
+          'flex flex-col',
+          animateContentPadding &&
+            'transition-[padding] duration-300 ease-in-out',
+          !sidebarOwnsHeader && 'laptop:pt-16',
+          showSidebar &&
+            (isV2 ? v2CollapsedPadding : 'tablet:pl-16 laptop:pl-11'),
+          className,
+          isAuthReady &&
+            showSidebar &&
+            (sidebarExpanded || forceSidebarExpanded) &&
+            (isV2 ? v2ExpandedPadding : !isScreenCentered && 'laptop:!pl-60'),
+          isBannerAvailable && !sidebarOwnsHeader && 'laptop:pt-24',
+          // The rail is `fixed` and drops by the banner's height on its own
+          // (--safe-area-top-offset), so the content has to drop by the same
+          // 2rem or the pinned banner paints over the top of it.
+          isBannerAvailable && sidebarOwnsHeader && 'laptop:pt-8',
+          // Mirrors the padding above as an inheritable value, so a sticky
+          // descendant can pin directly under whatever fixed chrome this
+          // layout actually has. A hardcoded offset overshoots wherever the
+          // chrome is shorter or absent (v2, tablet, mobile), and a sticky
+          // element whose `top` exceeds its natural position is pushed *down*
+          // over the content that follows it. One ternary rather than stacked
+          // classes because arbitrary properties have no reliable cascade
+          // order between them. Below laptop no chrome is fixed above the
+          // content, so the base value is zero.
+          '[--sticky-header-offset:0px]',
+          stickyHeaderOffset,
+        )}
+      >
+        {isAuthReady && isLayoutChromeResolved && showSidebar && (
+          <Sidebar
+            additionalButtons={additionalButtons}
+            isNavButtons={isNavItemsButton}
+            showFeedbackWidget={!hideFeedbackWidget}
+            onNavTabClick={onNavTabClick}
+            onLogoClick={onLogoClick}
+            activePage={activePage ?? router.asPath ?? router.pathname}
+          />
+        )}
+        {sidebarOwnsHeader ? (
+          <div
+            className={classNames(
+              'flex min-h-0 flex-1 flex-col laptop:my-3 laptop:ml-1 laptop:mr-3',
+              // A dock pins to the window, so the frame gives up its bottom
+              // gutter for the one case that holds one. Otherwise the frame
+              // stops 14px short of the viewport and a `sticky bottom-0` dock
+              // inside it cannot reach the bottom, resting there on first
+              // paint and at the end of the feed while pinning flush in
+              // between — a dock that jumps as the feed loads.
+              // Literal, not built from `DOCK_CLASS`: Tailwind scans source
+              // text and generates nothing for an interpolated class name.
+              'laptop:has-[.feed-dock]:mb-0',
+            )}
+          >
+            {showHomepageTopBanners && (
+              <HomepageTopBanners className="mx-4 mb-3 laptop:mx-0" />
+            )}
+            {topBanner}
+            <div
+              className={classNames(
+                'relative flex min-h-0 flex-1 flex-col',
+                // `overflow-clip` (not `hidden`) clips content to the rounded
+                // card without establishing a scroll container, so descendant
+                // `position: sticky` elements (e.g. the post action bar) stick
+                // to the viewport instead of being inert.
+                // No drop shadow — the subtle border defines the floating card
+                // in both themes; shadow-2 cast a heavy bottom shadow.
+                'laptop:overflow-clip laptop:rounded-24 laptop:border laptop:border-border-subtlest-quaternary laptop:bg-background-default laptop:p-0.5',
+                // The dock becomes the frame's bottom edge, so the padding
+                // that would hold it up goes, and the corners it would be
+                // clipped into square off.
+                'laptop:has-[.feed-dock]:rounded-b-none laptop:has-[.feed-dock]:border-b-0 laptop:has-[.feed-dock]:pb-0',
+                LAYOUT_FRAME_CLASS,
+                // These subtract exactly the chrome above the frame plus its
+                // own margins, so the frame ends level with the window. With
+                // a dock the bottom margin is gone, so 0.75rem less comes off
+                // — a frame that stops short leaves a `sticky bottom-0` dock
+                // resting at its end, which is what happens for as long as
+                // the feed is too short to make the page scrollable.
+                !hasTopBanners &&
+                  !topBanner &&
+                  (isBannerAvailable
+                    ? 'laptop:min-h-[calc(100vh-3.5rem)] laptop:has-[.feed-dock]:min-h-[calc(100vh-2.75rem)]'
+                    : 'laptop:min-h-[calc(100vh-1.5rem)] laptop:has-[.feed-dock]:min-h-[calc(100vh-0.75rem)]'),
+              )}
+            >
+              <RouteProgressBar />
+              {children}
+            </div>
+          </div>
+        ) : (
+          children
+        )}
+      </main>
+      {!hideFeedbackWidget && !sidebarOwnsHeader && <FeedbackWidget />}
+    </div>
+  );
+}
+
+const MainLayout = ({
+  layoutVariant,
+  ...props
+}: MainLayoutProps): ReactElement => (
+  <LayoutVariantContext.Provider value={layoutVariant}>
+    <ActiveFeedNameContextProvider>
+      <SearchProvider>
+        <SpotlightProvider>
+          <MainLayoutComponent {...props} />
+        </SpotlightProvider>
+      </SearchProvider>
+    </ActiveFeedNameContextProvider>
+  </LayoutVariantContext.Provider>
+);
+
+export default MainLayout;

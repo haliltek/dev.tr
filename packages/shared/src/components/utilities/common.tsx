@@ -1,0 +1,305 @@
+import type { HTMLAttributes, ReactElement, ReactNode } from 'react';
+import React from 'react';
+import classNames from 'classnames';
+import classed from '../../lib/classed';
+import styles from './utilities.module.css';
+import feedStyles from '../Feed.module.css';
+import { ArrowIcon } from '../icons';
+import { SourceMemberRole } from '../../graphql/sources';
+import type { OrganizationMemberRole } from '../../features/organizations/types';
+
+export enum Theme {
+  Avocado = 'avocado',
+  Bacon = 'bacon',
+  BlueCheese = 'blue-cheese',
+  Bun = 'bun',
+  Burger = 'burger',
+  Cabbage = 'cabbage',
+  Cheese = 'cheese',
+  Ketchup = 'ketchup',
+  Lettuce = 'lettuce',
+}
+
+export enum Justify {
+  End = 'justify-end',
+  Center = 'justify-center',
+  Between = 'justify-between',
+  Start = 'justify-start',
+}
+
+export const pageBorders =
+  'laptop:border-r laptop:border-l border-border-subtlest-tertiary';
+
+const pagePaddings = 'px-4 tablet:px-8';
+const basePageClassNames = classNames(
+  styles.pageContainer,
+  'relative z-1 flex w-full flex-col',
+);
+
+export const BasePageContainer = classed(
+  'main',
+  pagePaddings,
+  basePageClassNames,
+);
+
+export const pageContainerClassNames = classNames(
+  basePageClassNames,
+  'items-stretch tablet:self-center laptop:min-h-page',
+);
+
+export const PageContainerCentered = classed(
+  BasePageContainer,
+  'min-h-page justify-center items-center',
+);
+
+export const PageContainer = classed(
+  BasePageContainer,
+  pagePaddings,
+  pageContainerClassNames,
+);
+
+export const truncateTextClassNames = 'max-w-full shrink truncate';
+export const TruncateText = classed('span', truncateTextClassNames);
+
+const RawPageWidgets = classed(
+  'aside',
+  'flex flex-col gap-6 px-4 tablet:px-6 laptop:px-4 w-full max-w-full',
+);
+
+interface PageWidgetsProps {
+  laptop?: boolean;
+  className?: string;
+  children?: ReactNode;
+}
+export const PageWidgets = ({
+  laptop = true,
+  className,
+  children,
+}: PageWidgetsProps): ReactElement => (
+  <RawPageWidgets
+    className={classNames(
+      className,
+      laptop && 'laptop:w-[21.25rem] laptop:max-w-[21.25rem]',
+    )}
+  >
+    {children}
+  </RawPageWidgets>
+);
+
+export const ResponsivePageContainer = classed(
+  PageContainer,
+  pageBorders,
+  'py-6 laptop:min-h-screen',
+);
+
+export const BaseFeedPage = classed(
+  'main',
+  'flex flex-col flex-1 items-start max-w-full pb-16',
+  styles.feedPage,
+);
+
+/**
+ * The feed's horizontal inset — the single source of it.
+ *
+ * It lives on FeedContainer rather than on a page container because
+ * the feed renders through two different ones depending on layout and
+ * route: FeedPage, which carries `pageMainClassNames`, and
+ * FeedPageLayoutList, which forces `!px-0`. FeedContainer is the only
+ * element common to both, so it is the only place an inset applies
+ * everywhere and can never stack with another.
+ *
+ * Chrome outside the container — the breadcrumbs and the tab strip —
+ * uses the same constant to line up with the cards.
+ *
+ * Inside the v2 floating card (`LAYOUT_FRAME_CLASS`) there is no inset at
+ * all, which is what v2 has always shipped. The card is already the frame:
+ * rounded, bordered, and held off the window by its own margins. A gutter
+ * in there is a second frame drawn inside the first, and it costs the grid
+ * 80px of width that the column count never hears about — `numCards` comes
+ * from viewport media queries in `FeedLayoutProvider`, so the feed goes on
+ * asking for the same number of columns in a narrower space.
+ *
+ * Below laptop the card does not exist and neither does this class, so the
+ * tablet gutter this constant exists for applies in both layouts.
+ *
+ * Below tablet there is no gutter either, which is what every layout has
+ * always shipped on phones. The feed is a single full-bleed column there:
+ * cards run edge to edge and carry their own `px-4`, so a gutter here is
+ * that inset charged twice and leaves the post text 32px off the screen.
+ * The chrome that uses this constant to line up with the cards — the tab
+ * strip — has to go full-bleed on phones for the same reason.
+ *
+ * Keyed to the frame's own class rather than to `isV2` on purpose. The flag
+ * resolves after mount, so a React-side gate let the gutter and the frame
+ * settle independently; a descendant selector cannot — the inset is absent
+ * exactly when the frame that replaces it is on screen.
+ */
+export const feedGutter =
+  'tablet:px-6 laptop:px-10 laptop:[.layout-frame_&]:px-0';
+
+/**
+ * The feed grid's own width: full width normally, and clamped and centred to
+ * the same card-based max-width as the grid on wide screens (desktopL). Needs
+ * `--num-cards` and `--feed-gap` set on the element for that calc.
+ *
+ * Chrome that has to line up with the cards pairs this with `feedGutter`:
+ * together they are where the feed's left and right edges actually are, which
+ * neither one is on its own.
+ */
+export const feedWidth = classNames(
+  'w-full laptopL:mx-auto',
+  feedStyles.container,
+);
+
+/**
+ * The last step in to the cards, and the one `feedGutter` cannot describe.
+ *
+ * Inside the v2 floating card the gutter is zero — the card is already the
+ * frame — but the grid then takes an inset of its own so the cards sit off
+ * the frame's rounded corners (`laptop:p-6` in FeedContainer). So in v2 the
+ * cards' left and right edges are 24px inside the gutter's, and chrome that
+ * lines up with them by gutter alone lands a full inset short.
+ *
+ * Horizontal only: the grid's vertical half is the frame's own breathing
+ * room, and chrome outside the grid sets its own height.
+ *
+ * Keyed to the frame's class rather than to `isV2` for the same reason
+ * `feedGutter` is: the flag resolves after mount, and this inset has to
+ * appear at exactly the moment the frame it insets from does.
+ */
+export const feedFrameInsetX = 'laptop:[.layout-frame_&]:px-6';
+
+// Vertical padding only. The horizontal inset moved to FeedContainer
+// (see `feedGutter`) because this component is not in the tree on
+// every feed route — FeedPageLayoutList is used instead on some — and
+// an inset here would both miss those routes and stack with the one
+// that covers them.
+const feedPageVerticalPadding =
+  'tablet:py-4 laptop:py-10 laptop:[.layout-frame_&]:py-0';
+
+export const FeedPage = ({
+  className,
+  ...props
+}: HTMLAttributes<HTMLElement>): ReactElement => (
+  <BaseFeedPage
+    {...props}
+    className={classNames(feedPageVerticalPadding, className)}
+  />
+);
+export const FeedPageLayoutList = classed(
+  BasePageContainer,
+  pageContainerClassNames,
+  'pt-10 !ml-auto !px-0 tablet:!max-w-full laptop:!w-full laptop:!max-w-[42.5rem]',
+  styles.feedPage,
+);
+
+export const FeedPageLayoutMobile = classed(
+  FeedPageLayoutList,
+  'laptop:!max-w-full',
+);
+
+export const CommentFeedPage = classed(
+  BasePageContainer,
+  '!px-0 !mx-auto tablet:!max-w-full laptop:!mt-0 tablet:!mt-4',
+);
+
+export const FormErrorMessage = classed(
+  'div',
+  'mt-4 text-status-error typo-caption1',
+);
+
+export const ActiveTabIndicator = classed(
+  'div',
+  'absolute inset-x-0 bottom-0 h-0.5 my-0 mx-auto bg-text-primary',
+  styles.activeTabIndicator,
+);
+
+export const CustomFeedHeader = classed(
+  'div',
+  'flex h-11 self-stretch items-center mb-6 typo-callout',
+);
+
+export const FeedPageHeader = classed(
+  'header',
+  'overflow-x-auto self-stretch mb-6 no-scrollbar hidden laptop:flex',
+);
+
+export const Summary = classed('summary', 'cursor-pointer focus-outline');
+
+export const SummaryArrow = classed(ArrowIcon, 'icon arrow ml-auto text-xl');
+
+export const SummaryContainer = classed(
+  'div',
+  'text-text-secondary multi-truncate border-l border-accent-cabbage-default pl-4',
+);
+
+export const TLDRText = classed(
+  'span',
+  'pr-1 font-bold text-accent-cabbage-default',
+);
+
+export const HotLabel = (): ReactElement => (
+  <div className="rounded-4 bg-status-error px-2 py-px font-bold uppercase text-white typo-caption2">
+    Hot
+  </div>
+);
+
+export const SecondaryCenteredBodyText = classed(
+  'p',
+  'typo-body text-text-secondary text-center',
+);
+
+export type HTMLElementComponent<T = HTMLElement> = React.FC<HTMLAttributes<T>>;
+
+export enum SharedFeedPage {
+  MyFeed = 'my-feed',
+  Popular = 'popular',
+  Search = 'search',
+  Upvoted = 'upvoted',
+  Custom = 'custom',
+  CustomForm = 'custom-form',
+}
+
+export const getShouldRedirect = (
+  isOnMyFeed: boolean,
+  isLoggedIn: boolean,
+): boolean => {
+  if (!isOnMyFeed) {
+    return false;
+  }
+
+  return !isLoggedIn;
+};
+
+export const FlexRow = classed('span', 'flex flex-row');
+export const FlexCol = classed('div', 'flex flex-col');
+export const FlexCentered = classed('div', 'flex justify-center items-center');
+
+export interface WithClassNameProps {
+  className?: string;
+}
+
+export const formatReadTime = (minutes: number): string => {
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return hours > 0
+    ? `${hours.toString()}h ${remainingMinutes.toString()}m`
+    : `${remainingMinutes.toString()}m`;
+};
+
+export const lazyCommentThreshold = 5;
+
+export const PageInfoHeader = classed(
+  'div',
+  'mb-10 flex w-full flex-col gap-5 rounded-16 border border-border-subtlest-tertiary p-4',
+);
+
+// Currently it's only Moderator that deviates from the actual SourceMemberRole name.
+export const getRoleName = (
+  role: SourceMemberRole | OrganizationMemberRole,
+): string => (role === SourceMemberRole.Moderator ? 'Mod' : role);
+
+export const HorizontalSeparator = classed(
+  'div',
+  'border-t border-border-subtlest-tertiary',
+);

@@ -1,0 +1,230 @@
+import type { ReactElement } from 'react';
+import React from 'react';
+import classNames from 'classnames';
+import PostContentContainer from './PostContentContainer';
+import usePostContent from '../../hooks/usePostContent';
+import { BasePostContent } from './BasePostContent';
+import {
+  getSocialTwitterPostType,
+  isVideoPost,
+  PostType,
+} from '../../graphql/posts';
+import { useMemberRoleForSource } from '../../hooks/useMemberRoleForSource';
+import SquadPostAuthor from './SquadPostAuthor';
+import SharePostContent from './SharePostContent';
+import MarkdownPostContent from './MarkdownPostContent';
+import { SquadPostWidgets } from './SquadPostWidgets';
+import type { PostContentProps, PostNavigationProps } from './common';
+import ShareYouTubeContent from './ShareYouTubeContent';
+import { useTrackPostView } from '../../hooks/post/useTrackPostView';
+import { withPostById } from './withPostById';
+import PostSourceInfo from './PostSourceInfo';
+import { isSourceUserSource } from '../../graphql/sources';
+import { ProfileImageSize } from '../ProfilePicture';
+import { BoostNewPostStrip } from '../../features/boost/BoostNewPostStrip';
+import { useActions, useViewSize, ViewSize } from '../../hooks';
+import { ActionType } from '../../graphql/actions';
+import { useShowBoostButton } from '../../features/boost/useShowBoostButton';
+import type { Post } from '../../graphql/posts';
+import {
+  CommunitySentiment,
+  mapCommunitySentimentPost,
+} from './focus/CommunitySentiment';
+
+const ContentMap = {
+  [PostType.Freeform]: MarkdownPostContent,
+  [PostType.Welcome]: MarkdownPostContent,
+  [PostType.Share]: SharePostContent,
+  [PostType.VideoYouTube]: ShareYouTubeContent,
+};
+
+const getSquadContentComponent = (type: PostType) => {
+  if (type === PostType.Freeform || type === PostType.Welcome) {
+    return ContentMap[PostType.Freeform];
+  }
+
+  if (type === PostType.VideoYouTube) {
+    return ContentMap[PostType.VideoYouTube];
+  }
+
+  return ContentMap[PostType.Share];
+};
+
+type SquadPostContentRawProps = Omit<PostContentProps, 'post'> & { post: Post };
+
+export function SquadPostContentRaw({
+  post,
+  isFallback,
+  shouldOnboardAuthor,
+  origin,
+  position,
+  postPosition,
+  inlineActions,
+  hideSubscribeAction,
+  className,
+  customNavigation,
+  onPreviousPost,
+  onNextPost,
+  onClose,
+  isBannerVisible,
+  isPostPage,
+}: SquadPostContentRawProps): ReactElement {
+  const isBoostButtonVisible = useShowBoostButton({ post });
+  const { checkHasCompleted, isActionsFetched } = useActions();
+  const hasClosedBanner = checkHasCompleted(
+    ActionType.ClosedNewPostBoostBanner,
+  );
+  const shouldShowBanner =
+    isActionsFetched &&
+    !hasClosedBanner &&
+    isPostPage &&
+    isBoostButtonVisible &&
+    !post?.flags?.campaignId;
+  const isLaptop = useViewSize(ViewSize.Laptop);
+  const hasNavigation = !!onPreviousPost || !!onNextPost;
+  const isCompactModalSpacing = !isPostPage;
+  const engagementActions = usePostContent({ origin, post });
+  const { onReadArticle, onCopyPostLink } = engagementActions;
+  const { role } = useMemberRoleForSource({
+    source: post?.source,
+    user: post?.author,
+  });
+  const navigationProps: PostNavigationProps = {
+    post,
+    onPreviousPost,
+    onNextPost,
+    postPosition,
+    onClose,
+    inlineActions,
+  };
+  const isUserSource = isSourceUserSource(post?.source);
+  let sourceInfoClassName: string | undefined;
+  if (!isUserSource) {
+    if (shouldShowBanner && isLaptop) {
+      sourceInfoClassName = isCompactModalSpacing ? 'mb-3' : 'mb-4';
+    } else {
+      sourceInfoClassName = isCompactModalSpacing ? 'mb-4' : 'mb-6';
+    }
+  }
+
+  useTrackPostView({ post });
+
+  const socialTwitterType = getSocialTwitterPostType(post);
+  const finalType = isVideoPost(post)
+    ? PostType.VideoYouTube
+    : socialTwitterType || post?.type;
+  const Content = getSquadContentComponent(finalType);
+  const communitySentimentPost =
+    post.type === PostType.Share && post.sharedPost ? post.sharedPost : post;
+  const communitySentimentData = communitySentimentPost.communitySentiment
+    ? mapCommunitySentimentPost(communitySentimentPost.communitySentiment)
+    : undefined;
+  const showCommunitySentiment = !!communitySentimentData;
+
+  return (
+    <PostContentContainer
+      className={classNames(
+        'relative flex-1 flex-col laptop:flex-row laptop:pb-0',
+        className?.container,
+      )}
+      hasNavigation={hasNavigation}
+      isNavigationOutside
+      navigationProps={
+        position === 'fixed'
+          ? {
+              ...navigationProps,
+              isBannerVisible,
+              onReadArticle,
+              className: className?.fixedNavigation,
+            }
+          : undefined
+      }
+    >
+      <div
+        className={classNames(
+          'relative flex min-w-0 flex-1 flex-col px-4 tablet:px-6 laptop:px-8 laptop:pt-6',
+          className?.content,
+        )}
+      >
+        <BasePostContent
+          className={{
+            ...className,
+            onboarding: classNames('mb-6', className?.onboarding),
+            header: 'mb-6',
+            navigation: {
+              actions: 'ml-auto laptop:hidden',
+              container: 'mb-6 pt-6',
+            },
+          }}
+          isPostPage={isPostPage}
+          isFallback={isFallback}
+          customNavigation={customNavigation}
+          shouldOnboardAuthor={shouldOnboardAuthor}
+          navigationProps={navigationProps}
+          engagementProps={engagementActions}
+          origin={origin}
+          post={post}
+        >
+          {shouldShowBanner && !isLaptop && (
+            <BoostNewPostStrip className="-mt-2 mb-4" />
+          )}
+          <div
+            className={
+              isUserSource
+                ? 'flex flex-row-reverse items-center justify-between gap-4'
+                : undefined
+            }
+          >
+            <PostSourceInfo
+              post={post}
+              onClose={onClose}
+              onReadArticle={onReadArticle}
+              hideSubscribeAction={hideSubscribeAction}
+              className={sourceInfoClassName}
+            />
+            {shouldShowBanner && !isUserSource && isLaptop && (
+              <BoostNewPostStrip />
+            )}
+            {(post?.author || isFallback) && (
+              <SquadPostAuthor
+                author={post?.author}
+                role={role}
+                date={post.createdAt}
+                className={{
+                  container: !isUserSource ? 'mt-3' : 'shrink truncate',
+                }}
+                isUserSource={isUserSource}
+                size={ProfileImageSize.Large}
+                showSkeletonWhenMissing={isFallback}
+              />
+            )}
+          </div>
+          {shouldShowBanner && isUserSource && isLaptop && (
+            <BoostNewPostStrip className="mt-2" />
+          )}
+          <Content
+            post={post}
+            onReadArticle={onReadArticle}
+            isCompactSpacing={isCompactModalSpacing}
+          />
+          {showCommunitySentiment && (
+            <CommunitySentiment
+              data={communitySentimentData}
+              className={isCompactModalSpacing ? 'mb-4' : 'mb-6'}
+            />
+          )}
+        </BasePostContent>
+      </div>
+      <SquadPostWidgets
+        onCopyPostLink={onCopyPostLink}
+        onReadArticle={onReadArticle}
+        post={post}
+        className="mb-6 !gap-2 border-l border-border-subtlest-tertiary pt-4 laptop:mb-0"
+        onClose={onClose}
+        origin={origin}
+      />
+    </PostContentContainer>
+  );
+}
+
+export const SquadPostContent = withPostById(SquadPostContentRaw);

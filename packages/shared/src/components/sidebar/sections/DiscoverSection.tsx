@@ -1,0 +1,170 @@
+import type { ReactElement } from 'react';
+import React, { useMemo } from 'react';
+import type { SidebarMenuItem } from '../common';
+import { ListIcon } from '../common';
+import {
+  CompassIcon,
+  CookieIcon,
+  DiscussIcon,
+  EarthIcon,
+  HashtagIcon,
+  HotIcon,
+  TourIcon,
+  WorldIcon,
+} from '../../icons';
+import { MedalIcon } from '../../icons/Medal';
+import { AgentIcon } from '../../icons/Agent';
+import { Section } from '../Section';
+import type { SidebarSectionProps } from './common';
+import { SidebarSettingsFlags } from '../../../graphql/settings';
+import { useAuthContext } from '../../../contexts/AuthContext';
+import { useActions, useConditionalFeature } from '../../../hooks';
+import { featureInterestAgent } from '../../../lib/featureManagement';
+import { ActionType } from '../../../graphql/actions';
+import { watercoolerUrl, webappUrl } from '../../../lib/constants';
+import { useLogContext } from '../../../contexts/LogContext';
+import { LogEvent } from '../../../lib/log';
+import { OtherFeedPage } from '../../../lib/query';
+import { useLayoutVariant } from '../../../hooks/layout/useLayoutVariant';
+
+interface DiscoverSectionProps extends SidebarSectionProps {
+  onNavTabClick?: (tab: string) => void;
+  // Hot Takes is a modal launcher rather than a hub section; the v2 Explore
+  // panel opts out of it. Defaults on so the v1 sidebar is unchanged.
+  showHotTakes?: boolean;
+  // Extra rows injected right after "Explore" (e.g. the v2 Explore panel slots
+  // Happening Now between Explore and Tags).
+  itemsAfterExplore?: SidebarMenuItem[];
+}
+
+export const DiscoverSection = ({
+  isItemsButton,
+  onNavTabClick,
+  showHotTakes = true,
+  itemsAfterExplore,
+  ...defaultRenderSectionProps
+}: DiscoverSectionProps): ReactElement => {
+  const { completeAction } = useActions();
+  const { user, isLoggedIn } = useAuthContext();
+  const { logEvent } = useLogContext();
+  const { isV2 } = useLayoutVariant();
+  const HotTakesIcon = isV2 ? TourIcon : HotIcon;
+  const { value: showAgent } = useConditionalFeature({
+    feature: featureInterestAgent,
+    shouldEvaluate: isLoggedIn && isV2,
+  });
+  const menuItems: SidebarMenuItem[] = useMemo(() => {
+    return [
+      {
+        icon: (active: boolean) => (
+          <ListIcon Icon={() => <CompassIcon secondary={active} />} />
+        ),
+        title: 'Keşfet',
+        // Bare path (not webappUrl) so it active-matches the in-place Explore
+        // feed on the extension new tab; `onNavTabClick` switches the feed
+        // client-side, so this must render as a button, not a link.
+        path: '/posts',
+        action: () => onNavTabClick?.(OtherFeedPage.Explore),
+      },
+      ...(itemsAfterExplore ?? []),
+      {
+        icon: (active: boolean) => (
+          <ListIcon Icon={() => <HashtagIcon secondary={active} />} />
+        ),
+        title: 'Etiketler',
+        path: `${webappUrl}tags`,
+        isForcedLink: true,
+      },
+      {
+        icon: (active: boolean) => (
+          <ListIcon Icon={() => <EarthIcon secondary={active} />} />
+        ),
+        title: 'Kaynaklar',
+        path: `${webappUrl}sources`,
+        isForcedLink: true,
+      },
+      {
+        icon: (active: boolean) => (
+          <ListIcon Icon={() => <MedalIcon secondary={active} />} />
+        ),
+        title: 'Lider Tablosu',
+        path: `${webappUrl}users`,
+        isForcedLink: true,
+      },
+      {
+        icon: (active: boolean) => (
+          <ListIcon Icon={() => <WorldIcon secondary={active} />} />
+        ),
+        title: 'Dünyalar',
+        path: `${webappUrl}world`,
+        isForcedLink: true,
+      },
+      {
+        icon: (active: boolean) => (
+          <ListIcon Icon={() => <CookieIcon secondary={active} />} />
+        ),
+        title: 'Sohbet Odası',
+        path: watercoolerUrl,
+        isForcedLink: true,
+      },
+      {
+        icon: (active: boolean) => (
+          <ListIcon Icon={() => <DiscussIcon secondary={active} />} />
+        ),
+        title: 'Tartışmalar',
+        path: `${webappUrl}discussed`,
+        isForcedLink: true,
+        action: () => {
+          if (user) {
+            completeAction(ActionType.CommentFeed);
+          }
+        },
+      },
+      showHotTakes && {
+        icon: (active: boolean) => (
+          <ListIcon Icon={() => <HotTakesIcon secondary={active} />} />
+        ),
+        title: 'Günün Konuları',
+        requiresLogin: true,
+        path: `${webappUrl}?openModal=hottakes`,
+        // Modal launcher, not a page: its path is "/" + query, and the active
+        // check strips queries, so on the home feed it would light up as the
+        // current page.
+        disableActiveState: true,
+        isForcedLink: true,
+        action: () => {
+          logEvent({ event_name: LogEvent.OpenHotAndCold });
+        },
+      },
+      isV2 &&
+        showAgent && {
+          icon: (active: boolean) => (
+            <ListIcon Icon={() => <AgentIcon secondary={active} />} />
+          ),
+          title: 'Agents',
+          path: `${webappUrl}agent`,
+          isForcedLink: true,
+          requiresLogin: true,
+        },
+    ].filter(Boolean) as SidebarMenuItem[];
+  }, [
+    completeAction,
+    user,
+    logEvent,
+    onNavTabClick,
+    HotTakesIcon,
+    showHotTakes,
+    itemsAfterExplore,
+    isV2,
+    showAgent,
+  ]);
+
+  return (
+    <Section
+      {...defaultRenderSectionProps}
+      items={menuItems}
+      isItemsButton={isItemsButton}
+      flag={SidebarSettingsFlags.OtherExpanded}
+    />
+  );
+};

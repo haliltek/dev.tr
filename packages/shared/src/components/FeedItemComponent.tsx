@@ -1,0 +1,497 @@
+import type { ReactElement } from 'react';
+import React from 'react';
+import type { AdSquadItem, FeedItem } from '../hooks/useFeed';
+import { isBoostedPostAd, isBoostedSquadAd } from '../hooks/useFeed';
+import { PlaceholderGrid } from './cards/placeholder/PlaceholderGrid';
+import { PlaceholderList } from './cards/placeholder/PlaceholderList';
+import { SignalPlaceholderList } from './cards/placeholder/SignalPlaceholderList';
+import type { Ad, Post, PostItem } from '../graphql/posts';
+import { isSocialTwitterPost, PostType } from '../graphql/posts';
+import type { LoggedUser } from '../lib/user';
+import useLogImpression from '../hooks/feed/useLogImpression';
+import type { FeedPostClick } from '../hooks/feed/useFeedOnPostClick';
+import { LogEvent, Origin, TargetType } from '../lib/log';
+import type { SearchLogExtra } from '../lib/searchLog';
+import type { UseVotePost } from '../hooks';
+import { useFeedLayout } from '../hooks';
+import { CollectionList } from './cards/collection/CollectionList';
+import { FeedItemType } from './cards/common/common';
+import { AdGrid } from './cards/ad/AdGrid';
+import { AdList } from './cards/ad/AdList';
+import { SignalAdList } from './cards/ad/SignalAdList';
+import type { AdCardProps } from './cards/ad/common/common';
+import { FreeformGrid } from './cards/Freeform/FreeformGrid';
+import { FreeformList } from './cards/Freeform/FreeformList';
+import type { PostClick } from '../lib/click';
+import { ArticleList } from './cards/article/ArticleList';
+import { ArticleGrid } from './cards/article/ArticleGrid';
+import type { FeaturedWideColSpan } from './cards/common/featuredWide';
+import { PostTypeToWideCard } from './cards/common/wideCards';
+import { ShareGrid } from './cards/share/ShareGrid';
+import { ShareList } from './cards/share/ShareList';
+import { CollectionGrid } from './cards/collection';
+import type { UseBookmarkPost } from '../hooks/useBookmarkPost';
+import { AdActions } from '../lib/ads';
+import { useFeedCardContext } from '../features/posts/FeedCardContext';
+import { AdPixel } from './cards/ad/common/AdPixel';
+import { AdMeasurement } from './cards/ad/common/AdMeasurement';
+import { AdViewability } from './cards/ad/common/AdViewability';
+import type { ViewabilityData } from '../features/monetization/viewability';
+import { viewabilityLogExtra } from '../features/monetization/viewability';
+import { BriefCard } from './cards/brief/BriefCard/BriefCard';
+import { ActivePostContextProvider } from '../contexts/ActivePostContext';
+import { LogExtraContextProvider } from '../contexts/LogExtraContext';
+import { SquadAdList } from './cards/ad/squad/SquadAdList';
+import { SquadAdGrid } from './cards/ad/squad/SquadAdGrid';
+import { adLogEvent, feedHighlightsLogEvent, feedLogExtra } from '../lib/feed';
+import {
+  findCreativeForTags,
+  getEngagementLogExtra,
+} from '../lib/engagementAds';
+import { useEngagementAdsContext } from '../contexts/EngagementAdsContext';
+import { useLogContext } from '../contexts/LogContext';
+import PollGrid from './cards/poll/PollGrid';
+import { PollList } from './cards/poll/PollList';
+import { SocialTwitterGrid } from './cards/socialTwitter/SocialTwitterGrid';
+import { SocialTwitterList } from './cards/socialTwitter/SocialTwitterList';
+import { SignalList } from './cards/common/list/SignalList';
+import { OtherFeedPage } from '../lib/query';
+import { isSourceSquadOrMachine } from '../graphql/sources';
+import { HighlightGrid } from './cards/highlight/HighlightGrid';
+import { HighlightList } from './cards/highlight/HighlightList';
+import { getHighlightIds, getHighlightIdsKey } from '../graphql/highlights';
+
+export type FeedItemComponentProps = {
+  item: FeedItem;
+  index: number;
+  row: number;
+  column: number;
+  columns: number;
+  openNewTab: boolean;
+  postMenuIndex: number | undefined;
+  user: LoggedUser | undefined;
+  feedName: string;
+  ranking?: string;
+  onPostClick: PostClick;
+  onReadArticleClick: FeedPostClick;
+  onShare: (post: Post, row?: number, column?: number) => void;
+  onMenuClick: (
+    e: React.MouseEvent,
+    index: number,
+    row: number,
+    column: number,
+  ) => void;
+  onCopyLinkClick: (
+    e: React.MouseEvent,
+    post: Post,
+    index: number,
+    row: number,
+    column: number,
+  ) => void;
+  onCommentClick: (
+    post: Post,
+    index: number,
+    row: number,
+    column: number,
+    isAd?: boolean,
+  ) => unknown;
+  virtualizedNumCards: number;
+  disableAdRefresh?: boolean;
+  /**
+   * When set, render the post as a wide featured highlight card spanning
+   * the given number of grid columns. Only used for article-like post
+   * types with an active `hero`.
+   */
+  wideColSpan?: FeaturedWideColSpan;
+  /** Set on search feeds so impressions can be joined to the query. */
+  searchLogExtra?: SearchLogExtra;
+} & Pick<UseVotePost, 'toggleUpvote' | 'toggleDownvote'> &
+  Pick<UseBookmarkPost, 'toggleBookmark'>;
+
+export function getFeedItemKey(item: FeedItem, index: number): string {
+  switch (item.type) {
+    case 'post':
+      return item.post.id;
+    case 'highlight':
+      return getHighlightIdsKey(item.highlights) || `highlight-${index}`;
+    case 'ad':
+      return `ad-${index}`;
+    default:
+      return `placeholder-${index}`;
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const PostTypeToTagCard: Record<PostType, React.ComponentType<any>> = {
+  [PostType.Article]: ArticleGrid,
+  [PostType.Share]: ShareGrid,
+  [PostType.Welcome]: FreeformGrid,
+  [PostType.Freeform]: FreeformGrid,
+  [PostType.VideoYouTube]: ArticleGrid,
+  [PostType.Collection]: CollectionGrid,
+  [PostType.Brief]: BriefCard,
+  [PostType.Poll]: PollGrid,
+  [PostType.SocialTwitter]: SocialTwitterGrid,
+  [PostType.Digest]: ArticleGrid,
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const PostTypeToTagList: Record<PostType, React.ComponentType<any>> = {
+  [PostType.Article]: ArticleList,
+  [PostType.Share]: ShareList,
+  [PostType.Welcome]: FreeformList,
+  [PostType.Freeform]: FreeformList,
+  [PostType.VideoYouTube]: ArticleList,
+  [PostType.Collection]: CollectionList,
+  [PostType.Brief]: BriefCard,
+  [PostType.Poll]: PollList,
+  [PostType.SocialTwitter]: SocialTwitterList,
+  [PostType.Digest]: ArticleList,
+};
+
+const getPostTypeForCard = (post?: Post): PostType => {
+  if (!post) {
+    return PostType.Article;
+  }
+
+  if (isSocialTwitterPost(post)) {
+    return PostType.SocialTwitter;
+  }
+
+  return post.type;
+};
+
+type GetTagsProps = {
+  isListFeedLayout: boolean;
+  shouldUseListMode: boolean;
+  postType: PostType;
+  feedName: string;
+};
+
+const getTags = ({
+  isListFeedLayout,
+  shouldUseListMode,
+  postType,
+  feedName,
+}: GetTagsProps) => {
+  const useListCards = isListFeedLayout || shouldUseListMode;
+  const isSignalFeed = feedName === OtherFeedPage.AgentsVibes;
+  const listPostTag = isSignalFeed ? SignalList : PostTypeToTagList[postType];
+  const listPlaceholderTag = isSignalFeed
+    ? SignalPlaceholderList
+    : PlaceholderList;
+  const listAdTag = isSignalFeed ? SignalAdList : AdList;
+
+  return {
+    PostTag: useListCards
+      ? listPostTag ?? ArticleList
+      : PostTypeToTagCard[postType] ?? ArticleGrid,
+    AdTag: useListCards ? listAdTag : AdGrid,
+    SquadAdTag: useListCards ? SquadAdList : SquadAdGrid,
+    PlaceholderTag: useListCards ? listPlaceholderTag : PlaceholderGrid,
+  };
+};
+
+export const withFeedLogExtraContext = (
+  WrappedComponent: typeof FeedItemComponent,
+): typeof FeedItemComponent => {
+  const WithFeedLogExtraContext = (
+    props: FeedItemComponentProps,
+  ): ReactElement | null => {
+    const { item } = props;
+    const { creatives } = useEngagementAdsContext();
+
+    if ([FeedItemType.Ad, FeedItemType.Post].includes(item?.type)) {
+      return (
+        <LogExtraContextProvider
+          selector={() => {
+            const extraData: Record<string, unknown> = {};
+
+            if (item.type === FeedItemType.Ad && item.ad?.generationId) {
+              extraData.gen_id = item.ad.generationId;
+            }
+
+            if (item.type === FeedItemType.Post || isBoostedPostAd(item)) {
+              const post =
+                item.type === FeedItemType.Post
+                  ? item.post
+                  : item.ad.data?.post;
+
+              extraData.referrer_target_id = post?.id;
+              extraData.referrer_target_type = post?.id
+                ? TargetType.Post
+                : undefined;
+
+              if (
+                item.type === FeedItemType.Post &&
+                post?.tags &&
+                creatives.length > 0
+              ) {
+                const creative = findCreativeForTags(creatives, post.tags);
+                if (creative) {
+                  Object.assign(extraData, getEngagementLogExtra(creative));
+                }
+              }
+            }
+
+            if (isBoostedSquadAd(item)) {
+              const source = item.ad.data?.source;
+
+              extraData.referrer_target_id = source?.id;
+              extraData.referrer_target_type = source?.id
+                ? TargetType.Source
+                : undefined;
+            }
+
+            return extraData;
+          }}
+        >
+          <WrappedComponent {...props} />
+        </LogExtraContextProvider>
+      );
+    }
+
+    return <WrappedComponent {...props} />;
+  };
+
+  WithFeedLogExtraContext.displayName = 'WithFeedLogExtraContext';
+
+  return WithFeedLogExtraContext;
+};
+
+function FeedItemComponent({
+  item,
+  index,
+  row,
+  column,
+  columns,
+  openNewTab,
+  postMenuIndex,
+  user,
+  feedName,
+  ranking,
+  toggleUpvote,
+  toggleDownvote,
+  onPostClick,
+  onShare,
+  onCopyLinkClick,
+  toggleBookmark,
+  onMenuClick,
+  onCommentClick,
+  onReadArticleClick,
+  virtualizedNumCards,
+  wideColSpan,
+  searchLogExtra,
+}: FeedItemComponentProps): ReactElement | null {
+  const { logEvent } = useLogContext();
+  const inViewRef = useLogImpression({
+    item,
+    index,
+    columns,
+    column,
+    row,
+    feedName,
+    ranking,
+    highlightColSpan: wideColSpan,
+    searchLogExtra,
+  });
+
+  const { shouldUseListFeedLayout, shouldUseListMode } = useFeedLayout();
+  const { boostedBy } = useFeedCardContext();
+
+  if (item.type === FeedItemType.Highlight) {
+    const HighlightTag =
+      shouldUseListFeedLayout || shouldUseListMode
+        ? HighlightList
+        : HighlightGrid;
+    const highlightIds = getHighlightIds(item.highlights);
+
+    return (
+      <HighlightTag
+        ref={inViewRef}
+        highlights={item.highlights}
+        onReadAllClick={() => {
+          logEvent(
+            feedHighlightsLogEvent(LogEvent.Click, {
+              columns: virtualizedNumCards,
+              column,
+              row,
+              feedName,
+              ranking,
+              action: 'read_all_click',
+              count: item.highlights.length,
+              highlightIds,
+              feedMeta: item.feedMeta,
+            }),
+          );
+        }}
+        onHighlightClick={(highlight, position) => {
+          logEvent(
+            feedHighlightsLogEvent(LogEvent.Click, {
+              columns: virtualizedNumCards,
+              column,
+              row,
+              feedName,
+              ranking,
+              action: 'highlight_click',
+              position,
+              count: item.highlights.length,
+              clickedHighlight: highlight,
+              highlightIds,
+              feedMeta: item.feedMeta,
+            }),
+          );
+        }}
+      />
+    );
+  }
+
+  const { PostTag, AdTag, SquadAdTag, PlaceholderTag } = getTags({
+    isListFeedLayout: shouldUseListFeedLayout,
+    shouldUseListMode,
+    postType: getPostTypeForCard(
+      isBoostedPostAd(item) ? item.ad.data?.post : (item as PostItem).post,
+    ),
+    feedName,
+  });
+
+  const onAdAction = (
+    action: AdActions,
+    ad: Ad,
+    extra?: Record<string, unknown>,
+  ) => {
+    logEvent(
+      adLogEvent(action, ad, {
+        columns: virtualizedNumCards,
+        column,
+        row,
+        extra: { ...feedLogExtra(feedName, ranking).extra, ...extra },
+      }),
+    );
+  };
+
+  const onAdViewable = (ad: Ad, data: ViewabilityData) =>
+    onAdAction(AdActions.Viewable, ad, viewabilityLogExtra(data));
+
+  if (item.type === FeedItemType.Ad && isBoostedSquadAd(item)) {
+    return (
+      <SquadAdTag
+        item={item as AdSquadItem}
+        onClickAd={() => onAdAction(AdActions.Click, item.ad)}
+        onMount={() => onAdAction(AdActions.Impression, item.ad)}
+        onViewable={(data) => onAdViewable(item.ad, data)}
+      />
+    );
+  }
+
+  if (item.type === FeedItemType.Post || isBoostedPostAd(item)) {
+    const itemPost =
+      item.type === FeedItemType.Post ? item.post : item.ad.data?.post;
+
+    if (!itemPost) {
+      return <PlaceholderTag />;
+    }
+
+    if (
+      !!itemPost.pinnedAt &&
+      itemPost.source?.currentMember?.flags?.collapsePinnedPosts
+    ) {
+      return null;
+    }
+
+    const postCardProps = {
+      enableSourceHeader:
+        feedName !== 'squad' && isSourceSquadOrMachine(itemPost.source),
+      ref: inViewRef,
+      post: { ...itemPost },
+      'data-testid': 'postItem',
+      onUpvoteClick: (post: Post, origin = Origin.Feed) => {
+        toggleUpvote({
+          payload: post,
+          origin,
+          opts: { columns, column, row },
+        });
+      },
+      onDownvoteClick: (post: Post, origin = Origin.Feed) => {
+        toggleDownvote({
+          payload: post,
+          origin,
+          opts: { columns, column, row },
+        });
+      },
+      onPostClick: (post: Post, event?: React.MouseEvent) =>
+        onPostClick(post, index, row, column, false, event),
+      onPostAuxClick: (post: Post) =>
+        onPostClick(post, index, row, column, true),
+      onReadArticleClick: () =>
+        onReadArticleClick(itemPost, index, row, column),
+      onShare: (post: Post) => onShare(post, row, column),
+      onBookmarkClick: (post: Post, origin = Origin.Feed) => {
+        toggleBookmark({
+          post,
+          origin,
+          opts: { columns, column, row },
+        });
+      },
+      openNewTab,
+      enableMenu: !!user,
+      onMenuClick: (event: React.MouseEvent) =>
+        onMenuClick(event, index, row, column),
+      onCopyLinkClick: (event: React.MouseEvent, post: Post) =>
+        onCopyLinkClick(event, post, index, row, column),
+      menuOpened: postMenuIndex === index,
+      onCommentClick: (post: Post) =>
+        onCommentClick(post, index, row, column, !!boostedBy),
+      eagerLoadImage: row === 0 && column === 0,
+    };
+
+    const isWidenedFeaturedPost =
+      item.type === FeedItemType.Post && !!wideColSpan && wideColSpan > 1;
+    const WideCard = isWidenedFeaturedPost
+      ? PostTypeToWideCard[itemPost.type]
+      : undefined;
+
+    return (
+      <ActivePostContextProvider post={itemPost}>
+        {WideCard ? (
+          <WideCard {...postCardProps} wideColSpan={wideColSpan} />
+        ) : (
+          <PostTag {...postCardProps}>
+            {item.type === FeedItemType.Ad && (
+              <>
+                <AdPixel pixel={item.ad.pixel} />
+                <AdMeasurement ad={item.ad} />
+                <AdViewability
+                  ad={item.ad}
+                  onViewable={(data) => onAdViewable(item.ad, data)}
+                />
+              </>
+            )}
+          </PostTag>
+        )}
+      </ActivePostContextProvider>
+    );
+  }
+
+  switch (item.type) {
+    case FeedItemType.Ad: {
+      const AdComponent = AdTag as React.ForwardRefExoticComponent<
+        AdCardProps & React.RefAttributes<Element>
+      >;
+      return (
+        <AdComponent
+          ref={inViewRef}
+          ad={item.ad}
+          index={item.index}
+          feedIndex={index}
+          onLinkClick={(ad: Ad) => onAdAction(AdActions.Click, ad)}
+          onViewable={onAdViewable}
+        />
+      );
+    }
+    default:
+      return <PlaceholderTag />;
+  }
+}
+
+export default withFeedLogExtraContext(FeedItemComponent);

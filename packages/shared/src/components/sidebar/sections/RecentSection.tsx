@@ -1,0 +1,162 @@
+import type { ReactElement } from 'react';
+import React, { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import type { SidebarMenuItem } from '../common';
+import { ListIcon } from '../common';
+import { pageIconForPath } from '../pageIcons';
+import {
+  HashtagIcon,
+  SourceIcon,
+  SquadIcon,
+  TimerIcon,
+  UserIcon,
+} from '../../icons';
+import { Image, ImageType } from '../../image/Image';
+import { Section } from '../Section';
+import { SidebarSettingsFlags } from '../../../graphql/settings';
+import { sourceImageQueryOptions } from '../../../graphql/sources';
+import type { SidebarSectionProps } from './common';
+import type { RecentPage, RecentPageType } from '../../../lib/recentPages';
+import { toWebappHref } from '../../../lib/links';
+import { useRecentPages } from '../../../hooks/useRecentPages';
+import { useAuthContext } from '../../../contexts/AuthContext';
+import { useUserShortByIdQuery } from '../../../hooks/user/useUserShortByIdQuery';
+import { useJobsFeature } from '../../../hooks/useJobsFeature';
+
+// Older stored entries predate `type`; fall back to the path prefix so they
+// still get a recognizable icon until they're re-recorded with a type.
+const resolveType = (page: RecentPage): RecentPageType => {
+  if (page.type) {
+    return page.type;
+  }
+  if (page.path.startsWith('/tags/')) {
+    return 'tag';
+  }
+  if (page.path.startsWith('/sources/')) {
+    return 'source';
+  }
+  if (page.path.startsWith('/squads/')) {
+    return 'squad';
+  }
+  return 'page';
+};
+
+const firstSegment = (path: string): string =>
+  path.split('?')[0].split('#')[0].split('/').filter(Boolean)[0] ?? '';
+
+const isJobsPath = (path: string): boolean => firstSegment(path) === 'jobs';
+
+const iconForType = (page: RecentPage, type: RecentPageType): ReactElement => {
+  switch (type) {
+    case 'user':
+      return <UserIcon />;
+    case 'source':
+      return <SourceIcon />;
+    case 'squad':
+      return <SquadIcon />;
+    case 'tag':
+      return <HashtagIcon />;
+    default: {
+      // Shared with the shortcuts dock so a row and the pin dragged out of it
+      // can't drift apart. Anything unmapped keeps the "history" timer.
+      const PageIcon = pageIconForPath(page.path);
+      return PageIcon ? <PageIcon /> : <TimerIcon />;
+    }
+  }
+};
+
+const handleFromPath = (path: string): string =>
+  path.split('?')[0].split('#')[0].split('/').filter(Boolean).pop() ?? '';
+
+// Renders the real entity avatar (squad logo / profile picture). Entries record
+// the avatar with the visit, so only rows written before that fall back to a
+// lookup, and the typed vector icon covers whatever still can't be resolved.
+const RecentItemIcon = ({ page }: { page: RecentPage }): ReactElement => {
+  const type = resolveType(page);
+  const handle = handleFromPath(page.path);
+  const { user } = useAuthContext();
+  const isOwnProfile =
+    type === 'user' && !!user?.username && handle === user.username;
+  const isSourceLike = type === 'squad' || type === 'source';
+  const needsLookup = !page.image && !isOwnProfile;
+
+  // Each query self-disables when handed an empty id/handle, so only the row's
+  // matching entity is fetched.
+  const { data: otherUser } = useUserShortByIdQuery({
+    id: needsLookup && type === 'user' ? handle : '',
+  });
+  const { data: source } = useQuery(
+    sourceImageQueryOptions({
+      handle: isSourceLike ? handle : '',
+      enabled: needsLookup,
+    }),
+  );
+
+  let { image } = page;
+  if (!image) {
+    if (isOwnProfile) {
+      image = user?.image;
+    } else if (type === 'user') {
+      image = otherUser?.image;
+    } else if (isSourceLike) {
+      image = source?.image;
+    }
+  }
+
+  if (image) {
+    return (
+      <Image
+        src={image}
+        // Sources/squads are square logos; users are round avatars.
+        type={type === 'user' ? ImageType.Avatar : ImageType.Squad}
+        alt=""
+        aria-hidden
+        className="size-5 rounded-6 object-cover"
+      />
+    );
+  }
+
+  return <ListIcon Icon={() => iconForType(page, type)} />;
+};
+
+// v2 Explore panel: the last few non-post pages the user visited (profiles,
+// feeds, tags, sources, etc.). Hidden until there's something to show.
+export const RecentSection = ({
+  isItemsButton,
+  ...defaultRenderSectionProps
+}: SidebarSectionProps): ReactElement | null => {
+  const recentPages = useRecentPages();
+  const { isJobsEnabled } = useJobsFeature();
+
+  const menuItems: SidebarMenuItem[] = useMemo(
+    () =>
+      recentPages
+        .filter((page) => isJobsEnabled || !isJobsPath(page.path))
+        .map((page) => ({
+          icon: () => <RecentItemIcon page={page} />,
+          title: page.title,
+          // Recorded from `router.asPath`, so always relative. The stored value
+          // stays that way — `resolveType`/`handleFromPath` match on path prefixes
+          // — and only the rendered link carries the origin.
+          path: toWebappHref(page.path),
+          // Recent mirrors pages you've already visited (often the current one),
+          // so it should never render as the active nav item.
+          disableActiveState: true,
+        })),
+    [isJobsEnabled, recentPages],
+  );
+
+  if (!menuItems.length) {
+    return null;
+  }
+
+  return (
+    <Section
+      {...defaultRenderSectionProps}
+      title="Son Gezilenler"
+      items={menuItems}
+      isItemsButton={false}
+      flag={SidebarSettingsFlags.RecentExpanded}
+    />
+  );
+};

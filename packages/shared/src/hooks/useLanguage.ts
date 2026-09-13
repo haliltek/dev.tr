@@ -1,0 +1,90 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuthContext } from '../contexts/AuthContext';
+import { UPDATE_USER_PROFILE_MUTATION } from '../graphql/users';
+import { useLogContext } from '../contexts/LogContext';
+import { SharedFeedPage } from '../components/utilities';
+import { gqlClient } from '../graphql/common';
+import { labels } from '../lib';
+import { LogEvent, TargetType } from '../lib/log';
+import { OtherFeedPage, RequestKey } from '../lib/query';
+import { useToastNotification } from './useToastNotification';
+
+export type UseLanguage = {
+  onLanguageChange: (value?: string | null) => void;
+};
+
+export const useLanguage = (): UseLanguage => {
+  const queryClient = useQueryClient();
+  const { user, updateUser } = useAuthContext();
+  const { logEvent } = useLogContext();
+  const { displayToast } = useToastNotification();
+
+  const { mutate: onLanguageChange } = useMutation({
+    mutationFn: async (value?: string | null) => {
+      if (!user) {
+        throw new Error('Cannot update language without an authenticated user');
+      }
+
+      const language = value ?? null;
+
+      await updateUser({
+        ...user,
+        language,
+      });
+
+      await gqlClient.request(UPDATE_USER_PROFILE_MUTATION, {
+        data: {
+          language,
+        },
+      });
+    },
+
+    onMutate: (value) => {
+      logEvent({
+        event_name: LogEvent.ChangeSettings,
+        target_type: TargetType.Language,
+        target_id: value ?? 'original',
+      });
+    },
+
+    onSuccess: async () => {
+      const requestKeys = [
+        ...Object.values(SharedFeedPage),
+        OtherFeedPage.Preview,
+        RequestKey.Squad,
+        RequestKey.FeedPreview,
+        RequestKey.FeedPreviewCustom,
+        RequestKey.Post,
+        RequestKey.Bookmarks,
+        RequestKey.ReadingHistory,
+        RequestKey.RelatedPosts,
+        RequestKey.SourceFeed,
+        RequestKey.SourceMostUpvoted,
+        RequestKey.SourceBestDiscussed,
+        RequestKey.TagFeed,
+        RequestKey.TagsMostUpvoted,
+        RequestKey.TagsBestDiscussed,
+      ];
+
+      await Promise.all(
+        requestKeys.map((requestKey) => {
+          const queryKey = [requestKey];
+
+          return queryClient.invalidateQueries({
+            queryKey,
+            exact: false,
+            type: 'all',
+          });
+        }),
+      );
+    },
+
+    onError: () => {
+      displayToast(labels.error.generic);
+    },
+  });
+
+  return {
+    onLanguageChange,
+  };
+};

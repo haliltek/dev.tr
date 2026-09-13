@@ -1,0 +1,23 @@
+import type { ReactElement } from 'react';
+import React from 'react';
+
+import type { NextSeoProps } from 'next-seo';
+import { getSettingsLayout } from '../../components/layouts/SettingsLayout';
+import ProfileIndex from '../../components/layouts/SettingsLayout/Profile';
+import { defaultSeo, noindexSeoProps } from '../../next-seo';
+import { getPageSeoTitles } from '../../components/layouts/utils';
+
+const seo: NextSeoProps = {
+  ...defaultSeo,
+  ...getPageSeoTitles('Profile details'),
+  ...noindexSeoProps,
+};
+
+const AccountProfilePage = (): ReactElement => {
+  return <ProfileIndex />;
+};
+
+AccountProfilePage.getLayout = getSettingsLayout;
+AccountProfilePage.layoutProps = { seo };
+
+export default AccountProfilePage;

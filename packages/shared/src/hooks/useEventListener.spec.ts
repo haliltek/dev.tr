@@ -1,0 +1,33 @@
+import { renderHook } from '@testing-library/react';
+
+import { useEventListener } from './useEventListener';
+
+describe('useEventListener', () => {
+  it('should work with react refs', () => {
+    const div = document.createElement('div');
+    const listener = jest.fn();
+    const addSpy = jest.spyOn(div, 'addEventListener');
+    const removeSpy = jest.spyOn(div, 'removeEventListener');
+
+    const reference = { current: div };
+    const { rerender, unmount } = renderHook(() =>
+      useEventListener(reference.current, 'resize', listener, {
+        passive: true,
+      }),
+    );
+
+    expect(addSpy).toHaveBeenCalledTimes(1);
+    expect(addSpy.mock.calls[0][2]).toStrictEqual({ passive: true });
+    expect(removeSpy).toHaveBeenCalledTimes(0);
+
+    rerender();
+
+    expect(addSpy).toHaveBeenCalledTimes(1);
+    expect(removeSpy).toHaveBeenCalledTimes(0);
+
+    unmount();
+
+    expect(addSpy).toHaveBeenCalledTimes(1);
+    expect(removeSpy).toHaveBeenCalledTimes(1);
+  });
+});
