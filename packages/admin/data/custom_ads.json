@@ -1,0 +1,41 @@
+[
+  {
+    "id": "ad_1789367986685",
+    "title": "AWS Türkiye Kullanıcı Topluluğu",
+    "sponsor": "AWS User Group Turkey",
+    "description": "",
+    "url": "/reklam",
+    "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800",
+    "logo": "https://devcore.tr/favicon.ico",
+    "targetTag": "cloud",
+    "impressions": 0,
+    "clicks": 0,
+    "active": true
+  },
+  {
+    "id": "ad_1",
+    "title": "Devcore Partner Programı - Sponsor Olun",
+    "description": "Türkiye'nin en nitelikli yazılımcı ekosistemine doğrudan ulaşın.",
+    "sponsor": "devcore.tr",
+    "logo": "https://devcore.tr/favicon.ico",
+    "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800",
+    "url": "/reklam",
+    "targetTag": "global",
+    "impressions": 1420,
+    "clicks": 68,
+    "active": true
+  },
+  {
+    "id": "ad_2",
+    "title": "Trendyol Tech Buluşmaları 2026",
+    "description": "Büyük ölçekli sistemler ve mikroservis mimarileri üzerine online webinar serisi.",
+    "sponsor": "Trendyol Tech",
+    "logo": "https://unavatar.io/trendyol.com",
+    "image": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800",
+    "url": "https://medium.com/trendyol-tech",
+    "targetTag": "microservices",
+    "impressions": 2840,
+    "clicks": 194,
+    "active": true
+  }
+]

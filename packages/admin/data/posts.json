@@ -1,0 +1,41 @@
+[
+  {
+    "id": "p_1",
+    "title": "Trendyol Mikroservis Mimarilerinde Event-Driven Yaklaşım",
+    "summary": "Kafka ve RabbitMQ entegrasyonuyla günde 500 milyon olayı nasıl yönetiyoruz?",
+    "tagsStr": "microservices, kafka, architecture, trendyol",
+    "sourceId": "trendyol-tech",
+    "sourceName": "Trendyol Tech",
+    "publishedAt": "2026-09-14T02:39:33.336Z",
+    "upvotes": 84,
+    "views": 1240,
+    "url": "https://medium.com/trendyol-tech",
+    "image": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800"
+  },
+  {
+    "id": "p_2",
+    "title": "Hepsiburada Çoklu Veri Merkezi PostgreSQL Yük Dengeleme",
+    "summary": "Yüksek erişilebilirlik (HA) ve coğrafi yedeklilik için uyguladığımız replikasyon stratejileri.",
+    "tagsStr": "database, postgresql, devops, hepsiburada",
+    "sourceId": "hepsiburada-tech",
+    "sourceName": "Hepsiburada Tech",
+    "publishedAt": "2026-09-13T18:39:33.336Z",
+    "upvotes": 67,
+    "views": 930,
+    "url": "https://medium.com/hepsiburadatech",
+    "image": "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=800"
+  },
+  {
+    "id": "p_3",
+    "title": "İyzico Ödeme Geçitlerinde Sıfır Kesinti (Zero-Downtime) Dağıtımı",
+    "summary": "Finansal standartlara uygun Kubernetes mavi-yeşil canlı dağıtım boru hattı.",
+    "tagsStr": "fintech, kubernetes, security, iyzico",
+    "sourceId": "iyzico-engineering",
+    "sourceName": "İyzico Engineering",
+    "publishedAt": "2026-09-13T06:39:33.336Z",
+    "upvotes": 112,
+    "views": 2150,
+    "url": "https://medium.com/iyzico-engineering",
+    "image": "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800"
+  }
+]

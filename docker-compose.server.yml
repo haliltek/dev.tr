@@ -111,12 +111,32 @@ services:
       - NEXT_PUBLIC_DOMAIN=localhost
       - NODE_OPTIONS=--max-old-space-size=1800
     command: ["npx", "next", "dev", "--turbopack", "-p", "5002"]
+  devcore-admin:
+    image: node:24.18-alpine
+    container_name: devcore-admin
+    restart: always
+    depends_on:
+      - daily-api
+    working_dir: /opt/app/packages/admin
+    ports:
+      - '127.0.0.1:5003:5003'
+    volumes:
+      - /root/devcore-tr/apps:/opt/app
+      - admin_next:/opt/app/packages/admin/.next
+    environment:
+      - NODE_ENV=production
+      - PORT=5003
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=DevcoreAdmin2026!
+      - BACKOFFICE_BACKEND_URL=http://daily-api:5000
+    command: ["npx", "next", "start", "-p", "5003"]
     deploy:
       resources:
         limits:
-          memory: 3200M
+          memory: 1024M
 
 volumes:
   pg_data:
   redis_data:
   webapp_next:
+  admin_next:

@@ -1,0 +1,67 @@
+[
+  {
+    "id": "obss",
+    "name": "OBSS Technology",
+    "handle": "obss",
+    "website": "https://obss.tech",
+    "description": "",
+    "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800",
+    "postCount": 0,
+    "active": true
+  },
+  {
+    "id": "trendyol-tech",
+    "name": "Trendyol Tech",
+    "handle": "trendyol-tech",
+    "website": "https://medium.com/trendyol-tech",
+    "description": "Trendyol mühendislerinin büyük ölçekli sistemler, mikroservisler ve yapay zeka yazıları.",
+    "image": "https://unavatar.io/trendyol.com",
+    "feedUrl": "https://medium.com/feed/trendyol-tech",
+    "postCount": 142,
+    "active": true
+  },
+  {
+    "id": "hepsiburada-tech",
+    "name": "Hepsiburada Tech",
+    "handle": "hepsiburadatech",
+    "website": "https://medium.com/hepsiburadatech",
+    "description": "E-ticaret altyapısı, ölçeklenebilirlik, veri bilimi ve modern mimariler.",
+    "image": "https://unavatar.io/hepsiburada.com",
+    "feedUrl": "https://medium.com/feed/hepsiburadatech",
+    "postCount": 88,
+    "active": true
+  },
+  {
+    "id": "iyzico-engineering",
+    "name": "İyzico Engineering",
+    "handle": "iyzico-engineering",
+    "website": "https://medium.com/iyzico-engineering",
+    "description": "Fintek dünyası, ödeme sistemleri, güvenlik ve backend mimarileri.",
+    "image": "https://unavatar.io/iyzico.com",
+    "feedUrl": "https://medium.com/feed/iyzico-engineering",
+    "postCount": 64,
+    "active": true
+  },
+  {
+    "id": "getir-tech",
+    "name": "Getir Tech",
+    "handle": "getir",
+    "website": "https://medium.com/getir",
+    "description": "Gerçek zamanlı veri akışı, mobil teknolojiler ve yüksek trafikli sistemler.",
+    "image": "https://unavatar.io/getir.com",
+    "feedUrl": "https://medium.com/feed/getir",
+    "postCount": 52,
+    "active": true
+  },
+  {
+    "id": "sahibinden-tech",
+    "name": "Sahibinden Technology",
+    "handle": "sahibindentech",
+    "website": "https://medium.com/sahibindentech",
+    "description": "Türkiye’nin dev ilan platformunun mimari ve teknoloji deneyimleri.",
+    "image": "https://unavatar.io/sahibinden.com",
+    "feedUrl": "https://medium.com/feed/sahibindentech",
+    "postCount": 45,
+    "active": true
+  }
+]
