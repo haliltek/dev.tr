@@ -5,8 +5,9 @@ import Head from 'next/head';
 export default function BackofficeRedirect(): ReactElement {
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const targetUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:5003'
+      const isDirectPort = window.location.port === '3096' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const targetUrl = isDirectPort
+        ? `http://${window.location.hostname}:5003`
         : '/admin';
       window.location.replace(targetUrl);
     }
@@ -36,7 +37,7 @@ export default function BackofficeRedirect(): ReactElement {
         <h2 style={{ color: '#58a6ff', marginBottom: '1rem' }}>Devcore.tr Yönetim Paneline Yönlendiriliyorsunuz...</h2>
         <p style={{ color: '#8b949e', marginBottom: '1.5rem' }}>Yeni güvenli TailAdmin paneline aktarılıyorsunuz.</p>
         <a
-          href={typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5003' : '/admin'}
+          href={typeof window !== 'undefined' && (window.location.port === '3096' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? `http://${window.location.hostname}:5003` : '/admin'}
           style={{
             padding: '0.6rem 1.2rem',
             backgroundColor: '#238636',
