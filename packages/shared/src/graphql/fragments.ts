@@ -374,7 +374,6 @@ export const SHARED_POST_INFO_FRAGMENT = gql`
     summary
     createdAt
     private
-    noindex
     upvoted
     commented
     bookmarked

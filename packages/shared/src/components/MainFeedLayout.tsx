@@ -36,6 +36,7 @@ import AuthContext from '../contexts/AuthContext';
 import type { LoggedUser } from '../lib/user';
 import { SharedFeedPage } from './utilities';
 import {
+  RankingAlgorithm,
   FEED_V2_HIGHLIGHTS_LIMIT,
   ANONYMOUS_FEED_QUERY,
   baseFeedSupportedTypes,
