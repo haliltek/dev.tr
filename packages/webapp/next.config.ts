@@ -73,6 +73,7 @@ const nextConfig: NextConfig = {
     },
   },
   experimental: {
+    optimizePackageImports: ['@dailydotdev/shared'],
     turbopackFileSystemCacheForDev: false,
   },
   ...withBundleAnalyzer({
