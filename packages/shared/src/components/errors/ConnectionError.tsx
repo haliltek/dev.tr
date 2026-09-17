@@ -14,24 +14,23 @@ function ConnectionError({ onRetry }: { onRetry?: () => void }): ReactElement {
   return (
     <div className="flex max-h-full w-full flex-col items-center justify-center gap-4 self-center text-center laptop:w-[21.25rem] laptop:max-w-[21.25rem]">
       <Typography type={TypographyType.LargeTitle} bold>
-        Connection lost
+        Bağlantı Kesildi
       </Typography>
       <Typography
         type={TypographyType.Body}
         bold
         color={TypographyColor.Tertiary}
       >
-        Looks like your internet connection is playing hide and seek. Check your
-        connection and try again.
+        İnternet bağlantınızda bir problem olabilir veya sunucuya erişilemiyor. Lütfen bağlantınızı kontrol edip tekrar deneyin.
       </Typography>
       {onRetry && (
         <Button
-          variant={ButtonVariant.Subtle}
+          variant={ButtonVariant.Primary}
           className="w-full"
           icon={<RefreshIcon />}
           onClick={onRetry}
         >
-          Try again
+          Tekrar Dene
         </Button>
       )}
       <Button
@@ -39,11 +38,9 @@ function ConnectionError({ onRetry }: { onRetry?: () => void }): ReactElement {
         className="w-full"
         icon={<TerminalIcon />}
         href={statusPage}
-        target="_blank"
-        rel={anchorDefaultRel}
         tag="a"
       >
-        Check system status
+        Sistem Durumunu Kontrol Et
       </Button>
     </div>
   );

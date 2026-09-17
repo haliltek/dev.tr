@@ -22,39 +22,32 @@ function ServerError(): ReactElement {
         loading="lazy"
       />
       <Typography type={TypographyType.LargeTitle} bold>
-        Production is down
-        <br />
-        (FML)
+        Geçici Bir Kesinti Yaşanıyor
       </Typography>
       <Typography
         type={TypographyType.Body}
         bold
         color={TypographyColor.Tertiary}
       >
-        Our team&apos;s on it! Try refreshing the page and cross your fingers,
-        or send our engineers some good vibes on X (Twitter).
+        Mühendislerimiz durumu inceliyor. Sayfayı yenilemeyi deneyebilir veya canlı sistem durumu sayfamızdan servisleri takip edebilirsiniz.
       </Typography>
+      <Button
+        variant={ButtonVariant.Primary}
+        className="w-full"
+        onClick={() => {
+          if (typeof window !== 'undefined') window.location.reload();
+        }}
+      >
+        Sayfayı Yenile
+      </Button>
       <Button
         variant={ButtonVariant.Subtle}
         className="w-full"
         icon={<TerminalIcon />}
         href={statusPage}
-        target="_blank"
-        rel={anchorDefaultRel}
         tag="a"
       >
-        Check system status
-      </Button>
-      <Button
-        variant={ButtonVariant.Subtle}
-        className="w-full"
-        icon={<TwitterIcon />}
-        href={twitter}
-        target="_blank"
-        rel={anchorDefaultRel}
-        tag="a"
-      >
-        Cheer our engineers
+        Sistem Durumunu Kontrol Et
       </Button>
     </div>
   );
