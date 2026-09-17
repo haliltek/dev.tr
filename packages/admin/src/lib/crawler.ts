@@ -150,6 +150,132 @@ function extractImage(content: string): string {
   return 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800';
 }
 
+export async function crawlSingleSource(source: CrawlerSource): Promise<{ added: number; logs: string[] }> {
+  const logs: string[] = [];
+  let sourceAdded = 0;
+
+  try {
+    logs.push(`[KAYNAK] ${source.name} taranıyor (${source.feedUrl})...`);
+
+    // Ensure source exists in DB
+    try {
+      const handle = (source.id).slice(0, 36);
+      await dbQuery(
+        `INSERT INTO source (id, name, website, image, active, handle, "createdAt", type)
+         VALUES ($1, $2, $3, $4, true, $5, NOW(), 'machine')
+         ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, image = EXCLUDED.image, active = true`,
+        [source.id, source.name, source.website, source.image, handle]
+      );
+    } catch (dbErr) {
+      console.error(`Source upsert failed for ${source.id}:`, dbErr);
+    }
+
+    const res = await fetch(source.feedUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; DevcoreCrawler/1.0; +https://devcore.tr)',
+        Accept: 'application/rss+xml, application/xml, text/xml, */*',
+      },
+      signal: AbortSignal.timeout(10000),
+    });
+
+    if (!res.ok) {
+      logs.push(`  [UYARI] HTTP ${res.status}: ${source.name} yanıt vermedi.`);
+      return { added: 0, logs };
+    }
+
+    const xmlText = await res.text();
+    const itemMatches = xmlText.match(/<item>([\s\S]*?)<\/item>/gi) || [];
+
+    for (const itemXml of itemMatches.slice(0, 15)) {
+      const titleMatch = itemXml.match(/<title>(?:<!\[CDATA\[(.*?)\]\]>|(.*?))<\/title>/i);
+      const title = cleanHtml(titleMatch ? titleMatch[1] || titleMatch[2] || '' : '');
+
+      const linkMatch = itemXml.match(/<link>(?:<!\[CDATA\[(.*?)\]\]>|(.*?))<\/link>/i);
+      let link = (linkMatch ? linkMatch[1] || linkMatch[2] || '' : '').trim();
+      if (link.includes('?')) {
+        link = link.split('?')[0];
+      }
+
+      if (!title || !link) continue;
+
+      // Check if post already exists
+      const existing = await dbQuery<{ id: string }>(
+        'SELECT id FROM post WHERE url = $1 LIMIT 1',
+        [link]
+      );
+
+      if (existing && existing.length > 0) {
+        continue;
+      }
+
+      const descMatch = itemXml.match(/<(?:description|content:encoded)>(?:<!\[CDATA\[([\s\S]*?)\]\]>|([\s\S]*?))<\/(?:description|content:encoded)>/i);
+      const rawDesc = descMatch ? descMatch[1] || descMatch[2] || '' : '';
+      const summary = cleanHtml(rawDesc).slice(0, 280);
+      const image = extractImage(rawDesc);
+
+      const pubDateMatch = itemXml.match(/<pubDate>(.*?)<\/pubDate>/i);
+      const publishedAt = pubDateMatch ? new Date(pubDateMatch[1]).toISOString() : new Date().toISOString();
+
+      // Collect tags
+      const tagMatches = itemXml.match(/<category>(?:<!\[CDATA\[(.*?)\]\]>|(.*?))<\/category>/gi) || [];
+      const categories = tagMatches
+        .map((t) => {
+          const m = t.match(/<category>(?:<!\[CDATA\[(.*?)\]\]>|(.*?))<\/category>/i);
+          return m ? cleanHtml(m[1] || m[2] || '') : '';
+        })
+        .filter(Boolean)
+        .map((c) => c.toLowerCase().replace(/[^a-z0-9]/g, ''))
+        .filter((c) => c.length > 2);
+
+      const allTags = Array.from(new Set([...(source.defaultTags || ['devcore', 'tech']), ...categories])).slice(0, 5);
+      const tagsStr = allTags.join(', ');
+
+      const idHash = crypto.createHash('md5').update(link).digest('hex');
+      const postId = `tr_${idHash.slice(0, 16)}`;
+      const shortId = idHash.slice(0, 14);
+
+      await dbQuery(
+        `INSERT INTO post (
+          id, "shortId", title, summary, url, "canonicalUrl", image, "tagsStr",
+          "sourceId", "publishedAt", "createdAt", score, views, upvotes, comments,
+          deleted, visible, type, "showOnFeed"
+        ) VALUES (
+          $1, $2, $3, $4, $5, $5, $6, $7,
+          $8, $9, NOW(), 120, 1, 0, 0,
+          false, true, 'article', true
+        ) ON CONFLICT (id) DO NOTHING`,
+        [postId, shortId, title, summary, link, image, tagsStr, source.id, publishedAt]
+      );
+
+      // Add keywords
+      for (const tag of allTags.slice(0, 3)) {
+        try {
+          await dbQuery(
+            `INSERT INTO keyword (value, "createdAt", "updatedAt", status)
+             VALUES ($1, NOW(), NOW(), 'allow')
+             ON CONFLICT (value) DO NOTHING`,
+            [tag]
+          );
+          await dbQuery(
+            `INSERT INTO post_keyword ("postId", keyword, status)
+             VALUES ($1, $2, 'allow')
+             ON CONFLICT DO NOTHING`,
+            [postId, tag]
+          );
+        } catch {}
+      }
+
+      sourceAdded++;
+    }
+
+    logs.push(`  -> ${source.name}: ${sourceAdded} yeni içerik veritabanına kaydedildi.`);
+  } catch (err: any) {
+    logs.push(`  [HATA] ${source.name} taranırken hata: ${err?.message || err}`);
+  }
+
+  return { added: sourceAdded, logs };
+}
+
 export async function runCrawlerTask(): Promise<CrawlerState> {
   if (crawlerState.status === 'running') {
     return crawlerState;
@@ -177,127 +303,9 @@ export async function runCrawlerTask(): Promise<CrawlerState> {
     let addedCount = 0;
 
     for (const source of allSources) {
-      try {
-        logs.push(`[KAYNAK] ${source.name} taranıyor (${source.feedUrl})...`);
-
-        // Ensure source exists in DB
-        try {
-          const handle = (source.id).slice(0, 36);
-          await dbQuery(
-            `INSERT INTO source (id, name, website, image, active, handle, "createdAt", type)
-             VALUES ($1, $2, $3, $4, true, $5, NOW(), 'machine')
-             ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, image = EXCLUDED.image, active = true`,
-            [source.id, source.name, source.website, source.image, handle]
-          );
-        } catch (dbErr) {
-          console.error(`Source upsert failed for ${source.id}:`, dbErr);
-        }
-
-        const res = await fetch(source.feedUrl, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (compatible; DevcoreCrawler/1.0; +https://devcore.tr)',
-            Accept: 'application/rss+xml, application/xml, text/xml, */*',
-          },
-          signal: AbortSignal.timeout(10000),
-        });
-
-        if (!res.ok) {
-          logs.push(`  [UYARI] HTTP ${res.status}: ${source.name} yanıt vermedi.`);
-          continue;
-        }
-
-        const xmlText = await res.text();
-        const itemMatches = xmlText.match(/<item>([\s\S]*?)<\/item>/gi) || [];
-
-        let sourceAdded = 0;
-
-        for (const itemXml of itemMatches.slice(0, 10)) {
-          const titleMatch = itemXml.match(/<title>(?:<!\[CDATA\[(.*?)\]\]>|(.*?))<\/title>/i);
-          const title = cleanHtml(titleMatch ? titleMatch[1] || titleMatch[2] || '' : '');
-
-          const linkMatch = itemXml.match(/<link>(?:<!\[CDATA\[(.*?)\]\]>|(.*?))<\/link>/i);
-          let link = (linkMatch ? linkMatch[1] || linkMatch[2] || '' : '').trim();
-          if (link.includes('?')) {
-            link = link.split('?')[0];
-          }
-
-          if (!title || !link) continue;
-
-          // Check if post already exists
-          const existing = await dbQuery<{ id: string }>(
-            'SELECT id FROM post WHERE url = $1 LIMIT 1',
-            [link]
-          );
-
-          if (existing && existing.length > 0) {
-            continue;
-          }
-
-          const descMatch = itemXml.match(/<(?:description|content:encoded)>(?:<!\[CDATA\[([\s\S]*?)\]\]>|([\s\S]*?))<\/(?:description|content:encoded)>/i);
-          const rawDesc = descMatch ? descMatch[1] || descMatch[2] || '' : '';
-          const summary = cleanHtml(rawDesc).slice(0, 280);
-          const image = extractImage(rawDesc);
-
-          const pubDateMatch = itemXml.match(/<pubDate>(.*?)<\/pubDate>/i);
-          const publishedAt = pubDateMatch ? new Date(pubDateMatch[1]).toISOString() : new Date().toISOString();
-
-          // Collect tags
-          const tagMatches = itemXml.match(/<category>(?:<!\[CDATA\[(.*?)\]\]>|(.*?))<\/category>/gi) || [];
-          const categories = tagMatches
-            .map((t) => {
-              const m = t.match(/<category>(?:<!\[CDATA\[(.*?)\]\]>|(.*?))<\/category>/i);
-              return m ? cleanHtml(m[1] || m[2] || '') : '';
-            })
-            .filter(Boolean)
-            .map((c) => c.toLowerCase().replace(/[^a-z0-9]/g, ''))
-            .filter((c) => c.length > 2);
-
-          const allTags = Array.from(new Set([...source.defaultTags, ...categories])).slice(0, 5);
-          const tagsStr = allTags.join(', ');
-
-          const idHash = crypto.createHash('md5').update(link).digest('hex');
-          const postId = `tr_${idHash.slice(0, 16)}`;
-          const shortId = idHash.slice(0, 14);
-
-          await dbQuery(
-            `INSERT INTO post (
-              id, "shortId", title, summary, url, "canonicalUrl", image, "tagsStr",
-              "sourceId", "publishedAt", "createdAt", score, views, upvotes, comments,
-              deleted, visible, type, "showOnFeed"
-            ) VALUES (
-              $1, $2, $3, $4, $5, $5, $6, $7,
-              $8, $9, NOW(), 120, 1, 0, 0,
-              false, true, 'article', true
-            ) ON CONFLICT (id) DO NOTHING`,
-            [postId, shortId, title, summary, link, image, tagsStr, source.id, publishedAt]
-          );
-
-          // Add keywords
-          for (const tag of allTags.slice(0, 3)) {
-            try {
-              await dbQuery(
-                `INSERT INTO keyword (value, "createdAt", "updatedAt", status)
-                 VALUES ($1, NOW(), NOW(), 'allow')
-                 ON CONFLICT (value) DO NOTHING`,
-                [tag]
-              );
-              await dbQuery(
-                `INSERT INTO post_keyword ("postId", keyword, status)
-                 VALUES ($1, $2, 'allow')
-                 ON CONFLICT DO NOTHING`,
-                [postId, tag]
-              );
-            } catch {}
-          }
-
-          sourceAdded++;
-          addedCount++;
-        }
-
-        logs.push(`  -> ${source.name}: ${sourceAdded} yeni içerik veritabanına kaydedildi.`);
-      } catch (err: any) {
-        logs.push(`  [HATA] ${source.name} taranırken hata: ${err?.message || err}`);
-      }
+      const res = await crawlSingleSource(source);
+      addedCount += res.added;
+      logs.push(...res.logs);
     }
 
     logs.push(`\n[TAMAMLANDI] Toplam ${addedCount} yeni makale veritabanına başarıyla aktarıldı!`);

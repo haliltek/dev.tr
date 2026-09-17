@@ -81,7 +81,7 @@ export default function SourcesManagementPage() {
       if (res.ok) {
         const data = await res.json();
         if (data.source) {
-          setSources((prev) => [data.source, ...prev]);
+          setSources((prev) => [data.source, ...prev.filter((s) => s.id !== data.source.id)]);
         }
         setShowModal(false);
         setNewSource({
@@ -92,6 +92,9 @@ export default function SourcesManagementPage() {
           image: "",
           feedUrl: "",
         });
+        if (data.addedPosts && data.addedPosts > 0) {
+          alert(`"${data.source.name}" başarıyla eklendi ve ${data.addedPosts} içerik veritabanına aktarıldı!`);
+        }
       } else {
         alert("Kaynak eklenirken bir sorun oluştu.");
       }

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { dbQuery } from './db';
-import { getCrawlerState, runCrawlerTask } from './crawler';
+import { getCrawlerState, runCrawlerTask, crawlSingleSource } from './crawler';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const ADS_FILE = path.join(DATA_DIR, 'custom_ads.json');
@@ -91,6 +91,24 @@ export interface SourceItem {
   active?: boolean;
 }
 
+export function slugifyTurkish(text: string): string {
+  const trMap: Record<string, string> = {
+    ç: 'c', Ç: 'c',
+    ğ: 'g', Ğ: 'g',
+    ı: 'i', I: 'i', İ: 'i',
+    ö: 'o', Ö: 'o',
+    ş: 's', Ş: 's',
+    ü: 'u', Ü: 'u',
+  };
+  return text
+    .replace(/[çÇğĞıIİöÖşŞüÜ]/g, (char) => trMap[char] || char)
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 36);
+}
+
 export async function getSources(): Promise<SourceItem[]> {
   ensureDir();
   let jsonSources: SourceItem[] = [];
@@ -123,9 +141,9 @@ export async function getSources(): Promise<SourceItem[]> {
         COUNT(p.id) as post_count
       FROM source s
       LEFT JOIN post p ON p."sourceId" = s.id AND p.deleted IS NOT TRUE
-      GROUP BY s.id, s.name, s.handle, s.website, s.description, s.image, s.active
-      ORDER BY post_count DESC, s.name ASC
-      LIMIT 200`
+      GROUP BY s.id, s.name, s.handle, s.website, s.description, s.image, s.active, s."createdAt"
+      ORDER BY s."createdAt" DESC, post_count DESC, s.name ASC
+      LIMIT 250`
     );
 
     if (rows && rows.length > 0) {
@@ -150,6 +168,15 @@ export async function getSources(): Promise<SourceItem[]> {
           dbSources.unshift(s);
         }
       }
+
+      // Sort: Sources with feedUrl always come FIRST (newest first), then others
+      dbSources.sort((a, b) => {
+        const aHasFeed = !!a.feedUrl;
+        const bHasFeed = !!b.feedUrl;
+        if (aHasFeed && !bHasFeed) return -1;
+        if (!aHasFeed && bHasFeed) return 1;
+        return (b.postCount || 0) - (a.postCount || 0);
+      });
 
       return dbSources;
     }
@@ -400,3 +427,5 @@ export function getCrawlerStatus() {
 export function triggerCrawlerRun() {
   return runCrawlerTask();
 }
+
+export { crawlSingleSource };

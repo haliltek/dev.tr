@@ -43,13 +43,13 @@ export default function PostMetadata({
   const hasUpvoteCount = typeof numUpvotes === 'number';
   const upvoteCount = numUpvotes ?? 0;
   const readTimeValue = readTime ?? 0;
-  const timeActionContent = isVideoType ? 'watch' : 'read';
+  const timeActionContent = isVideoType ? 'izleme' : 'okuma';
   const showReadTime = isVideoType ? Number.isInteger(readTime) : !!readTime;
   const { boostedBy } = useFeedCardContext();
 
-  const promotedText = useScrambler('Promoted');
+  const promotedText = useScrambler('Öne Çıkarılan');
   const promotedByTooltip = useScrambler(
-    boostedBy ? `Promoted by @${boostedBy.username}` : undefined,
+    boostedBy ? `@${boostedBy.username} tarafından öne çıkarıldı` : undefined,
   );
 
   const items: { key: string; node: ReactNode }[] = [
@@ -81,7 +81,7 @@ export default function PostMetadata({
       key: 'readTime',
       node: (
         <span data-testid="readTime">
-          {formatReadTime(readTimeValue)} {timeActionContent} time
+          {formatReadTime(readTimeValue)} {timeActionContent}
         </span>
       ),
     },
@@ -90,7 +90,7 @@ export default function PostMetadata({
         key: 'sources',
         node: (
           <span data-testid="numSources">
-            {numSources} {pluralize('source', numSources)}
+            {numSources} kaynak
           </span>
         ),
       },
@@ -100,7 +100,7 @@ export default function PostMetadata({
         key: 'upvotes',
         node: (
           <span data-testid="numUpvotes">
-            {largeNumberFormat(upvoteCount)} upvote{upvoteCount > 1 ? 's' : ''}
+            {largeNumberFormat(upvoteCount)} beğeni
           </span>
         ),
       },

@@ -16,10 +16,10 @@ export default function PostReadTime({
     return null;
   }
 
-  const timeActionContent = isVideoType ? 'watch' : 'read';
+  const timeActionContent = isVideoType ? 'izleme' : 'okuma';
   return (
     <span data-testid="readTime">
-      {formatReadTime(readTime ?? 0)} {timeActionContent} time
+      {formatReadTime(readTime ?? 0)} {timeActionContent}
     </span>
   );
 }
