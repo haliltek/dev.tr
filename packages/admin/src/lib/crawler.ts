@@ -220,21 +220,21 @@ export async function runCrawlerTask(): Promise<CrawlerState> {
           const allTags = Array.from(new Set([...source.defaultTags, ...categories])).slice(0, 5);
           const tagsStr = allTags.join(', ');
 
-          const idHash = crypto.createHash('md5').update(link).digest('hex').slice(0, 16);
-          const postId = `tr_${idHash}`;
-          const slug = `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 60)}-${idHash.slice(0, 6)}`;
+          const idHash = crypto.createHash('md5').update(link).digest('hex');
+          const postId = `tr_${idHash.slice(0, 16)}`;
+          const shortId = idHash.slice(0, 14);
 
           await dbQuery(
             `INSERT INTO post (
-              id, title, summary, url, "canonicalUrl", image, "tagsStr",
+              id, "shortId", title, summary, url, "canonicalUrl", image, "tagsStr",
               "sourceId", "publishedAt", "createdAt", score, views, upvotes, comments,
-              deleted, visible, type, "showOnFeed", slug
+              deleted, visible, type, "showOnFeed"
             ) VALUES (
-              $1, $2, $3, $4, $4, $5, $6,
-              $7, $8, NOW(), 120, 1, 0, 0,
-              false, true, 'article', true, $9
+              $1, $2, $3, $4, $5, $5, $6, $7,
+              $8, $9, NOW(), 120, 1, 0, 0,
+              false, true, 'article', true
             ) ON CONFLICT (id) DO NOTHING`,
-            [postId, title, summary, link, image, tagsStr, source.id, publishedAt, slug]
+            [postId, shortId, title, summary, link, image, tagsStr, source.id, publishedAt]
           );
 
           // Add keywords
