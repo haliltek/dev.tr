@@ -171,21 +171,7 @@ const nextConfig: NextConfig = {
         destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
       });
 
-      // Proxy /api/backoffice/:path* to backoffice daemon (takes precedence over /api/:path*)
-      rewrites.unshift({
-        source: '/api/backoffice/:path*',
-        destination: `${process.env.BACKOFFICE_API_URL || 'http://172.25.0.1:5005'}/api/:path*`,
-      });
 
-      // Proxy /api/v1/a and /api/v1/a/* to backoffice daemon custom ad-feed
-      rewrites.unshift({
-        source: '/api/v1/a',
-        destination: `${process.env.BACKOFFICE_API_URL || 'http://172.25.0.1:5005'}/api/ad-feed`,
-      });
-      rewrites.unshift({
-        source: '/api/v1/a/:path*',
-        destination: `${process.env.BACKOFFICE_API_URL || 'http://172.25.0.1:5005'}/api/ad-feed`,
-      });
 
       return {
         beforeFiles: [

@@ -62,7 +62,26 @@ export const EngagementAdsProvider = ({
       return [];
     }
 
-    return parseCreatives(rawCreatives).map((c) => resolveCreative(c, isLight));
+    const parsed = parseCreatives(rawCreatives);
+    const customized = parsed.map((c) => {
+      if (c.gen_id === 'mock-engagement-gen-id') {
+        return {
+          ...c,
+          promoted_name: 'devcore.tr',
+          promoted_body: "Türkiye'nin en nitelikli geliştirici ekosistemi. Teknik makaleleri keşfet, deneyimlerini paylaş.",
+          promoted_cta: 'Topluluğa Katıl',
+          promoted_url: '/reklam',
+          promoted_gradient_start: { dark: '#1e40af', light: '#2563eb' },
+          promoted_gradient_end: { dark: '#0369a1', light: '#0284c7' },
+          tools: ['Next.js', 'React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Docker'],
+          keywords: ['yazılım', 'geliştirici', 'topluluk', 'mühendislik'],
+          tags: ['react', 'nextjs', 'typescript', 'backend', 'devops', 'ai', 'cloud'],
+        };
+      }
+      return c;
+    });
+
+    return customized.map((c) => resolveCreative(c, isLight));
   }, [rawCreatives, isLight, user?.isPlus]);
 
   const getCreativeForTags = useCallback(

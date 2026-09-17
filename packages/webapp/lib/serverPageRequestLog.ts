@@ -14,7 +14,7 @@ export const logServerPageRequest = async (
   variant: ServerPageRequestVariant,
 ): Promise<void> => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl || process.env.DISABLE_SERVER_REQUEST_LOGGING === 'true') {
+  if (!apiUrl || process.env.DISABLE_SERVER_REQUEST_LOGGING !== 'false') {
     return;
   }
 
@@ -41,14 +41,10 @@ export const logServerPageRequest = async (
       visit_id: crypto.randomUUID(),
     };
 
-    if (isDevelopment) {
-      // eslint-disable-next-line no-console
-      console.log(eventPayload);
-    }
-
     await fetch(`${apiUrl}/e`, {
       method: 'POST',
       body: JSON.stringify({ events: [eventPayload] }),
+      signal: AbortSignal.timeout(500),
       headers: {
         'content-type': 'application/json',
         'user-agent': ua,
