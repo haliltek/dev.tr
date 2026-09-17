@@ -253,29 +253,20 @@ export async function getStaticProps(): Promise<
       revalidate: 3600,
     };
   } catch (err: unknown) {
-    const error = err as GraphQLError;
-
-    if (
-      [ApiError.NotFound, ApiError.Forbidden].includes(
-        error?.response?.errors?.[0]?.extensions?.code,
-      )
-    ) {
-      return {
-        props: {
-          highestReputation: [],
-          longestStreak: [],
-          highestPostViews: [],
-          mostUpvoted: [],
-          mostReferrals: [],
-          mostReadingDays: [],
-          highestLevel: [],
-          isHighestLevelSupported: false,
-          mostVerifiedUsers: [],
-          popularHotTakes: [],
-        },
-        revalidate: 60,
-      };
-    }
-    throw err;
+    return {
+      props: {
+        highestReputation: [],
+        longestStreak: [],
+        highestPostViews: [],
+        mostUpvoted: [],
+        mostReferrals: [],
+        mostReadingDays: [],
+        highestLevel: [],
+        isHighestLevelSupported: false,
+        mostVerifiedUsers: [],
+        popularHotTakes: [],
+      },
+      revalidate: 60,
+    };
   }
 }

@@ -198,22 +198,14 @@ export async function getStaticProps(): Promise<
       revalidate: 60,
     };
   } catch (err) {
-    const error = err as GraphQLError;
-    if (
-      [ApiError.NotFound, ApiError.Forbidden].includes(
-        error?.response?.errors?.[0]?.extensions?.code,
-      )
-    ) {
-      return {
-        props: {
-          mostRecentSources: [],
-          trendingSources: [],
-          popularSources: [],
-          topVideoSources: [],
-        },
-        revalidate: 60,
-      };
-    }
-    throw err;
+    return {
+      props: {
+        mostRecentSources: [],
+        trendingSources: [],
+        popularSources: [],
+        topVideoSources: [],
+      },
+      revalidate: 60,
+    };
   }
 }
