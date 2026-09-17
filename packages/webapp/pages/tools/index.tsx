@@ -342,80 +342,96 @@ export default ToolsDirectoryPage;
 export async function getStaticProps(): Promise<
   GetStaticPropsResult<ToolsDirectoryProps & { seo: NextSeoProps }>
 > {
-  // These directory queries are live in production (unlike the tool-page
-  // social queries), so a failure here should fail the revalidation and let
-  // Next keep serving the last good ISR output, rather than caching an
-  // empty page.
-  const [categories, trending, allTop] = await Promise.all([
-    getToolCategories(),
-    getTopTools({ first: TRENDING_COUNT, trending: true }),
-    getTopTools({ first: CATEGORY_FETCH_LIMIT }),
-  ]);
-  const fallbackTop = allTop.slice(0, 12);
-
-  const fullCategories = (
-    await Promise.all(
-      categories.map(async ({ category }) => ({
-        category,
-        tools: await getTopTools({ first: CATEGORY_FETCH_LIMIT, category }),
-      })),
-    )
-  ).filter(({ tools }) => tools.length > 0);
-
-  const uncategorized = allTop.filter((tool) => !tool.category);
-  if (uncategorized.length > 0) {
-    fullCategories.push({ category: OTHER_CATEGORY, tools: uncategorized });
-  }
-  if (allTop.length >= CATEGORY_FETCH_LIMIT) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `tools directory: the overall top-tools fetch hit the limit; the "${OTHER_CATEGORY}" section may be missing uncategorized tools`,
-    );
-  }
-
-  fullCategories.forEach(({ category, tools }) => {
-    if (category !== OTHER_CATEGORY && tools.length >= CATEGORY_FETCH_LIMIT) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `tools directory: category "${category}" hit the fetch limit; some tools are not listed`,
-      );
-    }
-  });
-
-  const tools = Array.from(
-    new Map(
-      [
-        ...fullCategories.flatMap(({ tools: categoryTools }) => categoryTools),
-        ...trending,
-        ...allTop,
-      ].map((tool) => [tool.id, tool]),
-    ).values(),
-  ).sort((a, b) => a.title.localeCompare(b.title));
-
-  const sections = fullCategories.map(({ category, tools: categoryTools }) => ({
-    category,
-    toolIds: categoryTools.map(({ id }) => id),
-  }));
-
   const seoTitles = getPageSeoTitles(
     'Developer tools directory — ranked by real stacks',
   );
-  const isEmpty = sections.length === 0 && fallbackTop.length === 0;
 
-  return {
-    props: {
-      tools,
-      trendingIds: trending.map(({ id }) => id),
-      sections,
-      fallbackTopIds: fallbackTop.map(({ id }) => id),
-      seo: {
-        title: seoTitles.title,
-        openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
-        description:
-          'Explore the tools developers actually use: top tools per category, rising tools this quarter, and per-tool pages with adoption, squads and community takes on daily.dev.',
-        ...(isEmpty ? noindexSeoProps : {}),
+  try {
+    const [categories, trending, allTop] = await Promise.all([
+      getToolCategories(),
+      getTopTools({ first: TRENDING_COUNT, trending: true }),
+      getTopTools({ first: CATEGORY_FETCH_LIMIT }),
+    ]);
+    const fallbackTop = allTop.slice(0, 12);
+
+    const fullCategories = (
+      await Promise.all(
+        categories.map(async ({ category }) => ({
+          category,
+          tools: await getTopTools({ first: CATEGORY_FETCH_LIMIT, category }),
+        })),
+      )
+    ).filter(({ tools }) => tools.length > 0);
+
+    const uncategorized = allTop.filter((tool) => !tool.category);
+    if (uncategorized.length > 0) {
+      fullCategories.push({ category: OTHER_CATEGORY, tools: uncategorized });
+    }
+    if (allTop.length >= CATEGORY_FETCH_LIMIT) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `tools directory: the overall top-tools fetch hit the limit; the "${OTHER_CATEGORY}" section may be missing uncategorized tools`,
+      );
+    }
+
+    fullCategories.forEach(({ category, tools }) => {
+      if (category !== OTHER_CATEGORY && tools.length >= CATEGORY_FETCH_LIMIT) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `tools directory: category "${category}" hit the fetch limit; some tools are not listed`,
+        );
+      }
+    });
+
+    const tools = Array.from(
+      new Map(
+        [
+          ...fullCategories.flatMap(({ tools: categoryTools }) => categoryTools),
+          ...trending,
+          ...allTop,
+        ].map((tool) => [tool.id, tool]),
+      ).values(),
+    ).sort((a, b) => a.title.localeCompare(b.title));
+
+    const sections = fullCategories.map(({ category, tools: categoryTools }) => ({
+      category,
+      toolIds: categoryTools.map(({ id }) => id),
+    }));
+
+    const isEmpty = sections.length === 0 && fallbackTop.length === 0;
+
+    return {
+      props: {
+        tools,
+        trendingIds: trending.map(({ id }) => id),
+        sections,
+        fallbackTopIds: fallbackTop.map(({ id }) => id),
+        seo: {
+          title: seoTitles.title,
+          openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
+          description:
+            'Explore the tools developers actually use: top tools per category, rising tools this quarter, and per-tool pages with adoption, squads and community takes on daily.dev.',
+          ...(isEmpty ? noindexSeoProps : {}),
+        },
       },
-    },
-    revalidate: 300,
-  };
+      revalidate: 300,
+    };
+  } catch {
+    return {
+      props: {
+        tools: [],
+        trendingIds: [],
+        sections: [],
+        fallbackTopIds: [],
+        seo: {
+          title: seoTitles.title,
+          openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
+          description:
+            'Explore the tools developers actually use: top tools per category, rising tools this quarter, and per-tool pages with adoption, squads and community takes on daily.dev.',
+          ...noindexSeoProps,
+        },
+      },
+      revalidate: 300,
+    };
+  }
 }
