@@ -18,26 +18,26 @@ export const FooterLinks = ({ className }: FooterLinksProps): ReactElement => {
             'mb-4 flex flex-row flex-wrap justify-center gap-3 text-text-tertiary typo-caption1',
           )}
         >
-          <li>&copy; {new Date().getFullYear()} Daily Dev Ltd.</li>
+          <li>&copy; {new Date().getFullYear()} devcore.tr</li>
           <li>
             <a href={contentGuidelines} target="_blank" rel={anchorDefaultRel}>
-              Guidelines
+              İlkeler
             </a>
           </li>
           <li>
-            <a href={`${webappUrl}posts`}>Explore</a>
+            <a href={`${webappUrl}posts`}>Keşfet</a>
           </li>
           <li>
-            <a href={`${webappUrl}tags`}>Tags</a>
+            <a href={`${webappUrl}tags`}>Etiketler</a>
           </li>
           <li>
-            <a href={`${webappUrl}sources`}>Sources</a>
+            <a href={`${webappUrl}sources`}>Kaynaklar</a>
           </li>
           <li>
-            <a href={`${webappUrl}squads`}>Squads</a>
+            <a href={`${webappUrl}squads`}>Topluluklar</a>
           </li>
           <li>
-            <a href={`${webappUrl}users`}>Leaderboard</a>
+            <a href={`${webappUrl}users`}>Liderlik Tablosu</a>
           </li>
         </ul>
       </nav>

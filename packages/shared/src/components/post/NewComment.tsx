@@ -208,7 +208,7 @@ function NewCommentComponent(
           width={40}
         />
       )}
-      <span className="text-text-tertiary typo-body">Share your thoughts</span>
+      <span className="text-text-tertiary typo-body">Düşüncelerini paylaş...</span>
       <Button
         size={buttonSize[size]}
         className="ml-auto hidden text-text-primary tablet:flex"
@@ -216,7 +216,7 @@ function NewCommentComponent(
         tag="a"
         disabled
       >
-        Post
+        Gönder
       </Button>
     </button>
   );

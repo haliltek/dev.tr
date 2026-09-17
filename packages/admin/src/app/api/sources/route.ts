@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSources, saveSources, SourceItem } from '@/lib/data';
+import { getSources, saveSources, SourceItem, triggerCrawlerRun } from '@/lib/data';
 
 export async function GET() {
   try {
@@ -40,20 +40,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Kaynak adı zorunludur.' }, { status: 400 });
     }
 
+    const rawHandle = (handle || name.toLowerCase().replace(/[^a-z0-9]/g, '-')).slice(0, 36);
     const newSource: SourceItem = {
-      id: handle || `src_${Date.now()}`,
+      id: rawHandle || `src_${Date.now()}`,
       name,
-      handle: handle || name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+      handle: rawHandle,
       website: website || 'https://devcore.tr',
       description: description || '',
       image: image || 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800',
-      feedUrl,
+      feedUrl: feedUrl ? feedUrl.trim() : undefined,
       postCount: 0,
       active: true,
     };
 
     sources.unshift(newSource);
     await saveSources(sources);
+
+    // If feedUrl is provided, trigger crawler in background to pull posts immediately
+    if (newSource.feedUrl) {
+      triggerCrawlerRun().catch((e) => console.error('Failed to trigger crawler after source addition:', e));
+    }
+
     return NextResponse.json({ success: true, source: newSource, sources });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Error';

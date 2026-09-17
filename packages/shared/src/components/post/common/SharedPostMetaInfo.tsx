@@ -28,7 +28,7 @@ export const SharedPostMetaInfo = ({
   const sharedPostSource = sharedPost.source;
   const sourceName = sharedPostSource?.name;
   const hasNamedSource = !!sourceName && sourceName.toLowerCase() !== 'unknown';
-  const readTimeLabel = readTimeUnit === 'watch' ? 'watch time' : 'read time';
+  const readTimeLabel = readTimeUnit === 'watch' ? 'izleme' : 'okuma';
 
   // Build the visible items first, then interleave separators only between
   // present items. This avoids a leading separator when earlier items are
@@ -58,7 +58,7 @@ export const SharedPostMetaInfo = ({
     items.push({
       key: 'domain',
       hideOnMobile: hasNamedSource,
-      content: <>From {sharedPost.domain}</>,
+      content: <>{sharedPost.domain} üzerinden</>,
     });
   }
 
@@ -76,7 +76,7 @@ export const SharedPostMetaInfo = ({
       key: 'readTime',
       content: (
         <>
-          {sharedPost.readTime}m {readTimeLabel}
+          {sharedPost.readTime} dk {readTimeLabel}
         </>
       ),
     });

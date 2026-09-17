@@ -92,6 +92,15 @@ export interface SourceItem {
 }
 
 export async function getSources(): Promise<SourceItem[]> {
+  ensureDir();
+  let jsonSources: SourceItem[] = [];
+  if (fs.existsSync(SOURCES_FILE)) {
+    try {
+      jsonSources = JSON.parse(fs.readFileSync(SOURCES_FILE, 'utf-8'));
+    } catch {}
+  }
+  const jsonMap = new Map<string, SourceItem>(jsonSources.map((s) => [s.id, s]));
+
   try {
     const rows = await dbQuery<{
       id: string;
@@ -116,50 +125,64 @@ export async function getSources(): Promise<SourceItem[]> {
       LEFT JOIN post p ON p."sourceId" = s.id AND p.deleted IS NOT TRUE
       GROUP BY s.id, s.name, s.handle, s.website, s.description, s.image, s.active
       ORDER BY post_count DESC, s.name ASC
-      LIMIT 100`
+      LIMIT 200`
     );
 
     if (rows && rows.length > 0) {
-      return rows.map((r) => ({
-        id: r.id,
-        name: r.name,
-        handle: r.handle || r.id,
-        website: r.website || '',
-        description: r.description || '',
-        image: r.image || '',
-        postCount: Number(r.post_count) || 0,
-        active: r.active !== false,
-      }));
+      const dbSources: SourceItem[] = rows.map((r) => {
+        const fromJson = jsonMap.get(r.id);
+        return {
+          id: r.id,
+          name: r.name,
+          handle: r.handle || r.id,
+          website: r.website || '',
+          description: r.description || '',
+          image: r.image || '',
+          feedUrl: fromJson?.feedUrl,
+          postCount: Number(r.post_count) || 0,
+          active: r.active !== false,
+        };
+      });
+
+      // Also include any JSON sources not present in PostgreSQL yet
+      for (const [id, s] of jsonMap) {
+        if (!dbSources.some((item) => item.id === id)) {
+          dbSources.unshift(s);
+        }
+      }
+
+      return dbSources;
     }
   } catch (err) {
     console.warn('[getSources] Fallback to JSON file:', err);
   }
 
-  // Fallback
-  ensureDir();
-  if (fs.existsSync(SOURCES_FILE)) {
-    try {
-      return JSON.parse(fs.readFileSync(SOURCES_FILE, 'utf-8'));
-    } catch {}
-  }
-  return [];
+  return jsonSources;
 }
 
 export async function saveSources(sources: SourceItem[]): Promise<void> {
   ensureDir();
   fs.writeFileSync(SOURCES_FILE, JSON.stringify(sources, null, 2));
 
-  // Sync to PostgreSQL
+  // Sync to PostgreSQL with proper UPSERT
   for (const s of sources) {
     try {
+      const handle = (s.handle || s.id).slice(0, 36);
+      const image = s.image || 'https://media.daily.dev/image/upload/s--LrHsyt2T--/f_auto/v1692632054/squad_placeholder_sfwkmj';
       await dbQuery(
-        `UPDATE source 
-         SET active = $1, name = $2, website = $3, description = $4, image = $5
-         WHERE id = $6`,
-        [s.active !== false, s.name, s.website, s.description, s.image, s.id]
+        `INSERT INTO source (id, name, handle, website, description, image, active, type)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, 'machine')
+         ON CONFLICT (id) DO UPDATE 
+         SET active = EXCLUDED.active, 
+             name = EXCLUDED.name, 
+             handle = EXCLUDED.handle,
+             website = EXCLUDED.website, 
+             description = EXCLUDED.description, 
+             image = EXCLUDED.image`,
+        [s.id, s.name, handle, s.website || '', s.description || '', image, s.active !== false]
       );
     } catch (err) {
-      console.warn(`[saveSources] Failed to update DB for ${s.id}:`, err);
+      console.warn(`[saveSources] Failed to upsert DB for ${s.id}:`, err);
     }
   }
 }

@@ -219,18 +219,18 @@ export function PostActions({
               iconPressed={
                 <UpvoteButtonIcon secondary brandAnimation={brandAnimation} />
               }
-              label="Upvote"
+              label="Beğen"
               color={ButtonColor.Avocado}
             />
           </Tooltip>
-          <Tooltip content={isDownvoteActive ? 'Remove downvote' : 'Downvote'}>
+          <Tooltip content={isDownvoteActive ? 'Beğenmemeyi kaldır' : 'Beğenme'}>
             <CardAction
               id="downvote-post-btn"
               pressed={isDownvoteActive}
               onClick={onToggleDownvote}
               icon={<DownvoteIcon />}
               iconPressed={<DownvoteIcon secondary />}
-              label="Downvote"
+              label="Beğenme"
               color={ButtonColor.Ketchup}
             />
           </Tooltip>
@@ -240,7 +240,7 @@ export function PostActions({
             onClick={onComment}
             icon={<CommentIcon />}
             iconPressed={<CommentIcon secondary />}
-            label="Comment"
+            label="Yorum yap"
             labelVisible
             color={ButtonColor.BlueCheese}
           />
@@ -249,7 +249,7 @@ export function PostActions({
               condition={isAwarded}
               wrapper={(children) => {
                 return (
-                  <Tooltip content="You already awarded this post!">
+                  <Tooltip content="Bu gönderiye zaten ödül verdiniz!">
                     <div>{children}</div>
                   </Tooltip>
                 );
@@ -283,7 +283,7 @@ export function PostActions({
                 }}
                 icon={<MedalBadgeIcon />}
                 iconPressed={<MedalBadgeIcon secondary />}
-                label="Award"
+                label="Ödül ver"
                 labelVisible
                 color={ButtonColor.Cabbage}
                 buttonClassName={classNames(isAwarded && 'pointer-events-none')}
@@ -295,14 +295,14 @@ export function PostActions({
             id="bookmark-post-btn"
             pressed={post.bookmarked}
             onClick={onToggleBookmark}
-            label="Bookmark"
+            label="Kaydet"
             labelVisible
           />
           <CardAction
             id="copy-post-btn-post"
             onClick={() => onCopyLinkClick?.(post)}
             icon={<LinkIcon />}
-            label="Copy"
+            label="Kopyala"
             labelVisible
             color={ButtonColor.Cabbage}
           />

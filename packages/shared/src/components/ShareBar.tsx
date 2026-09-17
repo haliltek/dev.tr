@@ -93,7 +93,7 @@ export default function ShareBar({ post }: ShareBarProps): ReactElement {
   return (
     <WidgetContainer className="hidden flex-col !border-0 p-3 laptop:flex">
       <h4 className="mb-4 font-bold text-text-primary typo-callout">
-        Would you recommend this post?
+        Bu gönderiyi tavsiye eder misiniz?
       </h4>
       <div className="grid grid-cols-4 gap-2 gap-y-4">
         <SocialShareButton
@@ -107,7 +107,7 @@ export default function ShareBar({ post }: ShareBarProps): ReactElement {
               secondary={copying}
             />
           }
-          label={copying ? 'Copied!' : 'Copy link'}
+          label={copying ? 'Kopyalandı!' : 'Bağlantıyı kopyala'}
         />
         <SlackShareButton
           post={post}
@@ -151,7 +151,7 @@ export default function ShareBar({ post }: ShareBarProps): ReactElement {
           size={ButtonSize.Small}
           variant={ButtonVariant.Subtle}
         >
-          {isExpanded ? 'Show fewer options' : 'Show more options'}
+          {isExpanded ? 'Daha az seçenek' : 'Daha fazla seçenek'}
         </Button>
       )}
     </WidgetContainer>

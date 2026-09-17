@@ -113,9 +113,9 @@ export function PostComments({
       <CharmEmptyState
         className="mb-12 mt-8"
         image={cloudinaryCharmNoComments}
-        imageAlt="daily.dev charm peeking over a glowing speech bubble"
-        title="No comments yet"
-        description="The discussion is waiting for a spark. Share your take and get it started."
+        imageAlt="Henüz yorum yapılmadı"
+        title="Henüz yorum yok"
+        description="Tartışma henüz başlamadı. İlk yorumu yaparak sohbeti başlatın!"
       />
     );
   }

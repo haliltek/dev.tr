@@ -57,11 +57,11 @@ export function UserStats({ stats, userId }: UserStatsProps): ReactElement {
           className="text-accent-onion-default"
           size={IconSize.Small}
         />
-        <Item stat={{ title: 'Reputation', amount: stats.reputation }} />
+        <Item stat={{ title: 'İtibar', amount: stats.reputation }} />
       </div>
-      <Item stat={{ title: 'Upvotes', amount: stats.upvotes }} />
+      <Item stat={{ title: 'Beğeni', amount: stats.upvotes }} />
       <Item
-        stat={{ title: 'Followers', amount: stats.numFollowers }}
+        stat={{ title: 'Takipçi', amount: stats.numFollowers }}
         className={classNames('pl-6', stats.numFollowers && 'cursor-pointer')}
         onClick={() => {
           if (!stats.numFollowers) {
@@ -79,7 +79,7 @@ export function UserStats({ stats, userId }: UserStatsProps): ReactElement {
         }}
       />
       <Item
-        stat={{ title: 'Following', amount: stats.numFollowing }}
+        stat={{ title: 'Takip Edilen', amount: stats.numFollowing }}
         className={classNames(stats.numFollowing && 'cursor-pointer')}
         onClick={() => {
           if (!stats.numFollowing) {

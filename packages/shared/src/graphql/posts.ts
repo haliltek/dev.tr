@@ -138,14 +138,14 @@ export const getPostTitle = (
 
 export const getReadPostButtonText = (post: Post): string => {
   if (isVideoPost(post)) {
-    return 'Watch video';
+    return 'Videoyu izle';
   }
 
   if (isPostOrSharedPostTwitter(post)) {
-    return 'Read on';
+    return 'X’te oku';
   }
 
-  return 'Read post';
+  return 'Yazıyı oku';
 };
 
 export const translateablePostFields = [

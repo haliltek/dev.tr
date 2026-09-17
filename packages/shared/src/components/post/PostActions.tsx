@@ -232,10 +232,10 @@ function PostActionsV1({
       pressed={post.commented}
       onClick={onComment}
       icon={<CommentIconComponent secondary={post.commented} />}
-      aria-label="Comment"
+      aria-label="Yorum yap"
       className="btn-tertiary-blueCheese"
     >
-      Comment
+      Yorum yap
     </QuaternaryButton>
   );
 
@@ -317,7 +317,7 @@ function PostActionsV1({
                   post?.userState?.awarded && 'pointer-events-none',
                 )}
               >
-                Award
+                Ödül ver
               </QuaternaryButton>
             </ConditionalWrapper>
           )}
@@ -330,7 +330,7 @@ function PostActionsV1({
               className: 'btn-tertiary-bun',
             }}
           >
-            Bookmark
+            Kaydet
           </BookmarkButton>
           <div className="group/link-btn">
             <QuaternaryButton
@@ -344,7 +344,7 @@ function PostActionsV1({
               )}
               color={ButtonColor.Cabbage}
             >
-              Copy
+              Kopyala
             </QuaternaryButton>
           </div>
         </div>

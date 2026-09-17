@@ -146,18 +146,30 @@ const propsByFeed: Partial<Record<string, FeedQueryProps>> = {
   default: {
     query: ANONYMOUS_FEED_QUERY,
     queryIfLogged: FEED_V2_QUERY,
+    variables: {
+      ranking: RankingAlgorithm.Time,
+    },
   },
   'my-feed': {
     query: ANONYMOUS_FEED_QUERY,
     queryIfLogged: FEED_V2_QUERY,
+    variables: {
+      ranking: RankingAlgorithm.Time,
+    },
   },
   popular: {
     query: ANONYMOUS_FEED_QUERY,
     queryIfLogged: FEED_V2_QUERY,
+    variables: {
+      ranking: RankingAlgorithm.Time,
+    },
   },
   posts: {
     query: ANONYMOUS_FEED_QUERY,
     queryIfLogged: FEED_V2_QUERY,
+    variables: {
+      ranking: RankingAlgorithm.Time,
+    },
   },
   search: {
     query: ANONYMOUS_FEED_QUERY,
@@ -645,7 +657,10 @@ export default function MainFeedLayout({
         };
       }
 
-      return config.variables;
+      return {
+        ...config.variables,
+        ranking: RankingAlgorithm.Time,
+      };
     };
 
     const variables = getVariables();

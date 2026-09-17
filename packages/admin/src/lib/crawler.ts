@@ -1,5 +1,7 @@
 import { dbQuery } from './db';
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 
 export interface CrawlerSource {
   id: string;
@@ -8,6 +10,30 @@ export interface CrawlerSource {
   website: string;
   image: string;
   defaultTags: string[];
+}
+
+function getCustomFeedSources(): CrawlerSource[] {
+  try {
+    const filePath = path.join(process.cwd(), 'data', 'custom_sources.json');
+    if (fs.existsSync(filePath)) {
+      const list = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      if (Array.isArray(list)) {
+        return list
+          .filter((s: any) => s.feedUrl && s.active !== false)
+          .map((s: any) => ({
+            id: s.id,
+            name: s.name,
+            feedUrl: s.feedUrl.trim(),
+            website: s.website || 'https://devcore.tr',
+            image: s.image || 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800',
+            defaultTags: [s.handle || 'yazilim', 'devcore'],
+          }));
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to load custom feeds:', err);
+  }
+  return [];
 }
 
 export const TURKISH_FEEDS: CrawlerSource[] = [
@@ -129,11 +155,19 @@ export async function runCrawlerTask(): Promise<CrawlerState> {
     return crawlerState;
   }
 
+  const customSources = getCustomFeedSources();
+  const allSources = [...TURKISH_FEEDS];
+  for (const cs of customSources) {
+    if (!allSources.some((s) => s.id === cs.id || s.feedUrl === cs.feedUrl)) {
+      allSources.push(cs);
+    }
+  }
+
   crawlerState = {
     status: 'running',
-    message: 'Türk Teknoloji Kaynakları taranıyor...',
+    message: `${allSources.length} teknoloji kaynağı taranıyor...`,
     last_run: new Date().toLocaleTimeString('tr-TR'),
-    output: `[BAŞLATILDI] ${TURKISH_FEEDS.length} kaynak için RSS taraması başlatıldı...\n`,
+    output: `[BAŞLATILDI] ${allSources.length} kaynak için RSS taraması başlatıldı...\n`,
     total_added: 0,
   };
 
@@ -142,17 +176,18 @@ export async function runCrawlerTask(): Promise<CrawlerState> {
     let logs: string[] = [];
     let addedCount = 0;
 
-    for (const source of TURKISH_FEEDS) {
+    for (const source of allSources) {
       try {
         logs.push(`[KAYNAK] ${source.name} taranıyor (${source.feedUrl})...`);
 
         // Ensure source exists in DB
         try {
+          const handle = (source.id).slice(0, 36);
           await dbQuery(
             `INSERT INTO source (id, name, website, image, active, handle, "createdAt", type)
-             VALUES ($1, $2, $3, $4, true, $5, NOW(), 'blog')
+             VALUES ($1, $2, $3, $4, true, $5, NOW(), 'machine')
              ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, image = EXCLUDED.image, active = true`,
-            [source.id, source.name, source.website, source.image, source.id]
+            [source.id, source.name, source.website, source.image, handle]
           );
         } catch (dbErr) {
           console.error(`Source upsert failed for ${source.id}:`, dbErr);

@@ -41,27 +41,27 @@ export const publishTimeRelativeShort = (
   const dt = (now.getTime() - date.getTime()) / 1000;
 
   if (dt <= oneMinute) {
-    return 'now';
+    return 'şimdi';
   }
 
   if (dt <= oneHour) {
     const numMinutes = Math.round(dt / oneMinute);
-    return `${numMinutes}m`;
+    return `${numMinutes}dk`;
   }
 
   if (dt <= oneDay) {
     const numHours = Math.round(dt / oneHour);
-    return `${numHours}h`;
+    return `${numHours}sa`;
   }
 
   if (dt <= oneWeek) {
     const numDays = Math.round(dt / oneDay);
-    return `${numDays}d`;
+    return `${numDays}g`;
   }
 
   if (dt <= oneYear) {
     const numWeeks = Math.round(dt / oneWeek);
-    return `${numWeeks}w`;
+    return `${numWeeks}h`;
   }
 
   const numYears = Math.round(dt / oneYear);
@@ -115,25 +115,25 @@ export function postDateFormat(
   const dt = (now.getTime() - date.getTime()) / 1000;
 
   if (dt <= oneMinute) {
-    return 'Now';
+    return 'Şimdi';
   }
 
   if (isSameDay(date, now)) {
-    return 'Today';
+    return 'Bugün';
   }
 
   if (isSameDay(date, subDays(now, 1))) {
-    return 'Yesterday';
+    return 'Dün';
   }
 
   const options: Intl.DateTimeFormatOptions = {
     month: 'short',
-    day: '2-digit',
+    day: 'numeric',
   };
   if (!isSameYear(date, now)) {
     options.year = 'numeric';
   }
-  return date.toLocaleString('en-US', options);
+  return date.toLocaleString('tr-TR', options);
 }
 
 export function postUpdatedDateFormat(
@@ -144,7 +144,7 @@ export function postUpdatedDateFormat(
 
   if (isSameDay(date, now) || isSameDay(date, subDays(now, 1))) {
     const relative = publishTimeRelativeShort(value, now);
-    return relative === 'now' ? relative : `${relative} ago`;
+    return relative === 'şimdi' ? relative : `${relative} önce`;
   }
 
   return postDateFormat(value, now);
@@ -158,27 +158,27 @@ export function commentDateFormat(
   const dt = (now.getTime() - date.getTime()) / 1000;
 
   if (dt <= oneMinute) {
-    return 'Now';
+    return 'Şimdi';
   }
 
   if (dt <= oneHour) {
     const numMinutes = Math.round(dt / oneMinute);
-    return `${numMinutes} ${numMinutes === 1 ? 'min' : 'mins'}`;
+    return `${numMinutes} dk`;
   }
 
   if (dt <= oneDay) {
     const numHours = Math.round(dt / oneHour);
-    return `${numHours} ${numHours === 1 ? 'hr' : 'hrs'}`;
+    return `${numHours} sa`;
   }
 
   if (dt <= oneYear) {
-    return date.toLocaleString('en-US', {
+    return date.toLocaleString('tr-TR', {
       month: 'short',
       day: 'numeric',
     });
   }
 
-  return date.toLocaleString('en-US', {
+  return date.toLocaleString('tr-TR', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -204,31 +204,31 @@ export const getReadHistoryDateFormat = (currentDate: Date): string => {
   const today = new Date();
 
   if (isDateOnlyEqual(today, currentDate)) {
-    return 'Today';
+    return 'Bugün';
   }
 
   if (isDateOnlyEqual(today, addDays(currentDate, 1))) {
-    return 'Yesterday';
+    return 'Dün';
   }
 
-  const dayOfTheWeek = format(currentDate, 'EEE');
-  const dayOfTheMonth = currentDate.getDate();
-  const month = format(currentDate, 'MMM');
+  const dayName = currentDate.toLocaleDateString('tr-TR', { weekday: 'short' });
+  const dayNum = currentDate.getDate();
+  const monthName = currentDate.toLocaleDateString('tr-TR', { month: 'short' });
   const currentYear = currentDate.getFullYear();
   const year = currentYear === today.getFullYear() ? '' : ` ${currentYear}`;
 
-  return `${dayOfTheWeek}, ${dayOfTheMonth} ${month}${year}`;
+  return `${dayNum} ${monthName}${year}, ${dayName}`;
 };
 
 export const getTopReaderBadgeDateFormat = (date: string | Date): string => {
-  return new Date(date).toLocaleString('en-US', {
+  return new Date(date).toLocaleString('tr-TR', {
     year: 'numeric',
     month: 'long',
   });
 };
 
 export const getPlusMemberDateFormat = (date: string | Date): string => {
-  return new Date(date).toLocaleString('en-US', {
+  return new Date(date).toLocaleString('tr-TR', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -250,25 +250,25 @@ export const getLastActivityDateFormat = (
   const dt = (now.getTime() - date.getTime()) / 1000;
 
   if (dt <= oneMinute) {
-    return 'Now';
+    return 'Şimdi';
   }
 
   if (dt <= oneHour) {
     const numMinutes = Math.round(dt / oneMinute);
-    return `${numMinutes}m ago`;
+    return `${numMinutes}dk önce`;
   }
 
   if (dt <= maxHoursAgoInSeconds) {
     const numHours = Math.round(dt / oneHour);
-    return `${numHours}h ago`;
+    return `${numHours}sa önce`;
   }
 
   if (dt <= oneWeek) {
     const numDays = Math.round(dt / oneDay);
-    return `${numDays}d ago`;
+    return `${numDays}g önce`;
   }
 
-  return date.toLocaleString('en-US', {
+  return date.toLocaleString('tr-TR', {
     month: 'short',
     day: '2-digit',
   });

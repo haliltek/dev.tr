@@ -67,14 +67,14 @@ export const LayoutHeader = classed(
 );
 
 export const algorithms = [
-  { value: RankingAlgorithm.Popularity, text: 'Recommended' },
-  { value: RankingAlgorithm.Time, text: 'By date' },
+  { value: RankingAlgorithm.Time, text: 'En Yeniler' },
+  { value: RankingAlgorithm.Popularity, text: 'Önerilenler' },
 ];
 export const algorithmsList = algorithms.map((algo) => algo.text);
 export const periods = [
-  { value: 7, text: 'Last week' },
-  { value: 30, text: 'Last month' },
-  { value: 365, text: 'Last year' },
+  { value: 7, text: 'Son 1 hafta' },
+  { value: 30, text: 'Son 1 ay' },
+  { value: 365, text: 'Son 1 yıl' },
 ];
 export const periodTexts = periods.map((period) => period.text);
 

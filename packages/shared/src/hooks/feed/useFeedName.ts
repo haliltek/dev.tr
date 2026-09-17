@@ -23,6 +23,7 @@ interface UseFeedName {
 }
 
 const sortableFeeds: AllFeedPages[] = [
+  'default' as AllFeedPages,
   SharedFeedPage.Popular,
   SharedFeedPage.MyFeed,
 ];

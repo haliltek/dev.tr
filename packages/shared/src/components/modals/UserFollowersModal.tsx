@@ -23,7 +23,7 @@ export function UserFollowersModal({
   return (
     <UserListModal
       {...props}
-      title="Followers"
+      title="Takipçiler"
       scrollingProps={{
         isFetchingNextPage,
         canFetchMore: checkFetchMore(queryResult),
@@ -39,7 +39,7 @@ export function UserFollowersModal({
       userListProps={{
         emptyPlaceholder: (
           <FlexCentered className="p-10 text-text-tertiary typo-callout">
-            No followers found
+            Takipçi bulunamadı
           </FlexCentered>
         ),
       }}

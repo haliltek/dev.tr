@@ -71,7 +71,7 @@ export function SquadsToShare({
       variant={ButtonVariant.Primary}
       color={ButtonColor.Cabbage}
       className="!rounded-full"
-      label="New Squad"
+      label="Yeni Topluluk"
       size={size}
     />
   );

@@ -97,14 +97,14 @@ const SourceEntityCard = ({ source, className }: SourceEntityCardProps) => {
             type={TypographyType.Footnote}
             color={TypographyColor.Tertiary}
           >
-            {largeNumberFormat(source.membersCount ?? 0) || 0} Followers
+            {largeNumberFormat(source.membersCount ?? 0) || 0} Takipçi
           </Typography>
           <Separator />
           <Typography
             type={TypographyType.Footnote}
             color={TypographyColor.Tertiary}
           >
-            {largeNumberFormat(source.flags?.totalUpvotes ?? 0) || 0} Upvotes
+            {largeNumberFormat(source.flags?.totalUpvotes ?? 0) || 0} Beğeni
           </Typography>
         </div>
       </div>
