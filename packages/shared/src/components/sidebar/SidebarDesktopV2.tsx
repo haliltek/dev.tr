@@ -612,12 +612,6 @@ const SidebarSettingsButton = (): ReactElement => {
           } satisfies ProfileSectionItemProps,
         ]
       : []),
-    {
-      title: 'Reklam',
-      href: businessWebsiteUrl,
-      icon: MegaphoneIcon,
-      external: true,
-    },
   ];
 
   const logoutItems: ProfileSectionItemProps[] = [

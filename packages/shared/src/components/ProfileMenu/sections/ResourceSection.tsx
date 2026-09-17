@@ -25,12 +25,6 @@ export const ResourceSection = (): ReactElement => {
           href: `${webappUrl}sources/daily_updates`,
         },
         {
-          title: 'Reklam',
-          icon: MegaphoneIcon,
-          href: businessWebsiteUrl,
-          external: true,
-        },
-        {
           title: 'Dokümantasyon',
           icon: DocsIcon,
           href: docs,

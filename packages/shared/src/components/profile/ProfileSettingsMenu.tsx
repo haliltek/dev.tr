@@ -316,12 +316,6 @@ const useAccountPageItems = ({ onClose }: { onClose?: () => void } = {}) => {
               href: reputation,
               external: true,
             },
-            advertise: {
-              title: 'Reklam',
-              icon: MegaphoneIcon,
-              href: businessWebsiteUrl,
-              external: true,
-            },
             apps: {
               title: 'Apps',
               icon: PhoneIcon,

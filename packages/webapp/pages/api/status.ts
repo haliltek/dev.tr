@@ -217,8 +217,21 @@ export default async function handler(
   const memUsage = process.memoryUsage();
   const memoryMb = Math.round(memUsage.rss / 1024 / 1024);
 
-  // If RSS/Atom is requested
   const format = req.query.format?.toString().toLowerCase();
+
+  // If accessed directly from a browser address bar (accepts HTML and not explicitly requesting JSON/RSS)
+  const acceptHeader = (req.headers.accept || '').toLowerCase();
+  const isBrowserNavigation =
+    acceptHeader.includes('text/html') &&
+    !acceptHeader.includes('application/json') &&
+    format !== 'json';
+
+  if (isBrowserNavigation) {
+    res.writeHead(302, { Location: '/status' });
+    return res.end();
+  }
+
+  // If RSS/Atom is requested
   if (format === 'rss' || format === 'atom') {
     const rssXml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
