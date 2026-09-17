@@ -62,9 +62,9 @@ export async function verifySessionToken(token: string): Promise<{ username: str
 
 export function validateAdminCredentials(user: string, pass: string): boolean {
   const config = getStoredConfig();
-  const expectedUser = config.username || 'admin';
-  const expectedPass = config.passwordPlain || process.env.ADMIN_PASSWORD || 'DevcoreAdmin2026!';
-  return user.trim() === expectedUser.trim() && pass === expectedPass;
+  const expectedUser = (config.username || process.env.ADMIN_USERNAME || 'admin').trim().toLowerCase();
+  const expectedPass = (config.passwordPlain || process.env.ADMIN_PASSWORD || 'DevcoreAdmin2026!').trim();
+  return user.trim().toLowerCase() === expectedUser && pass.trim() === expectedPass;
 }
 
 export function updateAdminPassword(newPassword: string): void {

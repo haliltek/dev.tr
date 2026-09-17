@@ -28,11 +28,16 @@ export async function POST(req: NextRequest) {
       user: { username, role: 'admin' },
     });
 
+    const isHttps =
+      req.headers.get('x-forwarded-proto') === 'https' ||
+      req.nextUrl.protocol === 'https:' ||
+      process.env.COOKIE_SECURE === 'true';
+
     response.cookies.set({
       name: 'devcore_admin_session',
       value: token,
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isHttps,
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 7 days

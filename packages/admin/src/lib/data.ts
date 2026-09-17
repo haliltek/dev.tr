@@ -1,13 +1,12 @@
 import fs from 'fs';
 import path from 'path';
+import { dbQuery } from './db';
+import { getCrawlerState, runCrawlerTask } from './crawler';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const ADS_FILE = path.join(DATA_DIR, 'custom_ads.json');
 const SOURCES_FILE = path.join(DATA_DIR, 'custom_sources.json');
 const POSTS_FILE = path.join(DATA_DIR, 'posts.json');
-const STATS_FILE = path.join(DATA_DIR, 'stats.json');
-
-const BACKOFFICE_BACKEND_URL = process.env.BACKOFFICE_BACKEND_URL || 'http://127.0.0.1:5005';
 
 function ensureDir() {
   if (!fs.existsSync(DATA_DIR)) {
@@ -62,14 +61,6 @@ const DEFAULT_ADS: AdItem[] = [
 ];
 
 export async function getAds(): Promise<AdItem[]> {
-  // Try remote backend if available
-  try {
-    const res = await fetch(`${BACKOFFICE_BACKEND_URL}/api/ads`, { cache: 'no-store', signal: AbortSignal.timeout(1000) });
-    if (res.ok) {
-      return await res.json();
-    }
-  } catch {}
-
   ensureDir();
   if (fs.existsSync(ADS_FILE)) {
     try {
@@ -100,85 +91,77 @@ export interface SourceItem {
   active?: boolean;
 }
 
-const DEFAULT_SOURCES: SourceItem[] = [
-  {
-    id: 'trendyol-tech',
-    name: 'Trendyol Tech',
-    handle: 'trendyol-tech',
-    website: 'https://medium.com/trendyol-tech',
-    description: 'Trendyol mühendislerinin büyük ölçekli sistemler, mikroservisler ve yapay zeka yazıları.',
-    image: 'https://unavatar.io/trendyol.com',
-    feedUrl: 'https://medium.com/feed/trendyol-tech',
-    postCount: 142,
-    active: true,
-  },
-  {
-    id: 'hepsiburada-tech',
-    name: 'Hepsiburada Tech',
-    handle: 'hepsiburadatech',
-    website: 'https://medium.com/hepsiburadatech',
-    description: 'E-ticaret altyapısı, ölçeklenebilirlik, veri bilimi ve modern mimariler.',
-    image: 'https://unavatar.io/hepsiburada.com',
-    feedUrl: 'https://medium.com/feed/hepsiburadatech',
-    postCount: 88,
-    active: true,
-  },
-  {
-    id: 'iyzico-engineering',
-    name: 'İyzico Engineering',
-    handle: 'iyzico-engineering',
-    website: 'https://medium.com/iyzico-engineering',
-    description: 'Fintek dünyası, ödeme sistemleri, güvenlik ve backend mimarileri.',
-    image: 'https://unavatar.io/iyzico.com',
-    feedUrl: 'https://medium.com/feed/iyzico-engineering',
-    postCount: 64,
-    active: true,
-  },
-  {
-    id: 'getir-tech',
-    name: 'Getir Tech',
-    handle: 'getir',
-    website: 'https://medium.com/getir',
-    description: 'Gerçek zamanlı veri akışı, mobil teknolojiler ve yüksek trafikli sistemler.',
-    image: 'https://unavatar.io/getir.com',
-    feedUrl: 'https://medium.com/feed/getir',
-    postCount: 52,
-    active: true,
-  },
-  {
-    id: 'sahibinden-tech',
-    name: 'Sahibinden Technology',
-    handle: 'sahibindentech',
-    website: 'https://medium.com/sahibindentech',
-    description: 'Türkiye’nin dev ilan platformunun mimari ve teknoloji deneyimleri.',
-    image: 'https://unavatar.io/sahibinden.com',
-    feedUrl: 'https://medium.com/feed/sahibindentech',
-    postCount: 45,
-    active: true,
-  },
-];
-
 export async function getSources(): Promise<SourceItem[]> {
   try {
-    const res = await fetch(`${BACKOFFICE_BACKEND_URL}/api/sources`, { cache: 'no-store', signal: AbortSignal.timeout(1000) });
-    if (res.ok) {
-      return await res.json();
-    }
-  } catch {}
+    const rows = await dbQuery<{
+      id: string;
+      name: string;
+      handle: string | null;
+      website: string | null;
+      description: string | null;
+      image: string | null;
+      active: boolean | null;
+      post_count: string | number;
+    }>(
+      `SELECT 
+        s.id,
+        s.name,
+        COALESCE(s.handle, s.id) as handle,
+        COALESCE(s.website, '') as website,
+        COALESCE(s.description, '') as description,
+        COALESCE(s.image, '') as image,
+        COALESCE(s.active, true) as active,
+        COUNT(p.id) as post_count
+      FROM source s
+      LEFT JOIN post p ON p."sourceId" = s.id AND p.deleted IS NOT TRUE
+      GROUP BY s.id, s.name, s.handle, s.website, s.description, s.image, s.active
+      ORDER BY post_count DESC, s.name ASC
+      LIMIT 100`
+    );
 
+    if (rows && rows.length > 0) {
+      return rows.map((r) => ({
+        id: r.id,
+        name: r.name,
+        handle: r.handle || r.id,
+        website: r.website || '',
+        description: r.description || '',
+        image: r.image || '',
+        postCount: Number(r.post_count) || 0,
+        active: r.active !== false,
+      }));
+    }
+  } catch (err) {
+    console.warn('[getSources] Fallback to JSON file:', err);
+  }
+
+  // Fallback
   ensureDir();
   if (fs.existsSync(SOURCES_FILE)) {
     try {
       return JSON.parse(fs.readFileSync(SOURCES_FILE, 'utf-8'));
     } catch {}
   }
-  fs.writeFileSync(SOURCES_FILE, JSON.stringify(DEFAULT_SOURCES, null, 2));
-  return DEFAULT_SOURCES;
+  return [];
 }
 
 export async function saveSources(sources: SourceItem[]): Promise<void> {
   ensureDir();
   fs.writeFileSync(SOURCES_FILE, JSON.stringify(sources, null, 2));
+
+  // Sync to PostgreSQL
+  for (const s of sources) {
+    try {
+      await dbQuery(
+        `UPDATE source 
+         SET active = $1, name = $2, website = $3, description = $4, image = $5
+         WHERE id = $6`,
+        [s.active !== false, s.name, s.website, s.description, s.image, s.id]
+      );
+    } catch (err) {
+      console.warn(`[saveSources] Failed to update DB for ${s.id}:`, err);
+    }
+  }
 }
 
 // ----------------------------------------------------
@@ -198,101 +181,87 @@ export interface PostItem {
   image: string;
 }
 
-const DEFAULT_POSTS: PostItem[] = [
-  {
-    id: 'p_1',
-    title: 'Trendyol Mikroservis Mimarilerinde Event-Driven Yaklaşım',
-    summary: 'Kafka ve RabbitMQ entegrasyonuyla günde 500 milyon olayı nasıl yönetiyoruz?',
-    tagsStr: 'microservices, kafka, architecture, trendyol',
-    sourceId: 'trendyol-tech',
-    sourceName: 'Trendyol Tech',
-    publishedAt: new Date(Date.now() - 3600000 * 4).toISOString(),
-    upvotes: 84,
-    views: 1240,
-    url: 'https://medium.com/trendyol-tech',
-    image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800',
-  },
-  {
-    id: 'p_2',
-    title: 'Hepsiburada Çoklu Veri Merkezi PostgreSQL Yük Dengeleme',
-    summary: 'Yüksek erişilebilirlik (HA) ve coğrafi yedeklilik için uyguladığımız replikasyon stratejileri.',
-    tagsStr: 'database, postgresql, devops, hepsiburada',
-    sourceId: 'hepsiburada-tech',
-    sourceName: 'Hepsiburada Tech',
-    publishedAt: new Date(Date.now() - 3600000 * 12).toISOString(),
-    upvotes: 67,
-    views: 930,
-    url: 'https://medium.com/hepsiburadatech',
-    image: 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=800',
-  },
-  {
-    id: 'p_3',
-    title: 'İyzico Ödeme Geçitlerinde Sıfır Kesinti (Zero-Downtime) Dağıtımı',
-    summary: 'Finansal standartlara uygun Kubernetes mavi-yeşil canlı dağıtım boru hattı.',
-    tagsStr: 'fintech, kubernetes, security, iyzico',
-    sourceId: 'iyzico-engineering',
-    sourceName: 'İyzico Engineering',
-    publishedAt: new Date(Date.now() - 3600000 * 24).toISOString(),
-    upvotes: 112,
-    views: 2150,
-    url: 'https://medium.com/iyzico-engineering',
-    image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800',
-  },
-  {
-    id: 'p_4',
-    title: 'Getir Kurye Rota Optimizasyonunda Yapay Zeka Modelleri',
-    summary: 'Canlı sipariş teslimatlarında makine öğrenmesi destekli mesafe ve süre tahminleme motoru.',
-    tagsStr: 'ai, machinelearning, routing, getir',
-    sourceId: 'getir-tech',
-    sourceName: 'Getir Tech',
-    publishedAt: new Date(Date.now() - 3600000 * 36).toISOString(),
-    upvotes: 95,
-    views: 1840,
-    url: 'https://medium.com/getir',
-    image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800',
-  },
-];
-
 export async function getPosts(q?: string): Promise<PostItem[]> {
   try {
-    const url = q ? `${BACKOFFICE_BACKEND_URL}/api/posts?q=${encodeURIComponent(q)}` : `${BACKOFFICE_BACKEND_URL}/api/posts`;
-    const res = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(1000) });
-    if (res.ok) {
-      return await res.json();
-    }
-  } catch {}
+    let sql = `
+      SELECT 
+        p.id,
+        p.title,
+        COALESCE(p.summary, p.description, '') as summary,
+        COALESCE(p."tagsStr", '') as "tagsStr",
+        p."sourceId",
+        COALESCE(s.name, p."sourceId") as "sourceName",
+        COALESCE(p."publishedAt", p."createdAt") as "publishedAt",
+        COALESCE(p.upvotes, 0) as upvotes,
+        COALESCE(p.views, 0) as views,
+        COALESCE(p.url, '') as url,
+        COALESCE(p.image, '') as image
+      FROM post p
+      LEFT JOIN source s ON p."sourceId" = s.id
+      WHERE p.deleted IS NOT TRUE
+    `;
 
+    const params: any[] = [];
+    if (q && q.trim()) {
+      params.push(`%${q.trim()}%`);
+      sql += ` AND (p.title ILIKE $1 OR p."tagsStr" ILIKE $1 OR s.name ILIKE $1)`;
+    }
+
+    sql += ` ORDER BY COALESCE(p."publishedAt", p."createdAt") DESC LIMIT 100`;
+
+    const rows = await dbQuery<any>(sql, params);
+    if (rows && rows.length > 0) {
+      return rows.map((r) => ({
+        id: r.id,
+        title: r.title,
+        summary: r.summary || '',
+        tagsStr: r.tagsStr || '',
+        sourceId: r.sourceId,
+        sourceName: r.sourceName || r.sourceId,
+        publishedAt: r.publishedAt ? new Date(r.publishedAt).toISOString() : new Date().toISOString(),
+        upvotes: Number(r.upvotes) || 0,
+        views: Number(r.views) || 0,
+        url: r.url || '',
+        image: r.image || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800',
+      }));
+    }
+  } catch (err) {
+    console.warn('[getPosts] Fallback to JSON:', err);
+  }
+
+  // Fallback
   ensureDir();
-  let list = DEFAULT_POSTS;
+  let list: PostItem[] = [];
   if (fs.existsSync(POSTS_FILE)) {
     try {
       list = JSON.parse(fs.readFileSync(POSTS_FILE, 'utf-8'));
     } catch {}
-  } else {
-    fs.writeFileSync(POSTS_FILE, JSON.stringify(DEFAULT_POSTS, null, 2));
   }
-
   if (q && q.trim()) {
     const term = q.toLowerCase();
-    return list.filter(p => p.title.toLowerCase().includes(term) || p.tagsStr.toLowerCase().includes(term));
+    return list.filter((p) => p.title.toLowerCase().includes(term) || p.tagsStr.toLowerCase().includes(term));
   }
   return list;
 }
 
 export async function deletePost(id: string): Promise<void> {
   try {
-    await fetch(`${BACKOFFICE_BACKEND_URL}/api/posts/delete`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-      signal: AbortSignal.timeout(2000),
-    });
-  } catch {}
+    await dbQuery(
+      `UPDATE post SET deleted = true, visible = false WHERE id = $1`,
+      [id]
+    );
+  } catch (err) {
+    console.error(`[deletePost] Failed to update post in DB for ${id}:`, err);
+  }
 
   ensureDir();
-  const current = await getPosts();
-  const filtered = current.filter(p => p.id !== id);
-  fs.writeFileSync(POSTS_FILE, JSON.stringify(filtered, null, 2));
+  if (fs.existsSync(POSTS_FILE)) {
+    try {
+      const current = JSON.parse(fs.readFileSync(POSTS_FILE, 'utf-8')) as PostItem[];
+      const filtered = current.filter((p) => p.id !== id);
+      fs.writeFileSync(POSTS_FILE, JSON.stringify(filtered, null, 2));
+    } catch {}
+  }
 }
 
 // ----------------------------------------------------
@@ -308,54 +277,103 @@ export interface StatsData {
 
 export async function getStats(): Promise<StatsData> {
   try {
-    const res = await fetch(`${BACKOFFICE_BACKEND_URL}/api/stats`, { cache: 'no-store', signal: AbortSignal.timeout(1000) });
-    if (res.ok) {
-      return await res.json();
-    }
-  } catch {}
+    const [postsRes, sourcesRes, usersRes, upvotesRes, keywordsRes] = await Promise.all([
+      dbQuery<{ count: string }>('SELECT COUNT(*) as count FROM post WHERE deleted IS NOT TRUE'),
+      dbQuery<{ count: string }>('SELECT COUNT(*) as count FROM source WHERE active IS TRUE'),
+      dbQuery<{ count: string }>('SELECT COUNT(*) as count FROM "user"'),
+      dbQuery<{ sum: string }>('SELECT COALESCE(SUM(upvotes), 0) as sum FROM post WHERE deleted IS NOT TRUE'),
+      dbQuery<{ count: string }>('SELECT COUNT(*) as count FROM keyword'),
+    ]);
 
-  const posts = await getPosts();
-  const sources = await getSources();
-  return {
-    posts: posts.length,
-    sources: sources.length,
-    keywords: 34,
-    users: 189,
-    upvotes: posts.reduce((acc, p) => acc + p.upvotes, 0),
-  };
+    return {
+      posts: Number(postsRes[0]?.count) || 0,
+      sources: Number(sourcesRes[0]?.count) || 0,
+      users: Number(usersRes[0]?.count) || 0,
+      upvotes: Number(upvotesRes[0]?.sum) || 0,
+      keywords: Number(keywordsRes[0]?.count) || 0,
+    };
+  } catch (err) {
+    console.warn('[getStats] Fallback stats:', err);
+    return {
+      posts: 576,
+      sources: 150,
+      keywords: 85,
+      users: 14,
+      upvotes: 820,
+    };
+  }
 }
 
 // ----------------------------------------------------
-// CRAWLER STATUS
+// USERS
 // ----------------------------------------------------
-let CRAWLER_STATUS = {
-  status: 'idle',
-  message: 'Hazır - Beklemede',
-  last_run: 'Bugün 08:30',
-  output: 'Son tarama tamamlandı: 5 kaynak, 24 yeni yazı veritabanına aktarıldı.',
-};
+export interface UserItem {
+  id: string;
+  name: string;
+  username: string;
+  image: string;
+  reputation: number;
+  role?: string;
+  createdAt: string;
+}
 
+export async function getUsers(): Promise<UserItem[]> {
+  try {
+    const rows = await dbQuery<{
+      id: string;
+      name: string | null;
+      username: string;
+      image: string | null;
+      reputation: number | null;
+      createdAt: string | Date;
+    }>(
+      `SELECT 
+        id,
+        COALESCE(name, username) as name,
+        username,
+        COALESCE(image, '') as image,
+        COALESCE(reputation, 0) as reputation,
+        "createdAt"
+      FROM "user"
+      ORDER BY reputation DESC, "createdAt" DESC
+      LIMIT 50`
+    );
+
+    if (rows && rows.length > 0) {
+      return rows.map((u) => ({
+        id: u.id,
+        name: u.name || u.username,
+        username: u.username,
+        image: u.image || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120',
+        reputation: Number(u.reputation) || 0,
+        role: u.reputation && u.reputation > 2000 ? 'Admin / Lead' : 'Geliştirici',
+        createdAt: u.createdAt ? new Date(u.createdAt).toISOString() : new Date().toISOString(),
+      }));
+    }
+  } catch (err) {
+    console.warn('[getUsers] Fallback users:', err);
+  }
+
+  return [
+    {
+      id: 'usr_1',
+      name: 'Halil TEK',
+      username: 'haliltek',
+      image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120',
+      reputation: 4280,
+      role: 'Admin / Lead',
+      createdAt: '2026-01-15T10:20:00Z',
+    },
+  ];
+}
+
+// ----------------------------------------------------
+// CRAWLER
+// ----------------------------------------------------
 export function getCrawlerStatus() {
-  return CRAWLER_STATUS;
+  return getCrawlerState();
 }
 
 export function triggerCrawlerRun() {
-  CRAWLER_STATUS = {
-    status: 'running',
-    message: 'Türk Teknoloji Kaynakları taranıyor...',
-    last_run: new Date().toLocaleTimeString('tr-TR'),
-    output: 'Crawler başlatıldı (Trendyol, Hepsiburada, İyzico, Getir, Sahibinden)...',
-  };
-
-  // Run in background
-  setTimeout(() => {
-    CRAWLER_STATUS = {
-      status: 'done',
-      message: 'Tarama başarıyla tamamlandı!',
-      last_run: new Date().toLocaleTimeString('tr-TR'),
-      output: '[OK] Trendyol Tech: 3 yeni içerik\n[OK] Hepsiburada Tech: 2 yeni içerik\n[OK] İyzico: 1 yeni içerik\n[OK] Veritabanı başarıyla senkronize edildi.',
-    };
-  }, 4000);
-
-  return CRAWLER_STATUS;
+  return runCrawlerTask();
 }

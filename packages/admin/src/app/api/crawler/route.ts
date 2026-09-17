@@ -7,6 +7,6 @@ export async function GET() {
 }
 
 export async function POST() {
-  const status = triggerCrawlerRun();
+  const status = await triggerCrawlerRun();
   return NextResponse.json({ success: true, message: 'Tarayıcı başlatıldı.', status });
 }

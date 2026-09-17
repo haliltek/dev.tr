@@ -31,9 +31,8 @@ export default function SignInForm() {
         return;
       }
 
-      // Success
-      router.push("/");
-      router.refresh();
+      // Success: Full page reload ensures the session cookie is sent with document request
+      window.location.href = "/";
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Sunucuya bağlanılamadı.";
       setError(message);
