@@ -5,7 +5,7 @@
     "postcss-rem-to-responsive-pixel": "^6.0.2"
   },
   "scripts": {
-    "prepare": "corepack enable || true",
+    "prepare": "node -e \"try { require('child_process').execSync('corepack enable', {stdio: 'ignore'}) } catch {}\"",
     "pnpm-version": "pnpm -v",
     "admin:dev": "pnpm --filter devcore-admin dev",
     "admin:build": "pnpm --filter devcore-admin build",

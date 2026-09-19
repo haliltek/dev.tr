@@ -281,6 +281,86 @@ const isTurkishContent = (title?: string): boolean => {
   );
 };
 
+/**
+ * Interleaves feed edges so posts from the same source don't appear consecutively.
+ * Uses a round-robin rotation across distinct sources to ensure a mixed, diverse feed.
+ */
+function interleaveFeedEdges<T extends { node: FeedApiItem }>(
+  edges: T[],
+  lastSourceId?: string | null,
+): { interleaved: T[]; endingSourceId: string | null } {
+  if (!edges || edges.length <= 1) {
+    const firstNode = edges?.[0]?.node;
+    const singleSource =
+      firstNode?.itemType === 'post'
+        ? firstNode.post?.source?.id || firstNode.post?.source?.handle || null
+        : null;
+    return {
+      interleaved: edges,
+      endingSourceId: singleSource ?? lastSourceId ?? null,
+    };
+  }
+
+  const sourceQueues = new Map<string, T[]>();
+  const sourceKeys: string[] = [];
+
+  for (const edge of edges) {
+    const isPost = edge.node.itemType === 'post';
+    const srcKey = isPost
+      ? edge.node.post?.source?.id ||
+        edge.node.post?.source?.handle ||
+        edge.node.post?.source?.name ||
+        'default'
+      : '__neutral__';
+
+    if (!sourceQueues.has(srcKey)) {
+      sourceQueues.set(srcKey, []);
+      sourceKeys.push(srcKey);
+    }
+    sourceQueues.get(srcKey)!.push(edge);
+  }
+
+  const nonNeutralKeys = sourceKeys.filter((k) => k !== '__neutral__');
+  if (nonNeutralKeys.length <= 1) {
+    return {
+      interleaved: edges,
+      endingSourceId: nonNeutralKeys[0] ?? lastSourceId ?? null,
+    };
+  }
+
+  const result: T[] = [];
+  let currentLastSource = lastSourceId;
+  let remainingCount = edges.length;
+
+  while (remainingCount > 0) {
+    const orderedKeys = [...sourceKeys].sort((a, b) => {
+      if (a === currentLastSource) return 1;
+      if (b === currentLastSource) return -1;
+      return 0;
+    });
+
+    let pickedThisRound = 0;
+    for (const key of orderedKeys) {
+      const queue = sourceQueues.get(key);
+      if (queue && queue.length > 0) {
+        const item = queue.shift()!;
+        result.push(item);
+        remainingCount--;
+        pickedThisRound++;
+        if (key !== '__neutral__') {
+          currentLastSource = key;
+        }
+      }
+    }
+
+    if (pickedThisRound === 0) {
+      break;
+    }
+  }
+
+  return { interleaved: result, endingSourceId: currentLastSource ?? null };
+}
+
 export default function useFeed<T>(
   feedQueryKey: QueryKey,
   pageSize: number,
@@ -699,14 +779,32 @@ export default function useFeed<T>(
         visualCellsSoFar += placement.colSpan;
       };
 
-      feedQuery.data.pages.forEach(({ page }, pageIndex) => {
-        page.edges.forEach(({ node }, index: number) => {
-          // Bail before the ad slot is claimed, otherwise dropping the post
-          // would leave an ad stranded in a slot with nothing after it.
-          if (excludePinnedPosts && getFeedApiItemPost(node)?.pinnedAt) {
-            return;
-          }
+      let lastSourceId: string | null = null;
 
+      feedQuery.data.pages.forEach(({ page }, pageIndex) => {
+        const eligibleEdges = page.edges.filter(({ node }) => {
+          if (excludePinnedPosts && getFeedApiItemPost(node)?.pinnedAt) {
+            return false;
+          }
+          if (node.itemType === 'post') {
+            const { post } = node;
+            if (seenPostIds.has(post.id)) {
+              return false;
+            }
+            if (feedScope === 'tr' && !isTurkishContent(post.title)) {
+              return false;
+            }
+          }
+          return true;
+        });
+
+        const { interleaved, endingSourceId } = interleaveFeedEdges(
+          eligibleEdges,
+          lastSourceId,
+        );
+        lastSourceId = endingSourceId;
+
+        interleaved.forEach(({ node }, index: number) => {
           const adItem = getAd({ index: visualCellsSoFar });
 
           if (adItem) {
@@ -727,17 +825,6 @@ export default function useFeed<T>(
           }
 
           const { post } = node;
-          if (seenPostIds.has(post.id)) {
-            return;
-          }
-
-          if (feedScope === 'tr') {
-            const isTr = isTurkishContent(post.title);
-            if (!isTr) {
-              return;
-            }
-          }
-
           seenPostIds.add(post.id);
 
           pushAndAdvance({

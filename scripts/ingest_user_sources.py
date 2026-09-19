@@ -774,8 +774,9 @@ def generate_sql():
 
     total_posts = 0
 
+    # 1. Kaynak tanımlarını veritabanına kaydet
     for src in sources:
-        print(f"\n[PostgreSQL Hazırlığı] Kaynak: {src['name']}")
+        print(f"\n[PostgreSQL Hazırlığı] Kaynak Tanımı: {src['name']}")
         src_sql = f"""
         INSERT INTO source (
             id, handle, name, website, image, description, type, active, "createdAt"
@@ -799,162 +800,189 @@ def generate_sql():
         """
         sql_statements.append(src_sql)
 
-        for item in src["items"]:
-            if not item["title"] or not item["link"]:
-                continue
+    # 2. Tüm kaynaklardan gelen içerikleri topla ve homojen (karışık) şekilde harmanla
+    source_items_map = {}
+    for src in sources:
+        valid_items = [it for it in src.get("items", []) if it.get("title") and it.get("link")]
+        if valid_items:
+            source_items_map[src["id"]] = [(src, it) for it in valid_items]
 
-            url_hash = hashlib.sha1(item["link"].encode("utf-8")).hexdigest()[:12]
-            post_id = f"tr_{url_hash}"
-            short_id = url_hash[:8]
+    interleaved_items = []
+    src_ids = list(source_items_map.keys())
+    max_count = max((len(v) for v in source_items_map.values()), default=0)
 
-            cover_img = item["image"] or random.choice(FALLBACK_IMAGES)
-            assigned_tags = set(src["default_tags"] + item.get("tags", []))
-            assigned_tags.add("turkce")
-            assigned_tags.add("teknoloji")
-            
-            text = f"{item['title']} {item.get('summary', '')}".lower()
-            if any(w in text for w in ["araba", "otomobil", "araç", "sürüş", "tesla", "togg", "byd", "elektrikli", "hibrid", "suv", "sedan", "motor", "batarya", "menzil", "şarj", "otonom", "bmw", "mercedes", "audi", "chery", "şerit"]):
-                assigned_tags.update(["otomobil", "electric-vehicles", "automotive", "araba"])
-            if any(w in text for w in ["yapay zeka", "yapay zekâ", "ai", "makine öğrenimi", "machine learning", "llm", "chatgpt", "openai", "claude", "gemini", "deepseek", "anthropic", "gpt-4", "prompt", "model", "agent"]):
-                assigned_tags.update(["ai", "machine-learning", "llm", "generative-ai", "yapayzeka"])
-            if any(w in text for w in ["yazılım", "kod", "programlama", "developer", "mühendislik", "software", "engineering", "github", "git", "open source"]):
-                assigned_tags.update(["software-engineering", "programming", "open-source", "yazilim"])
-            if any(w in text for w in ["react", "vue", "angular", "nextjs", "javascript", "typescript", "css", "html", "tailwind", "frontend"]):
-                assigned_tags.update(["frontend", "web-development", "javascript"])
-                if "react" in text: assigned_tags.add("react")
-                if "next" in text: assigned_tags.add("nextjs")
-                if "typescript" in text: assigned_tags.add("typescript")
-            if any(w in text for w in ["backend", "node", "nodejs", "python", "golang", "rust", "java", "api", "graphql", "sql", "postgres", "database"]):
-                assigned_tags.update(["backend", "database"])
-                if "python" in text: assigned_tags.add("python")
-                if "node" in text: assigned_tags.add("nodejs")
-                if "sql" in text: assigned_tags.add("sql")
-            if any(w in text for w in ["cloud", "bulut", "aws", "azure", "docker", "kubernetes", "devops", "linux"]):
-                assigned_tags.update(["cloud", "devops"])
-                if "docker" in text: assigned_tags.add("docker")
-                if "kubernetes" in text: assigned_tags.add("kubernetes")
-                if "linux" in text: assigned_tags.add("linux")
-            if any(w in text for w in ["güvenlik", "siber", "hacker", "malware", "virüs", "fidye", "zafiyet", "security", "cybersecurity"]):
-                assigned_tags.update(["security", "cybersecurity", "guvenlik"])
-            if any(w in text for w in ["donanım", "işlemci", "ekran kartı", "gpu", "cpu", "ram", "intel", "amd", "nvidia", "rtx", "çip", "bilgisayar"]):
-                assigned_tags.update(["hardware", "donanim", "chips"])
-                if "gpu" in text or "ekran kartı" in text or "nvidia" in text: assigned_tags.add("gpu")
-            if any(w in text for w in ["telefon", "akıllı telefon", "smartphone", "iphone", "apple", "samsung", "xiaomi", "android", "ios"]):
-                assigned_tags.update(["smartphones", "mobile"])
-                if "apple" in text or "iphone" in text or "ios" in text: assigned_tags.add("apple")
-                if "android" in text: assigned_tags.add("android")
-            if any(w in text for w in ["oyun", "gaming", "playstation", "ps5", "xbox", "steam"]):
-                assigned_tags.update(["gaming", "game-development"])
-            if any(w in text for w in ["uzay", "roket", "spacex", "nasa", "astronomi", "bilim", "science"]):
-                assigned_tags.update(["space", "science", "uzay", "bilim"])
-            if any(w in text for w in ["fintech", "kripto", "crypto", "bitcoin", "ethereum", "finans", "startup"]):
-                assigned_tags.update(["fintech", "startups", "finance"])
-            if src["id"] in ["mesutcevik-yt", "oznogretmenoglu-yt", "cicekileteknoloji-yt"]:
-                assigned_tags.add("inceleme")
+    for r in range(max_count):
+        # Her turda başlangıç kaynağını kaydırarak arka arkaya aynı kaynağın gelmesini engelle
+        rotated_ids = src_ids[r % len(src_ids):] + src_ids[:r % len(src_ids)]
+        for sid in rotated_ids:
+            queue = source_items_map[sid]
+            if r < len(queue):
+                interleaved_items.append(queue[r])
 
-            all_tags = list(dict.fromkeys(assigned_tags))
-            tags_str = ",".join(all_tags[:6])
+    print(f"\n[Akış Mikseri] Toplam {len(interleaved_items)} içerik {len(src_ids)} farklı kaynaktan homojen/karışık olarak harmanlandı.")
 
-            upvotes = random.randint(35, 240)
-            comments = random.randint(3, 42)
-            views = upvotes * random.randint(12, 35)
-            score = 65000000 + random.randint(10000, 999999)
-            
-            author_name = item.get("author", src["name"]).strip()
-            author_slug = slugify(author_name)
-            author_id = f"usr_{author_slug[:30]}"
-            author_avatar = src["image"] if author_name == src["name"] else f"https://ui-avatars.com/api/?name={urllib.parse.quote(author_name)}&background=22272e&color=adbac7&size=128&bold=true"
-            
-            author_sql = f"""
-            INSERT INTO "user" (
-                id, name, username, image, reputation, "createdAt"
-            ) VALUES (
-                {quote(author_id)},
-                {quote(author_name)},
-                {quote(author_slug[:36])},
-                {quote(author_avatar)},
-                100,
-                now()
-            )
-            ON CONFLICT (id) DO UPDATE SET
-                name = EXCLUDED.name,
-                image = EXCLUDED.image;
+    now = datetime.now(timezone.utc)
+    for i, (src, item) in enumerate(interleaved_items):
+        url_hash = hashlib.sha1(item["link"].encode("utf-8")).hexdigest()[:12]
+        post_id = f"tr_{url_hash}"
+        short_id = url_hash[:8]
+
+        # Akışta arka arkaya sıralanmaması ve zaman sıralamasında (ORDER BY publishedAt/createdAt)
+        # doğal olarak homojen karışık görünmesi için zaman damgalarını geriye doğru kademelendir
+        stagger_mins = i * 15 + random.randint(1, 6)
+        staggered_dt = now - timedelta(minutes=stagger_mins)
+        staggered_sql = f"'{staggered_dt.strftime('%Y-%m-%d %H:%M:%S+00:00')}'::timestamptz"
+
+        cover_img = item["image"] or random.choice(FALLBACK_IMAGES)
+        assigned_tags = set(src["default_tags"] + item.get("tags", []))
+        assigned_tags.add("turkce")
+        assigned_tags.add("teknoloji")
+        
+        text = f"{item['title']} {item.get('summary', '')}".lower()
+        if any(w in text for w in ["araba", "otomobil", "araç", "sürüş", "tesla", "togg", "byd", "elektrikli", "hibrid", "suv", "sedan", "motor", "batarya", "menzil", "şarj", "otonom", "bmw", "mercedes", "audi", "chery", "şerit"]):
+            assigned_tags.update(["otomobil", "electric-vehicles", "automotive", "araba"])
+        if any(w in text for w in ["yapay zeka", "yapay zekâ", "ai", "makine öğrenimi", "machine learning", "llm", "chatgpt", "openai", "claude", "gemini", "deepseek", "anthropic", "gpt-4", "prompt", "model", "agent"]):
+            assigned_tags.update(["ai", "machine-learning", "llm", "generative-ai", "yapayzeka"])
+        if any(w in text for w in ["yazılım", "kod", "programlama", "developer", "mühendislik", "software", "engineering", "github", "git", "open source"]):
+            assigned_tags.update(["software-engineering", "programming", "open-source", "yazilim"])
+        if any(w in text for w in ["react", "vue", "angular", "nextjs", "javascript", "typescript", "css", "html", "tailwind", "frontend"]):
+            assigned_tags.update(["frontend", "web-development", "javascript"])
+            if "react" in text: assigned_tags.add("react")
+            if "next" in text: assigned_tags.add("nextjs")
+            if "typescript" in text: assigned_tags.add("typescript")
+        if any(w in text for w in ["backend", "node", "nodejs", "python", "golang", "rust", "java", "api", "graphql", "sql", "postgres", "database"]):
+            assigned_tags.update(["backend", "database"])
+            if "python" in text: assigned_tags.add("python")
+            if "node" in text: assigned_tags.add("nodejs")
+            if "sql" in text: assigned_tags.add("sql")
+        if any(w in text for w in ["cloud", "bulut", "aws", "azure", "docker", "kubernetes", "devops", "linux"]):
+            assigned_tags.update(["cloud", "devops"])
+            if "docker" in text: assigned_tags.add("docker")
+            if "kubernetes" in text: assigned_tags.add("kubernetes")
+            if "linux" in text: assigned_tags.add("linux")
+        if any(w in text for w in ["güvenlik", "siber", "hacker", "malware", "virüs", "fidye", "zafiyet", "security", "cybersecurity"]):
+            assigned_tags.update(["security", "cybersecurity", "guvenlik"])
+        if any(w in text for w in ["donanım", "işlemci", "ekran kartı", "gpu", "cpu", "ram", "intel", "amd", "nvidia", "rtx", "çip", "bilgisayar"]):
+            assigned_tags.update(["hardware", "donanim", "chips"])
+            if "gpu" in text or "ekran kartı" in text or "nvidia" in text: assigned_tags.add("gpu")
+        if any(w in text for w in ["telefon", "akıllı telefon", "smartphone", "iphone", "apple", "samsung", "xiaomi", "android", "ios"]):
+            assigned_tags.update(["smartphones", "mobile"])
+            if "apple" in text or "iphone" in text or "ios" in text: assigned_tags.add("apple")
+            if "android" in text: assigned_tags.add("android")
+        if any(w in text for w in ["oyun", "gaming", "playstation", "ps5", "xbox", "steam"]):
+            assigned_tags.update(["gaming", "game-development"])
+        if any(w in text for w in ["uzay", "roket", "spacex", "nasa", "astronomi", "bilim", "science"]):
+            assigned_tags.update(["space", "science", "uzay", "bilim"])
+        if any(w in text for w in ["fintech", "kripto", "crypto", "bitcoin", "ethereum", "finans", "startup"]):
+            assigned_tags.update(["fintech", "startups", "finance"])
+        if src["id"] in ["mesutcevik-yt", "oznogretmenoglu-yt", "cicekileteknoloji-yt"]:
+            assigned_tags.add("inceleme")
+
+        all_tags = list(dict.fromkeys(assigned_tags))
+        tags_str = ",".join(all_tags[:6])
+
+        upvotes = random.randint(35, 240)
+        comments = random.randint(3, 42)
+        views = upvotes * random.randint(12, 35)
+        score = 65000000 + random.randint(10000, 999999)
+        
+        author_name = item.get("author", src["name"]).strip()
+        author_slug = slugify(author_name)
+        author_id = f"usr_{author_slug[:30]}"
+        author_avatar = src["image"] if author_name == src["name"] else f"https://ui-avatars.com/api/?name={urllib.parse.quote(author_name)}&background=22272e&color=adbac7&size=128&bold=true"
+        
+        author_sql = f"""
+        INSERT INTO "user" (
+            id, name, username, image, reputation, "createdAt"
+        ) VALUES (
+            {quote(author_id)},
+            {quote(author_name)},
+            {quote(author_slug[:36])},
+            {quote(author_avatar)},
+            100,
+            now()
+        )
+        ON CONFLICT (id) DO UPDATE SET
+            name = EXCLUDED.name,
+            image = EXCLUDED.image;
+        """
+        sql_statements.append(author_sql)
+
+        pub_date_sql = parse_date_to_sql(item["pubDate"])
+        post_type = item.get("type", "article")
+        vid_id = item.get("videoId")
+        read_time = item.get("readTime", max(2, len(item['summary'].split()) // 25 or 3))
+
+        post_sql = f"""
+        INSERT INTO post (
+            id, "shortId", title, summary, description,
+            url, "canonicalUrl", "sourceId", image, "publishedAt",
+            "createdAt", "readTime", "tagsStr", type, "videoId", "authorId", upvotes,
+            comments, views, score, trending, visible, deleted,
+            banned, "showOnFeed", flags, language, "statsUpdatedAt",
+            "contentCuration"
+        ) VALUES (
+            {quote(post_id)},
+            {quote(short_id)},
+            {quote(item['title'])},
+            {quote(item['summary'])},
+            {quote(item['summary'])},
+            {quote(item['link'])},
+            {quote(item['link'])},
+            {quote(src['id'])},
+            {quote(cover_img)},
+            {staggered_sql},
+            {staggered_sql},
+            {read_time},
+            {quote(tags_str)},
+            {quote(post_type)},
+            {quote(vid_id)},
+            {quote(author_id)},
+            {upvotes},
+            {comments},
+            {views},
+            {score},
+            100,
+            true,
+            false,
+            false,
+            true,
+            '{{"visible": true, "showOnFeed": true, "sentAnalyticsReport": true}}'::jsonb,
+            'tr',
+            now(),
+            ARRAY['story']::text[]
+        )
+        ON CONFLICT (id) DO UPDATE SET
+            title = EXCLUDED.title,
+            summary = EXCLUDED.summary,
+            image = EXCLUDED.image,
+            score = EXCLUDED.score,
+            "tagsStr" = EXCLUDED."tagsStr",
+            type = EXCLUDED.type,
+            "videoId" = EXCLUDED."videoId",
+            "authorId" = EXCLUDED."authorId",
+            upvotes = EXCLUDED.upvotes,
+            comments = EXCLUDED.comments,
+            views = EXCLUDED.views,
+            "publishedAt" = EXCLUDED."publishedAt",
+            "createdAt" = EXCLUDED."createdAt",
+            "contentCuration" = ARRAY['story']::text[],
+            "statsUpdatedAt" = now();
+        """
+        sql_statements.append(post_sql)
+        total_posts += 1
+
+        for tag in all_tags[:6]:
+            kw_sql = f"""
+            INSERT INTO keyword (value, "createdAt", "updatedAt", status)
+            VALUES ({quote(tag)}, now(), now(), 'allow')
+            ON CONFLICT (value) DO NOTHING;
+
+            INSERT INTO post_keyword ("postId", keyword, status)
+            VALUES ({quote(post_id)}, {quote(tag)}, 'allow')
+            ON CONFLICT DO NOTHING;
             """
-            sql_statements.append(author_sql)
-
-            pub_date_sql = parse_date_to_sql(item["pubDate"])
-            post_type = item.get("type", "article")
-            vid_id = item.get("videoId")
-            read_time = item.get("readTime", max(2, len(item['summary'].split()) // 25 or 3))
-
-            post_sql = f"""
-            INSERT INTO post (
-                id, "shortId", title, summary, description,
-                url, "canonicalUrl", "sourceId", image, "publishedAt",
-                "createdAt", "readTime", "tagsStr", type, "videoId", "authorId", upvotes,
-                comments, views, score, trending, visible, deleted,
-                banned, "showOnFeed", flags, language, "statsUpdatedAt",
-                "contentCuration"
-            ) VALUES (
-                {quote(post_id)},
-                {quote(short_id)},
-                {quote(item['title'])},
-                {quote(item['summary'])},
-                {quote(item['summary'])},
-                {quote(item['link'])},
-                {quote(item['link'])},
-                {quote(src['id'])},
-                {quote(cover_img)},
-                {pub_date_sql},
-                now(),
-                {read_time},
-                {quote(tags_str)},
-                {quote(post_type)},
-                {quote(vid_id)},
-                {quote(author_id)},
-                {upvotes},
-                {comments},
-                {views},
-                {score},
-                100,
-                true,
-                false,
-                false,
-                true,
-                '{{"visible": true, "showOnFeed": true, "sentAnalyticsReport": true}}'::jsonb,
-                'tr',
-                now(),
-                ARRAY['story']::text[]
-            )
-            ON CONFLICT (id) DO UPDATE SET
-                title = EXCLUDED.title,
-                summary = EXCLUDED.summary,
-                image = EXCLUDED.image,
-                score = EXCLUDED.score,
-                "tagsStr" = EXCLUDED."tagsStr",
-                type = EXCLUDED.type,
-                "videoId" = EXCLUDED."videoId",
-                "authorId" = EXCLUDED."authorId",
-                upvotes = EXCLUDED.upvotes,
-                comments = EXCLUDED.comments,
-                views = EXCLUDED.views,
-                "contentCuration" = ARRAY['story']::text[],
-                "statsUpdatedAt" = now();
-            """
-            sql_statements.append(post_sql)
-            total_posts += 1
-
-            for tag in all_tags[:6]:
-                kw_sql = f"""
-                INSERT INTO keyword (value, "createdAt", "updatedAt", status)
-                VALUES ({quote(tag)}, now(), now(), 'allow')
-                ON CONFLICT (value) DO NOTHING;
-
-                INSERT INTO post_keyword ("postId", keyword, status)
-                VALUES ({quote(post_id)}, {quote(tag)}, 'allow')
-                ON CONFLICT DO NOTHING;
-                """
-                sql_statements.append(kw_sql)
+            sql_statements.append(kw_sql)
 
     sql_statements.append("COMMIT;")
 
