@@ -68,16 +68,15 @@ export const SquadListItem = ({
           type={TypographyType.Footnote}
           truncate
         >
-          {largeNumberFormat(squad.membersCount)} member
-          {squad.membersCount !== 1 && 's'}
+          {largeNumberFormat(squad.membersCount)} üye
         </Typography>
       </div>
       {showJoinButton && !hasSquadsInList && (
         <SquadActionButton
           alwaysShow
-          copy={{ join: 'Join' }}
+          copy={{ join: 'Katıl' }}
           onSuccess={() => {
-            displayToast(`🙌 You joined the Squad ${squad.name}`);
+            displayToast(`🙌 ${squad.name} Squad'ına katıldınız`);
           }}
           origin={Origin.Profile}
           size={ButtonSize.Small}

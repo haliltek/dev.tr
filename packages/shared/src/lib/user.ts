@@ -61,13 +61,13 @@ export interface PublicProfile {
 }
 
 export enum UserExperienceLevel {
-  LESS_THAN_1_YEAR = 'Aspiring engineer (<1 year)',
-  MORE_THAN_1_YEAR = 'Entry-level (1 year)',
-  MORE_THAN_2_YEARS = 'Mid-level (2-3 years)',
-  MORE_THAN_4_YEARS = 'Experienced (4-5 years)',
-  MORE_THAN_6_YEARS = 'Highly experienced (6-10 years)',
-  MORE_THAN_10_YEARS = `I've suffered enough (10+ years)`,
-  NOT_ENGINEER = `I'm not an engineer`,
+  LESS_THAN_1_YEAR = 'Geliştirici adayı (< 1 yıl)',
+  MORE_THAN_1_YEAR = 'Başlangıç seviyesi (1 yıl)',
+  MORE_THAN_2_YEARS = 'Orta seviye (2-3 yıl)',
+  MORE_THAN_4_YEARS = 'Deneyimli (4-5 yıl)',
+  MORE_THAN_6_YEARS = 'Yüksek deneyimli (6-10 yıl)',
+  MORE_THAN_10_YEARS = 'Kıdemli / Usta (10+ yıl)',
+  NOT_ENGINEER = 'Yazılımcı değilim',
 }
 
 export const ExperienceLevelOptions = Object.entries(UserExperienceLevel).map(
@@ -80,8 +80,8 @@ export enum CloudProvider {
   aws = 'Amazon Web Services (AWS)',
   gcp = 'Google Cloud (GCP)',
   azure = 'Microsoft Azure',
-  other = 'Other',
-  none = 'None',
+  other = 'Diğer',
+  none = 'Hiçbiri',
 }
 
 export const CloudProviderOptions = Object.entries(CloudProvider).map(

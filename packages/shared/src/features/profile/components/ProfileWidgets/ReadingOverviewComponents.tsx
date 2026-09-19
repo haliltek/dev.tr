@@ -32,7 +32,7 @@ export const ReadingTagProgress = ({
   const value = `+${(percentage * 100).toFixed(0)}%`;
 
   return (
-    <Tooltip content={`${count}/${total} reading days`} side="top">
+    <Tooltip content={`${count}/${total} okuma günü`} side="top">
       <div className="relative flex flex-row justify-between overflow-hidden rounded-6 border border-border-subtlest-tertiary px-2">
         <Link href={getTagPageLink(tag)} passHref prefetch={false}>
           <Typography
@@ -74,11 +74,11 @@ export const ReadingStreaksSection = ({
   <div className="my-3 flex gap-2">
     <SummaryCard
       count={largeNumberFormat(streak?.max)}
-      label="Longest streak 🏆"
+      label="En uzun seri 🏆"
     />
     <SummaryCard
       count={largeNumberFormat(streak?.total)}
-      label="Total reading days"
+      label="Toplam okuma günü"
     />
   </div>
 );
@@ -101,7 +101,7 @@ export const ReadingTagsSection = ({
         color={TypographyColor.Tertiary}
         className="my-1"
       >
-        Top tags by reading days
+        Okuma gününe göre en popüler etiketler
       </Typography>
       <div className="my-3 grid max-w-full grid-cols-2 gap-2">
         {mostReadTags?.map((tag) => (
@@ -120,12 +120,12 @@ export const ReadingTagsSection = ({
 export const HeatmapLegend = (): ReactElement => (
   <div className="mt-4 flex items-center justify-end typo-footnote">
     <div className="flex items-center">
-      <div className="mr-2">Less</div>
+      <div className="mr-2">Daha az</div>
       <div className="mr-0.5 h-2 w-2 rounded-6 border border-border-subtlest-quaternary" />
       <div className="mr-0.5 h-2 w-2 rounded-6 bg-text-disabled" />
       <div className="mr-0.5 h-2 w-2 rounded-6 bg-text-quaternary" />
       <div className="mr-0.5 h-2 w-2 rounded-6 bg-text-primary" />
-      <div className="ml-2">More</div>
+      <div className="ml-2">Daha çok</div>
     </div>
   </div>
 );
@@ -141,7 +141,7 @@ export const ReadingOverviewSkeleton = (): ReactElement => {
         bold
         className="flex items-center"
       >
-        Reading Overview
+        Okuma Özeti
       </Typography>
       <ClickableText
         tag="a"
@@ -149,7 +149,7 @@ export const ReadingOverviewSkeleton = (): ReactElement => {
         href={migrateUserToStreaks}
         rel={anchorDefaultRel}
       >
-        Learn more
+        Daha fazla bilgi
       </ClickableText>
 
       {/* Streaks section skeleton */}

@@ -53,7 +53,7 @@ import { getLayout as getMainLayout } from '../../../components/layouts/MainLayo
 import { noindexSeoProps } from '../../../next-seo';
 
 const seo: NextSeoProps = {
-  title: 'Squad analytics',
+  title: 'Squad analitiği',
   ...noindexSeoProps,
 };
 
@@ -163,38 +163,38 @@ const SquadAnalyticsPage = (): ReactElement => {
   const engagementData: AnalyticsNumberList = [
     {
       icon: <UpvoteIcon />,
-      label: 'Upvotes',
+      label: "Upvote'lar",
       value: analytics?.upvotes ?? 0,
     },
     {
       icon: <MergeIcon />,
-      label: 'Upvotes ratio',
+      label: 'Upvote oranı',
       value: `${analytics?.upvotesRatio ?? 0}%`,
-      tooltip: 'The percentage of upvotes out of total votes.',
+      tooltip: 'Toplam oylar içindeki Upvote yüzdesi.',
     },
     {
       icon: <DiscussIcon />,
-      label: 'Comments',
+      label: 'Yorumlar',
       value: analytics?.comments ?? 0,
     },
     {
       icon: <BookmarkIcon />,
-      label: 'Bookmarks',
+      label: 'Yer imleri',
       value: analytics?.bookmarks ?? 0,
     },
     {
       icon: <MedalBadgeIcon secondary />,
-      label: 'Awards',
+      label: 'Ödüller',
       value: analytics?.awards ?? 0,
     },
     {
       icon: <ShareIcon />,
-      label: 'Shares',
+      label: 'Paylaşımlar',
       value: analytics?.shares ?? 0,
     },
     {
       icon: <ClickIcon />,
-      label: 'Clicks',
+      label: 'Tıklamalar',
       value: analytics?.clicks ?? 0,
     },
   ];
@@ -209,26 +209,26 @@ const SquadAnalyticsPage = (): ReactElement => {
     <div className="mx-auto w-full max-w-[48rem]">
       <LayoutHeader className={classNames('!mb-0 border-b px-4', pageBorders)}>
         <PageHeaderTitle bold type={TypographyType.Title3}>
-          Squad analytics
+          Squad analitiği
         </PageHeaderTitle>
       </LayoutHeader>
 
       <ResponsivePageContainer className="!mx-0 !w-full !max-w-full gap-6">
         <SectionContainer>
-          <SectionHeader>Discovery (last 45 days)</SectionHeader>
+          <SectionHeader>Keşif (son 45 gün)</SectionHeader>
           <div className="grid grid-cols-1 gap-4 tablet:grid-cols-2">
             <DataTile
-              label="Impressions"
+              label="Görüntülenme"
               value={analytics?.impressions ?? 0}
-              info="The total number of times posts from this squad were shown to developers across the platform"
+              info="Bu squad'a ait postların platformdaki geliştiricilere gösterilme sayısı"
               icon={
                 <EyeIcon size={IconSize.Small} className="text-text-tertiary" />
               }
             />
             <DataTile
-              label="Unique reach"
+              label="Tekil erişim"
               value={analytics?.reach ?? 0}
-              info="The estimated number of unique developers who viewed posts from this squad"
+              info="Bu squad'a ait postları görüntüleyen tahmini tekil geliştirici sayısı"
               icon={
                 <EyeIcon size={IconSize.Small} className="text-text-tertiary" />
               }
@@ -239,7 +239,7 @@ const SquadAnalyticsPage = (): ReactElement => {
         <Divider className={dividerClassName} />
 
         <SectionContainer>
-          <SectionHeader>Impressions over time</SectionHeader>
+          <SectionHeader>Zaman içindeki görüntülenmeler</SectionHeader>
           {hasChartData ? (
             <CombinedImpressionsChart data={impressionsData} />
           ) : (
@@ -247,7 +247,7 @@ const SquadAnalyticsPage = (): ReactElement => {
               type={TypographyType.Callout}
               color={TypographyColor.Secondary}
             >
-              No impressions data in the last 45 days.
+              Son 45 günde görüntülenme verisi yok.
             </Typography>
           )}
         </SectionContainer>
@@ -255,7 +255,7 @@ const SquadAnalyticsPage = (): ReactElement => {
         <Divider className={dividerClassName} />
 
         <SectionContainer>
-          <SectionHeader>Engagement (last 45 days)</SectionHeader>
+          <SectionHeader>Etkileşim (son 45 gün)</SectionHeader>
           <AnalyticsNumbersList data={engagementData} />
         </SectionContainer>
       </ResponsivePageContainer>

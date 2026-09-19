@@ -23,8 +23,8 @@ const CertificationsPage = ({
       user={user}
       noindex={noindex}
       experiences={cert}
-      title="Certifications"
-      seoTitle={`Certifications for ${user.name} (@${user.username})`}
+      title="Sertifikalar"
+      seoTitle={`${user.name} (@${user.username}) sertifikaları`}
     />
   );
 };

@@ -26,7 +26,7 @@ import { getLayout as getMainLayout } from '../../components/layouts/MainLayout'
 import { noindexSeoProps } from '../../next-seo';
 
 const seo: NextSeoProps = {
-  title: 'Squad settings',
+  title: 'Squad ayarları',
   ...noindexSeoProps,
 };
 
@@ -79,7 +79,7 @@ export default function ModerateSquadPage({
           variant={ButtonVariant.Tertiary}
         />
         <PageHeaderTitle bold type={TypographyType.Title3}>
-          {isModerator ? 'Squad settings' : 'Pending posts'}
+          {isModerator ? 'Squad ayarları' : 'Bekleyen Postlar'}
         </PageHeaderTitle>
       </PageHeader>
       {handle && <SquadTabs active={SquadTab.PendingPosts} handle={handle} />}

@@ -70,7 +70,7 @@ export const BadgesAndAwards = ({
         bold
         className="flex items-center"
       >
-        Badges &amp; Awards
+        Rozetler &amp; Ödüller
       </Typography>
       <ClickableText
         tag="a"
@@ -78,22 +78,22 @@ export const BadgesAndAwards = ({
         href={topReaderBadgeDocs}
         rel={anchorDefaultRel}
       >
-        Learn more
+        Daha fazla bilgi
       </ClickableText>
 
       <div className="my-3 flex gap-3">
         <SummaryCard
           count={`x${topReaders?.[0]?.total ?? 0}`}
-          label="Top reader badge"
+          label="En çok okuyan rozeti"
         />
-        <SummaryCard count={`x${totalAwards}`} label="Total Awards" />
+        <SummaryCard count={`x${totalAwards}`} label="Toplam Ödül" />
       </div>
 
       {topReaders && topReaders.length > 0 && (
         <div
           className="flex flex-col gap-2"
           role="list"
-          aria-label="User badges"
+          aria-label="Kullanıcı rozetleri"
         >
           {topReaders.map((badge) => (
             <KeywordBadge key={`badge-${badge.id}`} badge={badge} />
@@ -105,7 +105,7 @@ export const BadgesAndAwards = ({
         <div
           className="mt-4 grid grid-cols-5 gap-4 laptop:grid-cols-6"
           role="list"
-          aria-label="User awards"
+          aria-label="Kullanıcı ödülleri"
         >
           {awards.map((award) => (
             <Award key={award.id} image={award.image} amount={award.count} />

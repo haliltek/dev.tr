@@ -156,7 +156,7 @@ const SimilarSources = ({
         name: source.name,
         permalink: source.permalink,
       }))}
-      title={`Sources similar to ${sourceName}`}
+      title={`${sourceName} benzeri kaynaklar`}
       className={pageSectionClassName}
     />
   );
@@ -201,13 +201,13 @@ const getSourcePageJsonLd = (source: Source): string => {
           {
             '@type': 'ListItem',
             position: 1,
-            name: 'Home',
+            name: 'Ana Sayfa',
             item: appOrigin,
           },
           {
             '@type': 'ListItem',
             position: 2,
-            name: 'Sources',
+            name: 'Kaynaklar',
             item: `${appOrigin}/sources`,
           },
           {
@@ -285,7 +285,7 @@ const SourcePage = ({
         />
         <ArchiveBreadcrumbs
           items={[
-            { label: 'Sources', href: '/sources' },
+            { label: 'Kaynaklar', href: '/sources' },
             { label: source.name },
           ]}
           className={pageSectionClassName}
@@ -340,7 +340,7 @@ const SourcePage = ({
             <EntitySectionHeading
               icon={<UpvoteIcon size={IconSize.Medium} className="shrink-0" />}
             >
-              Most upvoted posts from {source.name}
+              {source.name} kaynağından en çok Upvote alanlar
             </EntitySectionHeading>
             <EntityRailWithFade>
               <HorizontalFeed
@@ -365,7 +365,7 @@ const SourcePage = ({
             <EntitySectionHeading
               icon={<DiscussIcon size={IconSize.Medium} className="shrink-0" />}
             >
-              Best discussed posts from {source.name}
+              {source.name} kaynağından en çok tartışılanlar
             </EntitySectionHeading>
             <EntityRailWithFade>
               <HorizontalFeed
@@ -391,7 +391,7 @@ const SourcePage = ({
         />
         <div className={pageFeedSectionClassName}>
           <EntitySectionHeading>
-            All posts from {source.name}
+            {source.name} kaynağındaki tüm postlar
           </EntitySectionHeading>
           <Feed
             feedName={OtherFeedPage.Squad}
@@ -472,7 +472,7 @@ export async function getStaticProps({
       sourceTopPostsResult?.page?.edges
         ?.map((edge) => edge.node)
         .filter((post) => !!post.title) ?? [];
-    const seoTitles = getPageSeoTitles(`${source.name} posts`);
+    const seoTitles = getPageSeoTitles(`${source.name} postları`);
     const seo: NextSeoProps = {
       ...defaultSeo,
       ...seoTitles,

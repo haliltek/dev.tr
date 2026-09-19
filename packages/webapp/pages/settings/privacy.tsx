@@ -36,7 +36,7 @@ import { getPageSeoTitles } from '../../components/layouts/utils';
 
 const seo: NextSeoProps = {
   ...defaultSeo,
-  ...getPageSeoTitles('Privacy'),
+  ...getPageSeoTitles('Gizlilik'),
   ...noindexSeoProps,
 };
 
@@ -103,11 +103,11 @@ const AccountInvitePage = (): ReactElement | null => {
   };
 
   return (
-    <AccountPageContainer title="Privacy">
+    <AccountPageContainer title="Gizlilik">
       <AccountContentSection
         className={{ heading: 'mt-0' }}
-        title="How we handle your data"
-        description="We collect only what's needed and give you control over your information."
+        title="Verilerinizi nasıl işliyoruz"
+        description="Yalnızca gerekli olanları topluyor ve bilgileriniz üzerinde size tam kontrol sağlıyoruz."
       >
         <Typography
           href={privacyPolicy}
@@ -116,15 +116,15 @@ const AccountInvitePage = (): ReactElement | null => {
           target="_blank"
           rel="noopener"
         >
-          Privacy Policy →
+          Gizlilik Politikası →
         </Typography>
       </AccountContentSection>
       {/* Not gated on `isGdprCovered`: iubenda collects consent under LGPD and
           USPR too, and withdrawal has to be as reachable as consent was. */}
       <AccountContentSection
         className={{ container: 'flex flex-col' }}
-        title="Cookie preferences"
-        description="Control how we use cookies on your device."
+        title="Çerez tercihleri"
+        description="Cihazınızda çerezleri nasıl kullandığımızı yönetin."
       >
         <Typography
           href={cookiePolicy}
@@ -133,7 +133,7 @@ const AccountInvitePage = (): ReactElement | null => {
           target="_blank"
           rel="noopener"
         >
-          Cookie Policy →
+          Çerez Politikası →
         </Typography>
         {!isIOSNative() ? (
           // the custom toggles can't regenerate a TCF consent string, so
@@ -144,7 +144,7 @@ const AccountInvitePage = (): ReactElement | null => {
             variant={ButtonVariant.Secondary}
             onClick={onManagePreferences}
           >
-            Manage cookie preferences
+            Çerez tercihlerini yönet
           </Button>
         ) : (
           <div className="mt-4 flex flex-col gap-4">
@@ -157,7 +157,7 @@ const AccountInvitePage = (): ReactElement | null => {
         )}
       </AccountContentSection>
       <AccountContentSection
-        title="Legal & support"
+        title="Yasal & destek"
         className={{ container: 'flex flex-col gap-4' }}
       >
         <Typography
@@ -167,7 +167,7 @@ const AccountInvitePage = (): ReactElement | null => {
           target="_blank"
           rel="noopener"
         >
-          Terms of Service →
+          Kullanım Koşulları →
         </Typography>
         <Typography
           href={privacyPolicy}
@@ -176,7 +176,7 @@ const AccountInvitePage = (): ReactElement | null => {
           target="_blank"
           rel="noopener"
         >
-          Content guidelines →
+          İçerik kuralları →
         </Typography>
         <Typography
           href="mailto:hi@daily.dev"
@@ -185,7 +185,7 @@ const AccountInvitePage = (): ReactElement | null => {
           target="_blank"
           rel="noopener"
         >
-          Contact us →
+          Bize ulaşın →
         </Typography>
       </AccountContentSection>
     </AccountPageContainer>

@@ -31,7 +31,7 @@ ExploreTagPage.layoutProps = mainFeedLayoutProps;
 export default ExploreTagPage;
 
 const getSeoData = (tag: string): NextSeoProps => {
-  const seoTitles = getPageSeoTitles(`#${tag} feed`);
+  const seoTitles = getPageSeoTitles(`#${tag} feedi`);
   return {
     ...defaultSeo,
     ...seoTitles,
@@ -39,7 +39,7 @@ const getSeoData = (tag: string): NextSeoProps => {
       ...defaultOpenGraph,
       ...seoTitles.openGraph,
     },
-    description: `Explore #${tag} on daily.dev`,
+    description: `daily.dev üzerinde #${tag} içeriklerini keşfedin`,
   };
 };
 

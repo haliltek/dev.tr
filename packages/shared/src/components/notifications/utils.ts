@@ -256,28 +256,28 @@ export const notificationMutingCopy: Partial<
   Record<NotificationType, ActionCopy>
 > = {
   [NotificationType.ArticleNewComment]: {
-    mute: 'Turn off notifications from this post',
-    unmute: 'Turn on notifications from this post',
+    mute: 'Bu posttan gelen bildirimleri kapat',
+    unmute: 'Bu posttan gelen bildirimleri aç',
   },
   [NotificationType.SquadNewComment]: {
-    mute: 'Turn off notifications from this post',
-    unmute: 'Turn on notifications from this post',
+    mute: 'Bu posttan gelen bildirimleri kapat',
+    unmute: 'Bu posttan gelen bildirimleri aç',
   },
   [NotificationType.CommentReply]: {
-    mute: 'Mute this thread',
-    unmute: 'Unmute this thread',
+    mute: 'Bu konuşmayı sessize al',
+    unmute: 'Bu konuşmanın sesini aç',
   },
   [NotificationType.SquadReply]: {
-    mute: 'Mute this thread',
-    unmute: 'Unmute this thread',
+    mute: 'Bu konuşmayı sessize al',
+    unmute: 'Bu konuşmanın sesini aç',
   },
   [NotificationType.UserPostAdded]: {
-    mute: 'Mute notifications',
-    unmute: 'Unmute notifications',
+    mute: 'Bildirimleri sessize al',
+    unmute: 'Bildirimlerin sesini aç',
   },
   [NotificationType.SquadMemberJoined]: {
-    mute: 'Mute new member notifications',
-    unmute: 'Unmute new member notifications',
+    mute: 'Yeni üye bildirimlerini sessize al',
+    unmute: 'Yeni üye bildirimlerinin sesini aç',
   },
 };
 
@@ -472,13 +472,13 @@ export const notificationFilterCategoryLabel: Record<
   NotificationFilterCategory,
   string
 > = {
-  [NotificationFilterCategory.Upvotes]: 'Upvotes',
-  [NotificationFilterCategory.Mentions]: 'Mentions',
-  [NotificationFilterCategory.Comments]: 'Comments',
-  [NotificationFilterCategory.Followers]: 'Followers',
-  [NotificationFilterCategory.Squads]: 'Squads',
-  [NotificationFilterCategory.Agents]: 'Agents',
-  [NotificationFilterCategory.Updates]: 'Updates',
+  [NotificationFilterCategory.Upvotes]: 'Upvote',
+  [NotificationFilterCategory.Mentions]: 'Bahsetmeler',
+  [NotificationFilterCategory.Comments]: 'Yorumlar',
+  [NotificationFilterCategory.Followers]: 'Takipçiler',
+  [NotificationFilterCategory.Squads]: "Squad'lar",
+  [NotificationFilterCategory.Agents]: 'Agentlar',
+  [NotificationFilterCategory.Updates]: 'Güncellemeler',
 };
 
 const notificationTypeToCategory = Object.entries(
@@ -582,42 +582,42 @@ type NotificationItem =
 export const ACTIVITY_NOTIFICATIONS: NotificationItem[] = [
   {
     id: 'comments',
-    label: 'Comments on your posts',
+    label: 'Postlarınıza gelen yorumlar',
     group: true,
   },
   {
     id: NotificationType.CommentReply,
-    label: 'Replies to your comment',
+    label: 'Yorumunuza gelen yanıtlar',
     group: false,
   },
   {
     id: NotificationType.ArticleUpvoteMilestone,
-    label: 'Upvotes on your post',
+    label: 'Postunuza gelen Upvote’lar',
     group: false,
   },
   {
     id: NotificationType.CommentUpvoteMilestone,
-    label: 'Upvotes on your comment',
+    label: 'Yorumunuza gelen Upvote’lar',
     group: false,
   },
   {
     id: 'mentions',
-    label: 'Mentions of your username',
+    label: 'Kullanıcı adınızdan bahsetmeler',
     group: true,
   },
   {
     id: NotificationType.UserReceivedAward,
-    label: 'Cores & Awards you receive',
+    label: 'Aldığınız Core ve Ödüller',
     group: false,
   },
   {
     id: NotificationType.ArticleReportApproved,
-    label: 'Report updates',
+    label: 'Rapor güncellemeleri',
     group: false,
   },
   {
     id: NotificationType.UserFollow,
-    label: 'New followers',
+    label: 'Yeni takipçiler',
     group: false,
   },
 ];
@@ -625,39 +625,39 @@ export const ACTIVITY_NOTIFICATIONS: NotificationItem[] = [
 export const FOLLOWING_NOTIFICATIONS: NotificationItem[] = [
   {
     id: 'following',
-    label: 'Following',
+    label: 'Takip Edilenler',
     description:
-      'Get notified when sources, users, collections, or threads you follow are updated. You can manage each below.',
+      'Takip ettiğiniz kaynaklar, kullanıcılar, koleksiyonlar veya başlıklar güncellendiğinde bildirim alın. Aşağıdan her birini yönetebilirsiniz.',
     group: true,
   },
   {
     id: NotificationType.SourcePostAdded,
-    label: 'Source new post',
+    label: 'Kaynaktan yeni post',
     group: false,
   },
   {
     id: NotificationType.SquadPostAdded,
-    label: 'Squad new post',
+    label: "Squad'dan yeni post",
     group: false,
   },
   {
     id: NotificationType.UserPostAdded,
-    label: 'User new posts',
+    label: 'Kullanıcıdan yeni postlar',
     group: false,
   },
   {
     id: NotificationType.CollectionUpdated,
-    label: 'Collections you follow',
+    label: 'Takip ettiğiniz koleksiyonlar',
     group: false,
   },
   {
     id: NotificationType.PostBookmarkReminder,
-    label: 'Read it later',
+    label: 'Daha sonra oku',
     group: false,
   },
   {
     id: 'pollResult',
-    label: 'Poll Results',
+    label: 'Anket Sonuçları',
     group: true,
     type: 'checkbox',
   },
@@ -666,29 +666,29 @@ export const FOLLOWING_NOTIFICATIONS: NotificationItem[] = [
 export const STREAK_NOTIFICATIONS: NotificationItem[] = [
   {
     id: 'streaks',
-    label: 'Streaks',
+    label: 'Streak',
     description:
-      'Stay on track and never miss a reading day. Get reminders to protect your streak or bring it back when it breaks.',
+      'Okuma serinizi koruyun ve hiçbir günü kaçırmayın. Streak serinizi korumak veya kırıldığında geri getirmek için hatırlatıcılar alın.',
     group: true,
   },
   {
     id: NotificationType.StreakReminder,
-    label: 'Notify me before my streak expires',
+    label: 'Streak serim sona ermeden önce bana bildir',
     group: false,
   },
   {
     id: NotificationType.StreakResetRestore,
-    label: 'Restore broken streak',
+    label: 'Bozulan seriyi geri yükle',
     group: false,
   },
   {
     id: NotificationType.StreakFreezeUsed,
-    label: 'Streak freeze used',
+    label: 'Streak dondurucu kullanıldı',
     group: false,
   },
   {
     id: NotificationType.StreakFreezeDepleted,
-    label: 'Out of streak freezes',
+    label: 'Streak dondurucular tükendi',
     group: false,
   },
 ];
@@ -696,29 +696,29 @@ export const STREAK_NOTIFICATIONS: NotificationItem[] = [
 export const CREATORS_NOTIFICATIONS: NotificationItem[] = [
   {
     id: 'sourceSubmission',
-    label: 'Source suggestions',
+    label: 'Kaynak önerileri',
     description:
-      'Get notified on suggested sources, including review progress and outcomes.',
+      'İnceleme süreci ve sonuçları dahil olmak üzere önerilen kaynaklarla ilgili bildirimler alın.',
     group: true,
   },
   {
     id: 'squadPostReview',
-    label: 'Submitted post review',
+    label: 'Gönderilen post incelemesi',
     description:
-      'Get notified when your submitted post has been reviewed by a Squad moderator.',
+      'Gönderdiğiniz post bir Squad moderatörü tarafından incelendiğinde bildirim alın.',
     group: true,
   },
   {
     id: 'squadRoles',
-    label: 'Squad roles',
+    label: 'Squad rolleri',
     description:
-      'Get notified when your squad role changes, like becoming a moderator or admin.',
+      'Moderatör veya admin olmak gibi Squad rolünüz değiştiğinde bildirim alın.',
     group: true,
   },
   {
     id: NotificationType.PostAnalytics,
-    label: 'Post analytics',
-    description: 'Get updates about how your posts are performing.',
+    label: 'Post analitiği',
+    description: 'Postlarınızın performansı hakkında güncellemeler alın.',
     group: false,
   },
 ];
@@ -726,23 +726,23 @@ export const CREATORS_NOTIFICATIONS: NotificationItem[] = [
 export const DAILY_DEV_NOTIFICATIONS: NotificationItem[] = [
   {
     id: NotificationType.NewUserWelcome,
-    label: 'New user welcome',
+    label: 'Yeni kullanıcı karşılama',
     description:
-      'Get helpful tips and guidance as you get started with daily.dev.',
+      'Platformu kullanmaya başlarken faydalı ipuçları ve rehberlik alın.',
     group: false,
   },
   {
     id: NotificationType.Announcements,
-    label: 'Major announcements',
+    label: 'Önemli duyurular',
     description:
-      'Get notified about big product changes, launches, and important company news from daily.dev.',
+      'Büyük ürün değişiklikleri, lansmanlar ve önemli şirket haberleri hakkında bilgi alın.',
     group: false,
   },
   {
     id: NotificationType.Marketing,
-    label: 'Community & Marketing',
+    label: 'Topluluk & Pazarlama',
     description:
-      'Get emails about product news, events, giveaways, and highlights from the daily.dev community.',
+      'Ürün haberleri, etkinlikler, çekilişler ve topluluk özetleri hakkında bildirimler alın.',
     group: false,
   },
 ];
@@ -750,7 +750,7 @@ export const DAILY_DEV_NOTIFICATIONS: NotificationItem[] = [
 export const BILLING_NOTIFICATIONS: NotificationItem[] = [
   {
     id: NotificationType.InAppPurchases,
-    label: 'In-app purchases',
+    label: 'Uygulama içi satın alımlar',
     group: false,
   },
 ];

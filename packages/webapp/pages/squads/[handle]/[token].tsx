@@ -48,15 +48,15 @@ import type { DynamicSeoProps } from '../../../components/common';
 const getOthers = (others: Edge<SourceMember>[], total: number) => {
   const { length } = others;
   if (length === 0) {
-    return 'is';
+    return 'seni bekliyor';
   }
 
   if (length === 1) {
     const member = others[0].node.user.name;
-    return `and ${member} are`;
+    return `ve ${member} seni bekliyor`;
   }
 
-  return `and ${total - 1} others are`;
+  return `ve ${total - 1} kişi daha seni bekliyor`;
 };
 
 const BodyParagraph = classed('p', 'typo-body text-text-tertiary');
@@ -229,11 +229,11 @@ const SquadReferral = ({
   return (
     <PageContainer className="relative items-center pt-10 tablet:pt-20">
       <div className="squad-background-fade absolute -top-4 left-0 right-0 h-40 max-w-[100vw] rounded-26 tablet:-left-20 tablet:-right-20" />
-      <h1 className="typo-title1">You are invited to join {source.name}</h1>
+      <h1 className="typo-title1">{source.name} squad'ına katılmaya davet edildiniz</h1>
       <BodyParagraph className="mt-6">
-        {source.name} is your place to stay up to date as a Squad. You and your
-        Squad members can share knowledge and content in one place. Join now to
-        start collaborating.
+        {source.name}, Squad olarak güncel kalabileceğiniz alandır. Siz ve
+        Squad üyeleriniz bilgi ve içerikleri tek bir yerde paylaşabilirsiniz. İş birliğine
+        başlamak için hemen katılın.
       </BodyParagraph>
       <span className="mt-8 flex flex-row items-center" data-testid="inviter">
         <ProfileImageLink user={user} />
@@ -242,7 +242,7 @@ const SquadReferral = ({
           <Link href={user.permalink}>
             <a href={user.permalink}>(@{user.username})</a>
           </Link>{' '}
-          has invited you to <HighlightedText>{source.name}</HighlightedText>
+          sizi <HighlightedText>{source.name}</HighlightedText> squad'ına davet etti
         </BodyParagraph>
       </span>
       <div className="my-8 flex w-full flex-col rounded-24 border border-accent-cabbage-default p-6">
@@ -270,12 +270,12 @@ const SquadReferral = ({
             origin={Origin.SquadInvitation}
             inviterMember={member?.user}
           >
-            Join Squad
+            Squad'a Katıl
           </SimpleSquadJoinButton>
         </span>
       </div>
       <BodyParagraph data-testid="waiting-users">
-        {user.name} {othersLabel} waiting for you inside. Join them now!
+        {user.name} {othersLabel}. Aramıza hemen katılın!
       </BodyParagraph>
       <span className="mt-6 flex flex-row flex-wrap gap-2">
         {others.slice(0, 10).map(({ node }) => (
@@ -333,7 +333,7 @@ export async function getStaticProps({
   // Invite tokens are personal, single-squad links (private squads included) and
   // must never end up in search results.
   const seo: NextSeoProps = {
-    title: `${user.name} invited you to ${source.name}`,
+    title: `${user.name} sizi ${source.name} squad'ına davet etti`,
     description: source.description,
     openGraph: getSquadOpenGraph({ squad: source }),
     ...noindexSeoProps,

@@ -34,7 +34,7 @@ import { getLayout as getMainLayout } from '../../../components/layouts/MainLayo
 import { defaultOpenGraph, defaultSeo } from '../../../next-seo';
 import { getPageSeoTitles } from '../../../components/layouts/utils';
 
-const seoTitles = getPageSeoTitles('Squad settings');
+const seoTitles = getPageSeoTitles('Squad ayarları');
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
@@ -43,7 +43,7 @@ const seo: NextSeoProps = {
   ...defaultSeo,
 };
 
-const DEFAULT_ERROR = "Oops! That didn't seem to work. Let's try again!";
+const DEFAULT_ERROR = 'Bir sorun oluştu. Lütfen tekrar deneyin.';
 
 const EditSquad = ({ handle }: SquadSettingsProps): ReactElement => {
   const { isReady: isRouteReady } = useRouter();
@@ -63,7 +63,7 @@ const EditSquad = ({ handle }: SquadSettingsProps): ReactElement => {
         const queryKey = generateQueryKey(RequestKey.Squad, user, data.handle);
         await queryClient.invalidateQueries({ queryKey });
         updateSquad(data);
-        displayToast('The Squad has been updated');
+        displayToast('Squad güncellendi');
       },
       onError: (error: ApiErrorResult) => {
         const result = parseOrDefault<Record<string, string>>(

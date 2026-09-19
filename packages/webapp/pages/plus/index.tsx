@@ -39,7 +39,7 @@ const PlusIOS = dynamic(() =>
 );
 
 const seoTitlesControl = getPageSeoTitles(
-  'Unlock Premium Developer Features with Plus',
+  'Plus ile Premium Geliştirici Özelliklerinin Kilidini Açın',
 );
 const seoControl: NextSeoProps = {
   title: seoTitlesControl.title,
@@ -51,7 +51,7 @@ const seoControl: NextSeoProps = {
     ],
   },
   description:
-    'Upgrade to daily.dev Plus for an ad-free experience, custom feeds, bookmark folders, clickbait shield, and more.',
+    "Reklamsız deneyim, özel feed'ler, yer işareti klasörleri, yanıltıcı başlık kalkanı ve daha fazlası için daily.dev Plus'a geçin.",
 };
 
 export type PlusPageProps = Pick<GiftUserContextData, 'giftToUser'> &

@@ -138,7 +138,7 @@ export const ActiveOrRecomendedSquads = (
               size={ButtonSize.Small}
               variant={ButtonVariant.Subtle}
             >
-              {showMore.isActive ? 'Show less' : 'Show all Squads'}
+              {showMore.isActive ? 'Daha az göster' : 'Tüm Squad\'ları göster'}
             </Button>
           )}
         </div>

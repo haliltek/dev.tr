@@ -19,7 +19,7 @@ const COMPANY_TAGS = new Set([
 // impressions tag page and the default template would stutter into
 // "Tech News News & Updates".
 const HAND_SET_TITLES: Record<string, string> = {
-  'tech-news': 'Tech News: Latest Technology Updates',
+  'tech-news': 'Teknoloji Haberleri: En Son Gelişmeler',
 };
 
 // Variant rules match the slug rather than the display title, since the display
@@ -35,12 +35,12 @@ export const getTagSeoTitle = (tag: string, tagTitle: string): string => {
   }
 
   if (/\bnews\b/i.test(tagTitle)) {
-    return `${tagTitle}: Latest Updates & Discussions`;
+    return `${tagTitle}: En Son Güncellemeler ve Tartışmalar`;
   }
 
   if (COMPANY_TAGS.has(slug)) {
-    return `${tagTitle} Developer News & Updates`;
+    return `${tagTitle} Geliştirici Haberleri ve Güncellemeleri`;
   }
 
-  return `${tagTitle} News & Updates`;
+  return `${tagTitle} Haberleri ve Güncellemeleri`;
 };

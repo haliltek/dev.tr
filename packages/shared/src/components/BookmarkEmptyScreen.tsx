@@ -11,10 +11,10 @@ interface BookmarkEmptyScreenProps {
 }
 
 const defaultDescription =
-  'Go back to your feed and bookmark posts you’d like to keep or read later. Each post you bookmark will be stored here.';
+  'Feed\'inize dönün ve saklamak veya daha sonra okumak istediğiniz postları yer imlerine ekleyin. Yer imlerine eklediğiniz her post burada saklanacaktır.';
 
 export default function BookmarkEmptyScreen({
-  title = 'Your bookmark list is empty.',
+  title = 'Yer imi listeniz boş.',
   description = defaultDescription,
   image = cloudinaryCharmBookmarks,
   imageAlt = 'daily.dev charm holding a bookmark',
@@ -26,7 +26,7 @@ export default function BookmarkEmptyScreen({
       imageAlt={imageAlt}
       title={title}
       description={description}
-      action={{ label: 'Back to feed', href: '/' }}
+      action={{ label: 'Feed\'e geri dön', href: '/' }}
     />
   );
 }

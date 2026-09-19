@@ -128,7 +128,7 @@ export default function SettingsLayout({
           </Link>
 
           <Typography bold tag={TypographyTag.H2} type={TypographyType.Body}>
-            Settings
+            Ayarlar
           </Typography>
 
           <BuyCreditsButton
@@ -176,7 +176,7 @@ export default function SettingsLayout({
           isV2Laptop ? 'max-w-3xl' : 'max-w-5xl',
         )}
       >
-        <h1 className="sr-only">Settings</h1>
+        <h1 className="sr-only">Ayarlar</h1>
         {isMobile ? (
           <ProfileSettingsMenuMobile
             shouldKeepOpen

@@ -86,7 +86,7 @@ function EditPost(): ReactElement {
     !!initialScheduledAt && post?.type === PostType.Freeform;
   const schedule = useSchedulePost({
     initialScheduledAt,
-    clearLabel: 'Cancel scheduling',
+    clearLabel: 'Zamanlamayı iptal et',
   });
   const {
     onAskConfirmation,
@@ -172,7 +172,7 @@ function EditPost(): ReactElement {
   };
 
   const seo: NextSeoProps = {
-    title: `Edit - ${post?.title ?? ''} | ${post?.source?.name}`,
+    title: `Düzenle - ${post?.title ?? ''} | ${post?.source?.name}`,
     openGraph: { ...defaultOpenGraph },
     titleTemplate: '%s | daily.dev',
     ...defaultSeo,

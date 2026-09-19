@@ -14,7 +14,7 @@ import { getFeedSettingsLayout } from '../../../components/layouts/SettingsLayou
 
 const AccountManageSubscriptionPage = (): ReactElement => {
   return (
-    <AccountPageContainer title="Tags">
+    <AccountPageContainer title="Etiketler (Tag)">
       <section className="flex flex-col gap-4">
         <FeedSettingsTagsSection />
       </section>
@@ -22,7 +22,7 @@ const AccountManageSubscriptionPage = (): ReactElement => {
   );
 };
 
-const seoTitles = getPageSeoTitles('Tags');
+const seoTitles = getPageSeoTitles('Etiketler (Tag)');
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },

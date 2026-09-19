@@ -65,8 +65,8 @@ export const WatercoolerComposer = ({
       collapse();
       displayToast(
         moderationRequired(squad)
-          ? '✅ Your post has been submitted for moderation'
-          : '✅ Your post has been created!',
+          ? '✅ Postunuz moderasyon için gönderildi'
+          : '✅ Postunuz başarıyla oluşturuldu!',
       );
       // Scoped to this user's source feeds, matching the page's own key. A bare
       // ['sourceFeed'] would refetch every squad and source feed cached this
@@ -139,7 +139,7 @@ export const WatercoolerComposer = ({
             <ProfilePicture user={user} size={ProfileImageSize.Medium} />
           )}
           <span className="flex-1 truncate text-text-quaternary typo-body">
-            What&apos;s on your mind?
+            Aklında ne var?
           </span>
         </button>
       </Tooltip>
@@ -162,8 +162,8 @@ export const WatercoolerComposer = ({
             <Tooltip
               content={
                 cover
-                  ? 'Remove the cover to open the full composer'
-                  : 'Open full composer'
+                  ? 'Tam editörü açmak için kapak görselini kaldırın'
+                  : 'Tam editörü aç'
               }
             >
               <Button
@@ -173,7 +173,7 @@ export const WatercoolerComposer = ({
                 icon={<MaximizeIcon />}
                 onClick={onOpenFullComposer}
                 inactive={!!cover}
-                aria-label="Open full composer"
+                aria-label="Tam editörü aç"
               />
             </Tooltip>
             <Button
@@ -182,7 +182,7 @@ export const WatercoolerComposer = ({
               variant={ButtonVariant.Tertiary}
               onClick={collapse}
             >
-              Cancel
+              İptal
             </Button>
             <Button
               type="submit"
@@ -191,7 +191,7 @@ export const WatercoolerComposer = ({
               loading={isPosting || isJoining}
               disabled={!text.title.trim()}
             >
-              Post
+              Paylaş
             </Button>
           </span>
         }

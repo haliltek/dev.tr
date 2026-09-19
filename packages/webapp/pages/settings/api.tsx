@@ -175,16 +175,17 @@ const SKILLS: SkillDefinition[] = [
       },
       {
         tool: 'Cursor',
-        description: 'Add daily.dev as a remote skill in Cursor:',
+      },
+      {
+        tool: 'Cursor',
+        description: 'Add the daily-dev-ask skill in Cursor:',
         steps: [
-          'Open Cursor Settings -> Rules (Cmd+Shift+J on Mac, Ctrl+Shift+J on Windows/Linux)',
-          'Click "Add Rule" -> "Remote Rule (Github)"',
-          'Enter the repository URL below',
+          'Open Cursor Settings > Features > Rules for AI',
+          'Add the daily-dev-ask skill configuration',
+          `Reference the repository: ${CURSOR_REPO_URL}`,
         ],
-        code: CURSOR_REPO_URL,
         copyValue: CURSOR_REPO_URL,
-        copySuccessMessage: 'URL copied to clipboard',
-        note: 'Use /daily-dev-ask in Agent chat to search and answer questions.',
+        copySuccessMessage: 'Repository URL copied to clipboard',
       },
     ],
   },
@@ -192,11 +193,11 @@ const SKILLS: SkillDefinition[] = [
     id: 'daily-dev-agentic',
     name: 'daily-dev-agentic',
     description:
-      'Continuous self-improvement for agents through daily.dev feeds.',
+      'Autonomous agent integration that lets AI agents interact with your daily.dev feed.',
     methods: [
       {
         tool: 'OpenClaw',
-        description: 'Copy this instruction to your agent:',
+        description: 'Install the daily-dev-agentic skill in OpenClaw:',
         code: DAILY_DEV_AGENTIC_OPENCLAW_INSTRUCTION,
         copyValue: DAILY_DEV_AGENTIC_OPENCLAW_INSTRUCTION,
         copySuccessMessage: 'Instruction copied to clipboard',
@@ -211,10 +212,10 @@ const lowercaseRelativeDate = (dateStr: string): string => {
 };
 
 const ExpirationOptions = [
-  { value: '', label: 'Never expires' },
-  { value: '30', label: '30 days' },
-  { value: '90', label: '90 days' },
-  { value: '365', label: '1 year' },
+  { value: '', label: 'Süresiz (Asla bitmez)' },
+  { value: '30', label: '30 gün' },
+  { value: '90', label: '90 gün' },
+  { value: '365', label: '1 yıl' },
 ];
 
 interface CreateTokenModalProps {
@@ -236,7 +237,7 @@ const CreateTokenModal = ({
 
   const handleCreate = async () => {
     if (!name.trim()) {
-      displayToast('Please enter a token name');
+      displayToast('Lütfen bir token adı girin');
       return;
     }
 
@@ -249,26 +250,26 @@ const CreateTokenModal = ({
       setName('');
       setExpiration('');
     } catch {
-      displayToast('Failed to create token. Please try again.');
+      displayToast('Token oluşturulamadı. Lütfen tekrar deneyin.');
     }
   };
 
   return (
     <Modal isOpen={isOpen} onRequestClose={onClose} size={ModalSize.Small}>
-      <ModalHeader title="Create API Token" />
+      <ModalHeader title="API Token'ı Oluştur" />
       <ModalBody className="flex flex-col gap-4">
         <TextField
-          label="Token name"
+          label="Token adı"
           inputId="token-name"
           name="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="e.g., My AI Agent"
+          placeholder="Örn: Yapay Zeka Ajanım"
           maxLength={50}
         />
         <div className="flex flex-col gap-2">
           <Typography type={TypographyType.Callout} bold>
-            Expiration
+            Son kullanma süresi
           </Typography>
           <Radio
             name="expiration"
@@ -284,7 +285,7 @@ const CreateTokenModal = ({
           size={ButtonSize.Medium}
           onClick={onClose}
         >
-          Cancel
+          İptal
         </Button>
         <Button
           variant={ButtonVariant.Primary}
@@ -293,7 +294,7 @@ const CreateTokenModal = ({
           loading={isPending}
           disabled={!name.trim()}
         >
-          Create token
+          Token oluştur
         </Button>
       </ModalFooter>
     </Modal>
@@ -316,22 +317,22 @@ const TokenCreatedModal = ({
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(token);
-      displayToast('Token copied to clipboard');
+      displayToast('Token panoya kopyalandı');
     } catch {
-      displayToast('Failed to copy token');
+      displayToast('Token kopyalanamadı');
     }
   };
 
   return (
     <Modal isOpen={isOpen} onRequestClose={onClose} size={ModalSize.Small}>
-      <ModalHeader title="Token created" />
+      <ModalHeader title="Token oluşturuldu" />
       <ModalBody className="flex flex-col gap-4">
         <div className="flex items-center gap-2 rounded-12 bg-status-warning p-3">
           <LockIcon size={IconSize.Small} className="shrink-0" />
           <Typography type={TypographyType.Callout}>
-            This token will only be shown once.
+            Bu token yalnızca bir kez gösterilecektir.
             <br />
-            Copy it now!
+            Hemen şimdi kopyalayın!
           </Typography>
         </div>
         <div className="flex items-center gap-2 rounded-12 bg-surface-float p-3">
@@ -350,7 +351,7 @@ const TokenCreatedModal = ({
           size={ButtonSize.Medium}
           onClick={onClose}
         >
-          I&apos;ve copied my token
+          Token&apos;ımı kopyaladım
         </Button>
       </ModalFooter>
     </Modal>
@@ -384,7 +385,7 @@ const TokenListItem = ({
           <span>{tokenPrefix}...</span>
           <span>&#x2022;</span>
           <span>
-            Created{' '}
+            Oluşturulma:{' '}
             {lowercaseRelativeDate(
               formatDate({ value: createdAt, type: TimeFormatType.Post }),
             )}
@@ -393,7 +394,7 @@ const TokenListItem = ({
             <>
               <span>&#x2022;</span>
               <span>
-                Last used{' '}
+                Son kullanım:{' '}
                 {lowercaseRelativeDate(
                   formatDate({
                     value: lastUsedAt,
@@ -459,28 +460,28 @@ const ApiAccessPage = (): ReactElement => {
   const [expandedSkills, setExpandedSkills] = useState<Record<string, boolean>>(
     {},
   );
-  let tokenEmptyStateText = 'No tokens yet. Create one to get started.';
+  let tokenEmptyStateText = 'Henüz token yok. Başlamak için bir tane oluşturun.';
 
   if (!isPlus) {
     tokenEmptyStateText =
-      'Upgrade to Plus to create API tokens and authenticate with the daily.dev API.';
+      'API token\'ları oluşturmak ve daily.dev API\'si ile kimlik doğrulamak için Plus\'a yükseltin.';
   }
 
-  const handleCopy = async (value: string, successMessage = 'Copied') => {
+  const handleCopy = async (value: string, successMessage = 'Kopyalandı') => {
     try {
       await navigator.clipboard.writeText(value);
       displayToast(successMessage);
     } catch {
-      displayToast('Failed to copy');
+      displayToast('Kopyalanamadı');
     }
   };
 
   const handleRevoke = async (id: string) => {
     try {
       await revokeToken(id);
-      displayToast('Token revoked successfully');
+      displayToast('Token başarıyla iptal edildi');
     } catch {
-      displayToast('Failed to revoke token');
+      displayToast('Token iptal edilemedi');
     }
   };
 
@@ -493,7 +494,7 @@ const ApiAccessPage = (): ReactElement => {
 
   return (
     <AccountPageContainer
-      title="API Access"
+      title="API Erişimi"
       actions={
         isPlus ? (
           <Button
@@ -502,7 +503,7 @@ const ApiAccessPage = (): ReactElement => {
             icon={<PlusIcon />}
             onClick={() => setShowCreateModal(true)}
           >
-            {isMobile ? undefined : 'Create token'}
+            {isMobile ? undefined : 'Token oluştur'}
           </Button>
         ) : undefined
       }
@@ -510,14 +511,15 @@ const ApiAccessPage = (): ReactElement => {
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <Typography type={TypographyType.Body} bold>
-            Personal Access Tokens
+            Kişisel Erişim Token'ları (Personal Access Tokens)
           </Typography>
           <Typography
             type={TypographyType.Callout}
             color={TypographyColor.Tertiary}
           >
-            Use tokens to authenticate with the daily.dev API. Tokens provide
-            read-only access to your personalized feed and posts.
+            daily.dev API'si ile kimlik doğrulaması yapmak için token'ları
+            kullanın. Token'lar kişiselleştirilmiş feed'inize ve gönderilerinize
+            salt okunur erişim sağlar.
           </Typography>
         </div>
 
@@ -526,7 +528,7 @@ const ApiAccessPage = (): ReactElement => {
             type={TypographyType.Callout}
             color={TypographyColor.Tertiary}
           >
-            Loading tokens...
+            Token'lar yükleniyor...
           </Typography>
         )}
 
@@ -563,7 +565,7 @@ const ApiAccessPage = (): ReactElement => {
                 icon={<PlusIcon />}
                 onClick={() => setShowCreateModal(true)}
               >
-                Create your first token
+                İlk token'ınızı oluşturun
               </Button>
             ) : (
               <Button
@@ -572,7 +574,7 @@ const ApiAccessPage = (): ReactElement => {
                 tag="a"
                 href="/plus"
               >
-                Upgrade to Plus
+                Plus'a Yükselt
               </Button>
             )}
           </div>
@@ -580,13 +582,14 @@ const ApiAccessPage = (): ReactElement => {
 
         <div className="flex flex-col gap-2">
           <Typography type={TypographyType.Body} bold>
-            Skills
+            Beceriler & Entegrasyonlar (Skills)
           </Typography>
           <Typography
             type={TypographyType.Callout}
             color={TypographyColor.Tertiary}
           >
-            Install one or more daily.dev skills using the integrations below.
+            Aşağıdaki entegrasyonları kullanarak bir veya daha fazla daily.dev
+            becerisini kurun.
           </Typography>
           <div className="flex flex-col gap-4">
             {SKILLS.map((skill) => {
@@ -700,13 +703,14 @@ const ApiAccessPage = (): ReactElement => {
 
         <div className="flex flex-col gap-2">
           <Typography type={TypographyType.Body} bold>
-            Documentation
+            Dokümantasyon
           </Typography>
           <Typography
             type={TypographyType.Callout}
             color={TypographyColor.Tertiary}
           >
-            Learn how to use the API and explore available endpoints.
+            API'yi nasıl kullanacağınızı öğrenin ve mevcut uç noktaları
+            keşfedin.
           </Typography>
           <div className="flex flex-wrap gap-2">
             <Button
@@ -717,7 +721,7 @@ const ApiAccessPage = (): ReactElement => {
               href="https://docs.daily.dev/docs/plus/public-api"
               target="_blank"
             >
-              API Docs
+              API Dokümantasyonu
             </Button>
             <Button
               variant={ButtonVariant.Secondary}
@@ -727,7 +731,7 @@ const ApiAccessPage = (): ReactElement => {
               href={OPENAPI_URL}
               target="_blank"
             >
-              OpenAPI Reference
+              OpenAPI Referansı
             </Button>
           </div>
         </div>

@@ -61,7 +61,7 @@ import { AccountPageContainer } from '../../components/layouts/SettingsLayout/Ac
 
 const seo: NextSeoProps = {
   ...defaultSeo,
-  ...getPageSeoTitles('Job preferences'),
+  ...getPageSeoTitles('İş tercihleri'),
   ...noindexSeoProps,
 };
 
@@ -69,14 +69,14 @@ const options = [
   {
     key: CandidateStatus.ACTIVELY_LOOKING,
     icon: <ActivelyLookingIcon size={IconSize.XLarge} />,
-    title: 'Actively looking',
-    description: <>Ready to make a move and exploring new opportunities.</>,
+    title: 'Aktif olarak iş arıyorum',
+    description: <>Yeni fırsatları keşfetmeye ve adım atmaya hazırım.</>,
   },
   {
     key: CandidateStatus.OPEN_TO_OFFERS,
     icon: <SemiActiveIcon size={IconSize.XLarge} />,
-    title: <>Open to offers</>,
-    description: <>Happy where I am, but open to something exceptional.</>,
+    title: <>Tekliflere açığım</>,
+    description: <>Mevcut durumumdan memnunum, ancak olağanüstü fırsatlara açığım.</>,
   },
 ];
 
@@ -100,7 +100,7 @@ const JobPreferencesPage = (): ReactElement => {
       });
     }),
     onError: () => {
-      displayToast('Failed to update preferences. Please try again.');
+      displayToast('Tercihler güncellenemedi. Lütfen tekrar deneyin.');
     },
   });
 
@@ -116,29 +116,25 @@ const JobPreferencesPage = (): ReactElement => {
 
   if (!preferences || isPending) {
     return (
-      <AccountPageContainer title="Job preferences">
+      <AccountPageContainer title="İş tercihleri">
         <Loader />
       </AccountPageContainer>
     );
   }
 
   return (
-    <AccountPageContainer title="Job preferences">
+    <AccountPageContainer title="İş tercihleri">
       <div className="flex flex-col gap-6">
         <FlexRow className="gap-4">
           <FlexCol className="flex-1 gap-1">
             <Typography type={TypographyType.Body}>
-              <strong>Career mode</strong> (beta)
+              <strong>Kariyer modu</strong> (beta)
             </Typography>
             <Typography
               type={TypographyType.Footnote}
               color={TypographyColor.Tertiary}
             >
-              When this is on, daily.dev works as your trusted talent agent,
-              introducing you to real roles from real teams for your approval.
-              Nothing is shared without your say-so. We&apos;ll only reach out
-              when a role is worth your time. No spam. No pressure. Your career,
-              your terms.
+              Bu özellik açık olduğunda daily.dev sizin yetenek temsilciniz gibi çalışır ve gerçek ekiplerin gerçek pozisyonlarını onayınıza sunar. İzniniz olmadan hiçbir şey paylaşılmaz. Yalnızca vaktinize değecek roller için size ulaşırız. Spam yok, baskı yok. Sizin kariyeriniz, sizin kurallarınız.
             </Typography>
           </FlexCol>
           <Switch
@@ -203,29 +199,25 @@ const JobPreferencesPage = (): ReactElement => {
         <FlexCol className="gap-6">
           <FlexCol>
             <Typography type={TypographyType.Body} bold>
-              Supercharge your match quality
+              Eşleşme kalitesini artırın
             </Typography>
             <Typography
               type={TypographyType.Footnote}
               color={TypographyColor.Tertiary}
             >
-              The more we understand your background and current terms, the
-              better we can filter out noise and surface only roles that are
-              truly worth your attention.{' '}
+              Geçmişinizi ve mevcut şartlarınızı ne kadar iyi anlarsak, gereksiz ilanları filtreleyip yalnızca gerçekten dikkatinize değer olanları o kadar iyi öne çıkarabiliriz.{' '}
             </Typography>
           </FlexCol>
           <div className="flex flex-1 flex-col gap-6 tablet:flex-row">
             <FlexCol className="flex-1 gap-2">
               <Typography type={TypographyType.Body} bold>
-                Upload CV
+                CV Yükle
               </Typography>
               <Typography
                 type={TypographyType.Footnote}
                 color={TypographyColor.Tertiary}
               >
-                Your CV helps us understand your skills, experience, and career
-                path so we can match you to job that actually make sense. Never
-                shared unless you explicitly say yes to an job.
+                CV'niz yeteneklerinizi, deneyimlerinizi ve kariyer yolunuzu anlamamıza yardımcı olur, böylece size gerçekten anlamlı gelen işlerle eşleştirebiliriz. Bir pozisyona açıkça onay vermediğiniz sürece asla paylaşılmaz.
               </Typography>
 
               {preferences?.cv?.fileName && (
@@ -244,16 +236,13 @@ const JobPreferencesPage = (): ReactElement => {
 
             <FlexCol className="flex-1 gap-2">
               <Typography type={TypographyType.Body} bold>
-                Upload Employment Agreement
+                İş Sözleşmesi Yükle
               </Typography>
               <Typography
                 type={TypographyType.Footnote}
                 color={TypographyColor.Tertiary}
               >
-                Sharing your current agreement lets us guarantee that any role
-                we surface will exceed your existing terms. This stays 100%
-                confidential and is only used to protect your time and
-                negotiating power.
+                Mevcut sözleşmenizi paylaşmanız, sunacağımız pozisyonların mevcut şartlarınızı aşacağını garanti etmemizi sağlar. Bu bilgiler %100 gizli kalır ve yalnızca zamanınızı ve pazarlık gücünüzü korumak için kullanılır.
               </Typography>
               {preferences?.employmentAgreement?.fileName && (
                 <Typography
@@ -272,7 +261,7 @@ const JobPreferencesPage = (): ReactElement => {
         <Divider className="bg-border-subtlest-tertiary" />
         <FlexCol className="gap-6">
           <Typography bold type={TypographyType.Body}>
-            Your must-haves
+            Olmazsa olmazlarınız
           </Typography>
 
           <PreferenceOptionsForm />

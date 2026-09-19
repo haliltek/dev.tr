@@ -83,7 +83,7 @@ export const HighlightItem = ({
           <p className="text-text-secondary typo-markdown">{tldr}</p>
           <Link href={highlight.post.commentsPermalink}>
             <a className="flex items-center gap-1 font-bold text-text-link typo-footnote hover:underline">
-              Read more
+              Devamını oku
             </a>
           </Link>
         </div>

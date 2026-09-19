@@ -32,9 +32,9 @@ import { LogEvent, Origin } from '../../../../lib/log';
 import { labels } from '../../../../lib';
 
 const highlightsPlacementOptions = [
-  { value: HighlightsPlacement.Default, label: 'Default' },
-  { value: HighlightsPlacement.Pinned, label: 'Pin to top' },
-  { value: HighlightsPlacement.Disabled, label: 'Disabled' },
+  { value: HighlightsPlacement.Default, label: 'Varsayılan' },
+  { value: HighlightsPlacement.Pinned, label: 'En üste sabitle' },
+  { value: HighlightsPlacement.Disabled, label: 'Devre dışı' },
 ];
 
 export const FeedSettingsGeneralSection = (): ReactElement => {
@@ -59,7 +59,7 @@ export const FeedSettingsGeneralSection = (): ReactElement => {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <Typography bold type={TypographyType.Body}>
-            Feed name
+            Feed adı
           </Typography>
           <Typography
             type={TypographyType.Callout}
@@ -67,14 +67,14 @@ export const FeedSettingsGeneralSection = (): ReactElement => {
           >
             {isMainFeed && isPlus ? (
               <span>
-                Want a custom feed name? You can always{' '}
+                Özel bir feed adı mı istiyorsunuz? İstediğiniz zaman yeni bir feed{' '}
                 <Link href={`${webappUrl}feeds/new`}>
-                  <a className="underline">create</a>
-                </Link>{' '}
-                a custom feed!
+                  <a className="underline">oluşturabilirsiniz</a>
+                </Link>
+                !
               </span>
             ) : (
-              'Choose a name that reflects the focus of your feed.'
+              'Feed\'inizin odağını yansıtan bir ad seçin.'
             )}
           </Typography>
         </div>
@@ -88,7 +88,7 @@ export const FeedSettingsGeneralSection = (): ReactElement => {
             name="name"
             type="text"
             inputId="feedName"
-            label="For You"
+            label="Senin İçin (For You)"
             rightIcon={<LockIcon />}
             disabled
             readOnly
@@ -103,7 +103,7 @@ export const FeedSettingsGeneralSection = (): ReactElement => {
             name="name"
             type="text"
             inputId="feedName"
-            label="Enter feed name"
+            label="Feed adını girin"
             required
             maxLength={50}
             valueChanged={(value) => setData({ name: value })}
@@ -114,21 +114,20 @@ export const FeedSettingsGeneralSection = (): ReactElement => {
         <EmojiPicker
           value={data.icon || ''}
           onChange={(emoji) => setData({ icon: emoji })}
-          label="Choose an icon"
+          label="Bir simge seçin"
         />
       )}
       {(isPlus || isMainFeed) && (
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <Typography bold type={TypographyType.Body}>
-              Set as your default feed
+              Varsayılan feed olarak ayarla
             </Typography>
             <Typography
               type={TypographyType.Callout}
               color={TypographyColor.Tertiary}
             >
-              Make this feed the first one you see every time you open
-              daily.dev.
+              daily.dev'i her açtığınızda ilk gördüğünüz feed bu olsun.
             </Typography>
           </div>
           {isCustomFeed && (
@@ -150,13 +149,13 @@ export const FeedSettingsGeneralSection = (): ReactElement => {
                 )
               }
             >
-              {isDefaultFeed ? 'Default feed set' : 'Make default'}
+              {isDefaultFeed ? 'Varsayılan feed yapıldı' : 'Varsayılan yap'}
             </Button>
           )}
           {isMainFeed && (
             <Tooltip
               visible={isDefaultFeed}
-              content="Your main feed is already your default feed"
+              content="Ana feed'iniz zaten varsayılan feed'iniz"
               side="bottom"
             >
               <div className={classNames(isDefaultFeed ? 'w-44' : 'w-40')}>
@@ -180,7 +179,7 @@ export const FeedSettingsGeneralSection = (): ReactElement => {
                     );
                   }}
                 >
-                  {isDefaultFeed ? 'Default feed set' : 'Make default'}
+                  {isDefaultFeed ? 'Varsayılan feed yapıldı' : 'Varsayılan yap'}
                 </Button>
               </div>
             </Tooltip>
@@ -191,14 +190,14 @@ export const FeedSettingsGeneralSection = (): ReactElement => {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <Typography bold type={TypographyType.Body}>
-            Happening Now placement
+            Gündemdekiler (Happening Now) konumu
           </Typography>
           <Typography
             type={TypographyType.Callout}
             color={TypographyColor.Tertiary}
           >
-            Choose where the Happening Now card appears in your feed, or hide it
-            entirely.
+            Gündemdekiler kartının feed'inizde nerede görüneceğini seçin veya tamamen
+            gizleyin.
           </Typography>
         </div>
         <Dropdown
@@ -236,14 +235,14 @@ export const FeedSettingsGeneralSection = (): ReactElement => {
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <Typography bold type={TypographyType.Body}>
-                Delete feed
+                Feed'i sil
               </Typography>
               <Typography
                 type={TypographyType.Callout}
                 color={TypographyColor.Tertiary}
               >
-                Permanently remove this feed and all its settings. This action
-                cannot be undone.
+                Bu feed'i ve tüm ayarlarını kalıcı olarak silin. Bu işlem geri
+                alınamaz.
               </Typography>
             </div>
             <Button
@@ -254,7 +253,7 @@ export const FeedSettingsGeneralSection = (): ReactElement => {
               icon={<TrashIcon />}
               onClick={onDelete}
             >
-              Delete feed
+              Feed'i sil
             </Button>
           </div>
         </>

@@ -47,39 +47,39 @@ const experienceTypeConfig: Record<
 > = {
   [UserExperienceType.Work]: {
     icon: JobIcon,
-    label: 'work experience',
-    heading: 'Add your work experience',
-    subheading: "Show where you've worked and what you've accomplished",
+    label: 'iş deneyimini',
+    heading: 'İş deneyimini ekle',
+    subheading: "Nerede çalıştığını ve neler başardığını göster",
   },
   [UserExperienceType.Education]: {
     icon: GraduationIcon,
-    label: 'education',
-    heading: 'Add your education',
-    subheading: 'Share your academic background and achievements',
+    label: 'eğitimini',
+    heading: 'Eğitimini ekle',
+    subheading: 'Akademik geçmişini ve başarılarını paylaş',
   },
   [UserExperienceType.Certification]: {
     icon: MedalIcon,
-    label: 'certification',
-    heading: 'Add your certifications',
-    subheading: 'Showcase your professional certifications and credentials',
+    label: 'sertifikanı',
+    heading: 'Sertifikalarını ekle',
+    subheading: 'Profesyonel sertifikalarını ve yetkinliklerini sergile',
   },
   [UserExperienceType.OpenSource]: {
     icon: TerminalIcon,
-    label: 'open source contribution',
-    heading: 'Add your open source work',
-    subheading: 'Highlight your contributions to open source projects',
+    label: 'open source çalışmanı',
+    heading: 'Open source çalışmalarını ekle',
+    subheading: 'Open source projelere olan katkılarını öne çıkar',
   },
   [UserExperienceType.Project]: {
     icon: TourIcon,
-    label: 'project',
-    heading: 'Add your projects',
-    subheading: 'Share your side projects and publications',
+    label: 'projeni',
+    heading: 'Projelerini ekle',
+    subheading: 'Yan projelerini ve yayınlarını paylaş',
   },
   [UserExperienceType.Volunteering]: {
     icon: VolunteeringIcon,
-    label: 'volunteering experience',
-    heading: 'Add your volunteering',
-    subheading: 'Share your community involvement and volunteer work',
+    label: 'gönüllülük deneyimini',
+    heading: 'Gönüllülük çalışmalarını ekle',
+    subheading: 'Topluluk çalışmalarını ve gönüllü deneyimlerini paylaş',
   },
 };
 
@@ -208,7 +208,7 @@ export function UserExperienceList<T extends UserExperience>({
               size={ButtonSize.Small}
               icon={<PlusIcon />}
             >
-              Add your first {config.label}
+              İlk {config.label} ekle
             </Button>
           </Link>
         </div>
@@ -230,7 +230,7 @@ export function UserExperienceList<T extends UserExperience>({
                 variant={ButtonVariant.Tertiary}
                 size={ButtonSize.XSmall}
                 icon={<EditIcon />}
-                aria-label={`Edit ${title}`}
+                aria-label={`${title} düzenle`}
               />
             </Link>
           )}
@@ -280,7 +280,7 @@ export function UserExperienceList<T extends UserExperience>({
             iconPosition={ButtonIconPosition.Right}
             className="w-full"
           >
-            Show More
+            Daha Fazla Göster
           </Button>
         </Link>
       )}

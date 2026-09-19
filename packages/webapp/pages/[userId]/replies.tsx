@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import React, { useContext } from 'react';
 import { USER_COMMENTS_QUERY } from '@dailydotdev/shared/src/graphql/comments';
 import { Origin } from '@dailydotdev/shared/src/lib/log';
@@ -55,17 +55,17 @@ const ProfileCommentsPage = ({
     <MyProfileEmptyScreen
       className="items-center px-4 py-6 text-center tablet:px-6"
       image={cloudinaryCharmEmptyProfile}
-      imageAlt="daily.dev charm with an empty profile"
-      text="All tests have passed on the first try and you have no idea why? Time for a break. Browse the feed and join a discussion!"
-      cta="Explore posts"
+      imageAlt="Henüz yanıt verilmedi"
+      text="Tüm testler ilk seferde geçti ve nedenini bilmiyor musun? Biraz mola ver. Feed'e göz at ve tartışmalara katıl!"
+      cta="Postları keşfet"
       buttonProps={{ tag: 'a', href: '/' }}
     />
   ) : (
     <ProfileEmptyScreen
       image={cloudinaryCharmEmptyProfile}
-      imageAlt="daily.dev charm with an empty profile"
-      title={`${user?.name ?? 'User'} hasn't replied to any post yet`}
-      text="Once they do, those replies will show up here."
+      imageAlt="Henüz yanıt verilmedi"
+      title={`${user?.name ?? 'Kullanıcı'} henüz hiçbir posta yanıt vermedi`}
+      text="Yanıt verdiğinde, o yanıtlar burada görünecek."
     />
   );
 
@@ -74,7 +74,7 @@ const ProfileCommentsPage = ({
       user,
       {
         ...getPageSeoTitles(
-          `Posts with replies by ${user.name} (@${user.username})`,
+          `${user.name} (@${user.username}) yanıtları`,
         ),
         noindex: true,
         nofollow: true,
@@ -88,7 +88,7 @@ const ProfileCommentsPage = ({
       <NextSeo {...seo} />
       <GoBackHeaderMobile>
         <Typography bold type={TypographyType.Body}>
-          Replies
+          Yanıtlar
         </Typography>
       </GoBackHeaderMobile>
       <CommentFeed
@@ -107,5 +107,9 @@ const ProfileCommentsPage = ({
   );
 };
 
-ProfileCommentsPage.getLayout = getProfileLayout;
+ProfileCommentsPage.getLayout = (
+  page: ReactNode,
+  props: ProfileLayoutProps,
+): ReactNode =>
+  getProfileLayout(page, { ...props, pageHeaderTitle: 'Yanıtlar' });
 export default ProfileCommentsPage;

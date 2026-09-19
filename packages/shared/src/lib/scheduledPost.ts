@@ -43,21 +43,21 @@ export const formatScheduleDelta = (date: Date | null): string | null => {
 
   const diffMs = date.getTime() - Date.now();
   if (diffMs <= 0) {
-    return 'now';
+    return 'şimdi';
   }
 
   const minutes = Math.max(1, Math.round(diffMs / 60_000));
   if (minutes < 60) {
-    return `${minutes} minute${minutes === 1 ? '' : 's'} from now`;
+    return `${minutes} dakika sonra`;
   }
 
   const hours = Math.round(minutes / 60);
   if (hours < 24) {
-    return `${hours} hour${hours === 1 ? '' : 's'} from now`;
+    return `${hours} saat sonra`;
   }
 
   const days = Math.round(hours / 24);
-  return `${days} day${days === 1 ? '' : 's'} from now`;
+  return `${days} gün sonra`;
 };
 
 // Validation copy mirrors the daily-api errors so the client blocks the same
@@ -69,16 +69,16 @@ export const validatePostScheduledStart = (
   const date = parsePostScheduledStart(value, timezone);
 
   if (!date) {
-    return { error: 'Scheduled time is invalid' };
+    return { error: 'Planlanan zaman geçersiz' };
   }
 
   if (date.getTime() <= Date.now()) {
-    return { error: 'Scheduled time must be in the future' };
+    return { error: 'Planlanan zaman gelecekte bir tarih olmalıdır' };
   }
 
   if (date.getTime() > Date.now() + MAX_POST_SCHEDULE_MS) {
     return {
-      error: `Scheduled time must be within ${MAX_POST_SCHEDULE_DAYS} days`,
+      error: `Planlanan zaman ${MAX_POST_SCHEDULE_DAYS} gün içinde olmalıdır`,
     };
   }
 

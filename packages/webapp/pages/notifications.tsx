@@ -6,7 +6,7 @@ import { getLayout } from '../components/layouts/MainLayout';
 import { NotificationsFeed } from '../components/notifications/NotificationsFeed';
 
 const seo: NextSeoProps = {
-  title: 'Notifications',
+  title: 'Bildirimler',
   noindex: true,
   nofollow: true,
 };

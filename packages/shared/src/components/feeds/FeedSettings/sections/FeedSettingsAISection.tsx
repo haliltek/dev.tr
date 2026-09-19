@@ -57,7 +57,7 @@ export const FeedSettingsAISection = (): ReactElement => {
         <>
           <div className="flex w-full items-center rounded-12 border border-border-subtlest-tertiary bg-action-plus-float p-3">
             <Typography type={TypographyType.Callout}>
-              Upgrade and use daily.dev&apos;s AI Superpowers!
+              daily.dev Plus'a yükseltin ve Yapay Zeka (AI) Güçlerini kullanın!
             </Typography>
             <Link href={plusUrl} passHref>
               <Button
@@ -91,7 +91,7 @@ export const FeedSettingsAISection = (): ReactElement => {
               type={TypographyType.Body}
               bold
             >
-              Auto-translate your feed
+              Feed'ini otomatik çevir
             </Typography>
             <PlusUser />
           </div>
@@ -99,10 +99,10 @@ export const FeedSettingsAISection = (): ReactElement => {
             color={TypographyColor.Tertiary}
             type={TypographyType.Callout}
           >
-            Choose your preferred language, and we&apos;ll automatically
-            translate post titles and TLDR summaries in your feed. The full
-            posts will still be in English, but this helps you quickly
-            understand what&apos;s worth reading.
+            Tercih ettiğiniz dili seçin, feed'inizdeki post başlıklarını ve TLDR
+            özetlerini otomatik olarak çevirelim. Gönderilerin tamamı orijinal
+            dilinde kalır, ancak bu neyin okunmaya değer olduğunu hızlıca
+            anlamanıza yardımcı olur.
           </Typography>
         </div>
         <LanguageDropdown
@@ -132,7 +132,7 @@ export const FeedSettingsAISection = (): ReactElement => {
               type={TypographyType.Body}
               bold
             >
-              Clickbait Shield
+              Clickbait Kalkanı (Clickbait Shield)
             </Typography>
             <PlusUser />
           </div>
@@ -141,10 +141,10 @@ export const FeedSettingsAISection = (): ReactElement => {
             color={TypographyColor.Tertiary}
             type={TypographyType.Callout}
           >
-            Clickbait Shield uses AI to automatically optimize post titles by
-            fixing common problems like clickbait, lack of clarity, and overly
-            promotional language. The result is clearer, more informative titles
-            that help you quickly find the content you actually need.
+            Clickbait Kalkanı, yanıltıcı başlıklar (clickbait), belirsizlik ve
+            aşırı reklam dili gibi sorunları yapay zeka ile düzelterek post
+            başlıklarını optimize eder. İhtiyacınız olan içeriği hızlıca bulmanız
+            için daha net ve bilgilendirici başlıklar sunar.
           </Typography>
         </div>
         <ConditionalWrapper
@@ -153,7 +153,7 @@ export const FeedSettingsAISection = (): ReactElement => {
             return (
               <Tooltip
                 className="max-w-70 text-center !typo-subhead"
-                content="Upgrade to Plus to unlock Clickbait Shield and enhance titles automatically."
+                content="Clickbait Kalkanını açmak ve başlıkları otomatik geliştirmek için Plus'a yükseltin."
               >
                 <div className="w-fit">{child as ReactElement}</div>
               </Tooltip>
@@ -175,7 +175,7 @@ export const FeedSettingsAISection = (): ReactElement => {
                   });
                 }}
               >
-                {triesLeft}/{maxTries} uses left this month
+                Bu ay kalan kullanım: {triesLeft}/{maxTries}
               </Button>
             </Link>
           ) : undefined}
@@ -205,7 +205,7 @@ export const FeedSettingsAISection = (): ReactElement => {
               });
             }}
           >
-            Optimize title quality
+            Başlık kalitesini optimize et
           </Switch>
         </ConditionalWrapper>
       </section>

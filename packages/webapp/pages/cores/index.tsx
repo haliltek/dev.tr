@@ -39,12 +39,12 @@ import { getCoresLayout } from '../../components/layouts/CoresLayout';
 import { defaultOpenGraph } from '../../next-seo';
 import { getPageSeoTitles } from '../../components/layouts/utils';
 
-const seoTitles = getPageSeoTitles('Buy Cores');
+const seoTitles = getPageSeoTitles('Cores Satın Al');
 export const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
   description:
-    'Purchase Cores to recognize valuable contributions, support creators, and fuel the developer community on daily.dev. Fast, secure, and flexible credit bundles.',
+    'Değerli katkıları ödüllendirmek, içerik üreticilerini desteklemek ve daily.dev topluluğuna güç katmak için Cores satın alın. Hızlı, güvenli ve esnek kredi paketleri.',
 };
 
 const MobileContainer = classed(
@@ -85,7 +85,7 @@ export const PageCoreOptions = ({
   showCoresAtCheckout = true,
   title = (
     <Typography className="mb-4" type={TypographyType.LargeTitle} bold>
-      Get More Cores
+      Daha Fazla Cores Al
     </Typography>
   ),
   className,
@@ -134,13 +134,13 @@ const CorePageMobile = (): ReactElement => {
           <>
             <img
               src={buyCoreStarField}
-              alt="Scattered stars"
+              alt="Yıldızlar"
               className="absolute left-0 top-0 z-0"
             />
             <div className="flex flex-col items-center gap-2">
               <CoreIcon size={IconSize.Size80} />
               <Typography type={TypographyType.Body} bold className="mb-2">
-                Get More Cores
+                Daha Fazla Cores Al
               </Typography>
             </div>
           </>

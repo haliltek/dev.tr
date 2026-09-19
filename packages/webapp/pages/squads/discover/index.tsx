@@ -14,12 +14,12 @@ import { SquadDirectoryLayout } from '../../../../shared/src/components/squads/l
 import { defaultOpenGraph } from '../../../next-seo';
 import { getPageSeoTitles } from '../../../components/layouts/utils';
 
-const seoTitles = getPageSeoTitles('Explore all Squads');
+const seoTitles = getPageSeoTitles('Tüm Squad\'ları Keşfet');
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
   description:
-    'Browse and join Squads on daily.dev. Connect with fellow developers, share knowledge, and dive into specific topics of interest in your favorite Squads.',
+    'daily.dev üzerindeki Squad\'lara göz atın ve katılın. Geliştiricilerle bağlantı kurun, bilgi paylaşın ve en sevdiğiniz Squad\'larda ilgi duyduğunuz konulara dalın.',
 };
 
 const sourceIcon = <SourceIcon secondary size={IconSize.Large} />;
@@ -34,9 +34,9 @@ const getSquadsSchemas = (
         '@type': 'CollectionPage',
         '@id': 'https://daily.dev/squads/discover#collection',
         url: 'https://daily.dev/squads/discover',
-        name: 'Explore all Squads',
+        name: 'Tüm Squad\'ları Keşfet',
         description:
-          'Browse and join Squads on daily.dev to connect with developers around shared interests.',
+          'daily.dev üzerindeki Squad\'lara göz atın ve ortak ilgi alanlarına sahip geliştiricilerle bağlantı kurun.',
       },
       {
         '@type': 'ItemList',
@@ -77,7 +77,7 @@ function SquadDiscoveryPage(): ReactElement {
       <SquadsDirectoryFeed
         key="featured"
         linkToSeeAll="/squads/discover/featured"
-        title={{ copy: 'Featured', icon: sourceIcon }}
+        title={{ copy: 'Öne Çıkanlar', icon: sourceIcon }}
         query={{ isPublic: true, featured: true, first: limit }}
         firstItemShouldBeAd
       >

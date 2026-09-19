@@ -154,7 +154,7 @@ const ProfilePage = ({
             bold
             className="laptop:hidden"
           >
-            Highlights
+            Öne çıkanlar
           </Typography>
           <ProfileWidgets
             user={user}

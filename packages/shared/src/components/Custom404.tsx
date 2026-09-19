@@ -22,11 +22,11 @@ interface Custom404Props {
 // BasePostContent, where a root-relative href resolves against
 // chrome-extension://<id>/ and dies.
 const recoveryLinks = [
-  { label: 'Explore', href: `${webappUrl}posts` },
-  { label: 'Tags', href: `${webappUrl}tags` },
-  { label: 'Sources', href: `${webappUrl}sources` },
+  { label: 'Keşfet', href: `${webappUrl}posts` },
+  { label: 'Etiketler', href: `${webappUrl}tags` },
+  { label: 'Kaynaklar', href: `${webappUrl}sources` },
   {
-    label: 'Squads',
+    label: "Squad'lar",
     href: `${webappUrl}${squadCategoriesPaths.discover.substring(1)}`,
   },
 ];
@@ -45,21 +45,21 @@ export default function Custom404({
         <Image
           className="h-40 w-40 object-contain"
           src={cloudinaryCharm404}
-          alt="404 - Page not found"
+          alt="404 - Sayfa bulunamadı"
           loading="lazy"
         />
-        <h1 className="font-bold typo-large-title">Why are you here?</h1>
+        <h1 className="font-bold typo-large-title">Burada ne arıyorsun?</h1>
         <p className="text-text-tertiary typo-callout">
-          You’re not supposed to be here.
+          Aradığınız sayfa mevcut değil veya taşınmış olabilir.
         </p>
         <Link href="/" passHref>
           <Button tag="a" variant={ButtonVariant.Primary}>
-            Go home
+            Ana sayfaya dön
           </Button>
         </Link>
 
         {showRecoveryLinks && (
-          <nav aria-label="Other places to go">
+          <nav aria-label="Gidebileceğiniz diğer yerler">
             <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
               {recoveryLinks.map(({ label, href }) => (
                 <li key={href}>

@@ -46,7 +46,7 @@ export default function BookmarkFeedPage({
         user && (
           <PostsSearch
             autoFocus={false}
-            placeholder="Search bookmarks"
+            placeholder="Yer imlerinde ara"
             suggestionType="searchBookmarksSuggestions"
           />
         )

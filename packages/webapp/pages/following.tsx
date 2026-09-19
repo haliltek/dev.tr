@@ -9,12 +9,12 @@ import { defaultOpenGraph, noindexSeoProps } from '../next-seo';
 import ProtectedPage from '../components/ProtectedPage';
 import { getPageSeoTitles } from '../components/layouts/utils';
 
-const seoTitles = getPageSeoTitles('Discover posts based on your following');
+const seoTitles = getPageSeoTitles('Takip ettiklerinize göre postları keşfedin');
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
   description:
-    'Explore a personalized feed featuring posts from the sources, Squads, and users you follow. Stay updated with content that matches your interests on daily.dev.',
+    'Takip ettiğiniz kaynaklar, Squad\'lar ve kullanıcılardan gelen postları içeren kişiselleştirilmiş bir feed keşfedin. daily.dev ile ilgi alanlarınıza uygun içeriklerle güncel kalın.',
   ...noindexSeoProps,
 };
 

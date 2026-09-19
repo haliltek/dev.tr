@@ -33,7 +33,7 @@ const History = (): ReactElement | null => {
 const geHistoryLayout: typeof getLayout = (...props) =>
   getFooterNavBarLayout(getLayout(...props));
 
-const seo: NextSeoProps = { title: 'History', nofollow: true, noindex: true };
+const seo: NextSeoProps = { title: 'Geçmiş', nofollow: true, noindex: true };
 
 History.getLayout = geHistoryLayout;
 History.layoutProps = { seo };

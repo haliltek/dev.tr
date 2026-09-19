@@ -208,7 +208,7 @@ export function UserExperienceItem({
                 }
               >
                 <JobIcon size={IconSize.Size16} className="text-text-link" />
-                <span>Verify company</span>
+                <span>Şirketi doğrula</span>
               </button>
             )}
             {shouldShowVerifiedBadge && <VerifiedBadge />}

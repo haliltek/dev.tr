@@ -37,14 +37,14 @@ const Verification = (): ReactElement | null => {
         <HeaderLogo onLogoClick={() => router.push('/')} />
         <div className="mt-10 flex max-w-[30rem] flex-col items-center">
           <AuthModalText className="text-center">
-            Invalid verification link. Please request a new verification email.
+            Geçersiz doğrulama bağlantısı. Lütfen yeni bir doğrulama e-postası talep edin.
           </AuthModalText>
           <Button
             className="mt-6"
             variant={ButtonVariant.Primary}
             onClick={() => router.push('/')}
           >
-            Go to homepage
+            Ana sayfaya dön
           </Button>
         </div>
       </div>
@@ -57,10 +57,10 @@ const Verification = (): ReactElement | null => {
         {/* The same bar the funnel steps carry, so the logo keeps its
             icon-on-mobile, wordmark-on-desktop treatment across the flow. */}
         <FunnelStepTopBar
-          skip={{ cta: 'Start over', onClick: () => router.push('/') }}
+          skip={{ cta: 'Baştan başla', onClick: () => router.push('/') }}
         />
         <div className="w-full max-w-[30rem] px-4 pt-6">
-          <AuthHeader title="Verify your email" simplified onboardingHeadline />
+          <AuthHeader title="E-postanızı doğrulayın" simplified onboardingHeadline />
           <EmailCodeVerification
             code={code}
             isOnboardingFunnel

@@ -28,7 +28,7 @@ const Search = (): ReactElement => {
   const seo = useMemo(() => {
     if ('q' in query) {
       return {
-        title: `${query.q} - daily.dev post finder`,
+        title: `${query.q} - daily.dev post arama`,
       };
     }
     return {
@@ -52,10 +52,10 @@ const Search = (): ReactElement => {
             size={IconSize.XXXLarge}
           />
           <h2 className="text-center font-bold text-text-primary typo-title2">
-            Ready to dive in?
+            Keşfetmeye hazır mısınız?
           </h2>
           <p className="text-center text-text-tertiary typo-callout">
-            Start your search to explore a world of developer resources.
+            Geliştirici kaynakları dünyasını keşfetmek için aramanızı başlatın.
           </p>
         </div>
       )}

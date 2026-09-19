@@ -147,7 +147,7 @@ export function TagsDirectoryPage({
     if (trendingTags?.length) {
       lists.push({
         id: 'trending-tags',
-        title: 'Trending tags',
+        title: 'Trend etiketler',
         emoji: '',
         tags: toTagValues(trendingTags),
       });
@@ -155,7 +155,7 @@ export function TagsDirectoryPage({
     if (popularTags?.length) {
       lists.push({
         id: 'popular-tags',
-        title: 'Popular tags',
+        title: 'Popüler etiketler',
         emoji: '',
         tags: toTagValues(popularTags),
       });
@@ -163,7 +163,7 @@ export function TagsDirectoryPage({
     if (recentlyAddedTags?.length) {
       lists.push({
         id: 'recently-added-tags',
-        title: 'Recently added tags',
+        title: 'Yeni eklenen etiketler',
         emoji: '',
         tags: toTagValues(recentlyAddedTags),
       });
@@ -204,15 +204,15 @@ export function TagsDirectoryPage({
             color={TypographyColor.Primary}
             bold
           >
-            Explore tags
+            Etiketleri Keşfet
           </Typography>
           <Typography
             type={TypographyType.Body}
             color={TypographyColor.Secondary}
             className="max-w-[34rem]"
           >
-            Browse the tags millions of developers follow on daily.dev. Search,
-            jump to any letter, and follow the ones that matter to you.
+            daily.dev'de geliştiricilerin takip ettiği etiketlere göz atın.
+            Arayın, harflere göre filtreleyin ve ilginizi çekenleri takip edin.
           </Typography>
           <TagDirectorySearch
             onQueryChange={setSearch}
@@ -231,8 +231,8 @@ export function TagsDirectoryPage({
               className="mb-4"
             >
               {searchResults.length > 0
-                ? `Results for “${search.trim()}”`
-                : `No tags match “${search.trim()}”`}
+                ? `“${search.trim()}” için sonuçlar`
+                : `“${search.trim()}” ile eşleşen etiket bulunamadı`}
             </Typography>
             {searchResults.length > 0 && (
               <ul className={COLUMNS}>
@@ -252,7 +252,7 @@ export function TagsDirectoryPage({
           <>
             {/* A–Z filter — narrows the directory below to a single letter. */}
             {availableLetters.length > 0 && (
-              <nav aria-label="Filter tags by letter" className="mt-8 w-full">
+              <nav aria-label="Etiketleri harfe göre filtrele" className="mt-8 w-full">
                 <div
                   ref={letterNavRef}
                   onKeyDown={onLetterNavKeyDown}
@@ -266,7 +266,7 @@ export function TagsDirectoryPage({
                     aria-pressed={!activeLetter}
                     className={letterButtonClass(!activeLetter, false)}
                   >
-                    All
+                    Tümü
                   </button>
                   {LETTERS.map((letter) => {
                     const isDisabled = !tagsByLetter[letter]?.length;
@@ -356,8 +356,8 @@ export function TagsDirectoryPage({
                         className="mt-3 w-fit"
                       >
                         {isExpanded
-                          ? 'Show less'
-                          : `Show all ${group.length} tags`}
+                          ? 'Daha az göster'
+                          : `Tüm ${group.length} etiketi göster`}
                       </ClickableText>
                     )}
                   </section>

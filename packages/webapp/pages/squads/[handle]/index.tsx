@@ -321,11 +321,11 @@ const SquadPage = ({
 
     shownToastForSquadInSession.current[squadId] = true;
 
-    displayToast('Get notified about new Squad activity.', {
+    displayToast('Yeni Squad aktivitelerinden haberdar olun.', {
       subject: ToastSubject.Feed,
       persistent: true,
       action: {
-        copy: 'Turn on',
+        copy: 'Aç',
         onClick: async () => {
           const didEnable = await onEnable();
           if (!didEnable) {
@@ -614,7 +614,7 @@ const SquadPage = ({
                   <PostsSearch
                     autoFocus={false}
                     enableSuggestions={false}
-                    placeholder="Search this squad"
+                    placeholder="Bu squad içinde ara"
                     initialQuery={searchQuery}
                     onSubmitQuery={onSubmitSquadSearch}
                     onClearQuery={onClearSquadSearch}
@@ -723,7 +723,7 @@ export async function getServerSideProps({
     setCacheHeader();
 
     const seoTitleSource = referringUser
-      ? `${referringUser.name} invited you to ${squad.name}`
+      ? `${referringUser.name} sizi ${squad.name} squad'ına davet etti`
       : `${squad.name} Squad`;
     const squadSeoTitles = getPageSeoTitles(seoTitleSource);
 

@@ -23,15 +23,15 @@ import { AccountPageContainer } from '../../components/layouts/SettingsLayout/Ac
 
 const seo: NextSeoProps = {
   ...defaultSeo,
-  ...getPageSeoTitles('Notifications'),
+  ...getPageSeoTitles('Bildirimler'),
   ...noindexSeoProps,
 };
 
 type NotificationsTab = 'in-app' | 'email';
 
 const TABS: { value: NotificationsTab; label: string }[] = [
-  { value: 'in-app', label: 'Notifications' },
-  { value: 'email', label: 'Email' },
+  { value: 'in-app', label: 'Bildirimler' },
+  { value: 'email', label: 'E-posta' },
 ];
 
 const AccountNotificationsPage = (): ReactElement => {
@@ -48,10 +48,10 @@ const AccountNotificationsPage = (): ReactElement => {
     return (
       <AccountPageContent>
         <TabContainer className={{ header: 'h-14 px-4' }}>
-          <Tab label="Notifications">
+          <Tab label="Bildirimler">
             <InAppNotificationsTab />
           </Tab>
-          <Tab label="Email">
+          <Tab label="E-posta">
             <EmailNotificationsTab />
           </Tab>
         </TabContainer>
@@ -67,7 +67,7 @@ const AccountNotificationsPage = (): ReactElement => {
   // matching the Squads directory layout.
   const tabsTitle = (
     <SquadDirectoryNavbar
-      aria-label="Notification channels"
+      aria-label="Bildirim kanalları"
       className="!mx-0 min-w-0 flex-1 !border-0 !px-0"
     >
       {TABS.map((tab) => (
@@ -76,7 +76,7 @@ const AccountNotificationsPage = (): ReactElement => {
           buttonSize={ButtonSize.Small}
           isActive={activeTab === tab.value}
           label={tab.label}
-          ariaLabel={`Show ${tab.label.toLowerCase()} settings`}
+          ariaLabel={`${tab.label.toLowerCase()} ayarlarını göster`}
           onClick={() => setActiveTab(tab.value)}
         />
       ))}

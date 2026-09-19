@@ -29,9 +29,9 @@ import { contentPreferenceMutationMatcher } from '../../../../hooks/contentPrefe
 import { useFeedSettingsEditContext } from '../FeedSettingsEditContext';
 
 enum Tabs {
-  Sources = 'Sources',
-  Squads = 'Squads',
-  Users = 'Users',
+  Sources = 'Kaynaklar',
+  Squads = 'Squad\'lar',
+  Users = 'Kullanıcılar',
 }
 const tabs = Object.values(Tabs);
 const noop = () => undefined;
@@ -107,10 +107,10 @@ export const FeedSettingsContentSourcesSection = (): ReactElement => {
     <div className="flex flex-col gap-6">
       <SearchPanelContext.Provider value={searchPanel}>
         <SearchField
-          aria-label="Search sources, squads, or users"
+          aria-label="Kaynak, Squad veya kullanıcı ara"
           className="border-none !bg-background-subtle"
           inputId="search-filters"
-          placeholder="Search sources, squads, or users"
+          placeholder="Kaynak, Squad veya kullanıcı ara"
           valueChanged={(newValue) => {
             setState((currentState) => {
               return {
@@ -128,16 +128,16 @@ export const FeedSettingsContentSourcesSection = (): ReactElement => {
           color={TypographyColor.Tertiary}
           type={TypographyType.Callout}
         >
-          Following sources, squads, and users is a great way to tell the system
-          where you want your content to come from. It&apos;s a strong starting
-          signal for your feed, and as you engage with content over time, its
-          weight gradually decreases in favor of stronger signals based on your
-          actual activity.
+          Kaynakları, Squad'ları ve kullanıcıları takip etmek, içeriklerinizin
+          nereden gelmesini istediğinizi sisteme bildirmenin harika bir yoludur.
+          Feed'iniz için güçlü bir başlangıç sinyalidir ve zamanla içeriklerle
+          etkileşime girdikçe, ağırlıkları gerçek etkinliklerinize dayalı daha
+          güçlü sinyaller lehine dengelenir.
         </Typography>
         {searchPanel.query?.length ? (
           <>
-            <SearchPanelSourceSuggestions title="Sources" showFollow />
-            <SearchPanelUserSuggestions title="Users" showFollow />
+            <SearchPanelSourceSuggestions title="Kaynaklar" showFollow />
+            <SearchPanelUserSuggestions title="Kullanıcılar" showFollow />
           </>
         ) : (
           <ModalPropsContext.Provider

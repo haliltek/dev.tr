@@ -119,7 +119,7 @@ const DemoPage = (): ReactElement => {
           variant={ButtonVariant.Primary}
           size={ButtonSize.Small}
         >
-          Sign up
+          Kayıt ol
         </Button>
       </div>
       <div
@@ -131,25 +131,24 @@ const DemoPage = (): ReactElement => {
         className="mb-6 flex h-80 flex-col items-center justify-center gap-2 p-6"
       >
         <h2 className="text-center font-bold text-text-primary typo-title1">
-          Where developers suffer together
+          Geliştiricilerin birlikte dertleştiği yer
         </h2>
         <p className="text-center text-text-secondary typo-body">
-          Personalized news feed, dev communities and search.much better than
-          what&apos;s out there.
+          Kişiselleştirilmiş haber akışı, geliştirici toplulukları ve arama motoru. Dışarıdakilerden çok daha iyi.
         </p>
       </div>
       {featuresReady && <Feed className={feedProps.className} {...feedProps} />}
       {showSignupFooter && (
         <div className="mb-6 flex h-80 flex-col items-center justify-center gap-6 p-6">
           <h2 className="text-center font-bold text-text-primary typo-title1">
-            Where developers suffer together
+            Geliştiricilerin birlikte dertleştiği yer
           </h2>
           <Button
             onClick={() => showLogin({ trigger: AuthTriggers.WelcomePage })}
             variant={ButtonVariant.Primary}
             size={ButtonSize.Medium}
           >
-            Sign up to continue ➔
+            Devam etmek için kayıt olun ➔
           </Button>
         </div>
       )}

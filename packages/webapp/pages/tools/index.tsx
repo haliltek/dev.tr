@@ -47,7 +47,7 @@ const SEARCH_RESULTS_LIMIT = 100;
 const RECOMMENDED_COUNT = 5;
 // Catch-all section for stacked tools without a curated category, rendered
 // below the curated ones. Only sees tools inside the overall top-N fetch.
-const OTHER_CATEGORY = 'Other';
+const OTHER_CATEGORY = 'Diğer';
 
 const appOrigin = getAppOrigin();
 
@@ -228,15 +228,14 @@ const ToolsDirectoryPage = ({
             type={TypographyType.LargeTitle}
             bold
           >
-            Tools
+            Araçlar
           </Typography>
           <Typography
             type={TypographyType.Body}
             color={TypographyColor.Secondary}
             className="max-w-[34rem]"
           >
-            The tools developers actually run — ranked by real stacks on
-            daily.dev, not vendor pitches.
+            Geliştiricilerin gerçekten kullandığı araçlar — reklamlar değil, daily.dev'deki gerçek stack'lere göre sıralanmıştır.
           </Typography>
           <ToolDirectorySearch
             value={inputValue}
@@ -264,15 +263,15 @@ const ToolsDirectoryPage = ({
           <CharmEmptyState
             className="my-10"
             image={cloudinaryCharmSearchNoResults}
-            imageAlt="daily.dev charm looking through a magnifying glass"
-            title={`No tools match “${search.trim()}”`}
-            description="Try the tool's full name or a different spelling."
-            action={{ label: 'Clear search', onClick: clearSearch }}
+            imageAlt="Büyüteçle bakan daily.dev maskotu"
+            title={`“${search.trim()}” ile eşleşen araç bulunamadı`}
+            description="Aracın tam adını veya farklı bir yazılışını deneyin."
+            action={{ label: 'Aramayı temizle', onClick: clearSearch }}
           />
         )}
 
         {isSearching && searchResults.length > 0 && (
-          <ToolSection title={`Results for “${search.trim()}”`}>
+          <ToolSection title={`“${search.trim()}” için sonuçlar`}>
             {renderGrid(searchResults, { searched: true })}
           </ToolSection>
         )}
@@ -280,7 +279,7 @@ const ToolsDirectoryPage = ({
         {!isSearching && (
           <div className="flex flex-col">
             {trending.length > 0 && (
-              <ToolSection title="Rising this quarter">
+              <ToolSection title="Bu çeyrekte yükselenler">
                 {renderGrid(trending)}
               </ToolSection>
             )}
@@ -310,7 +309,7 @@ const ToolsDirectoryPage = ({
                           )
                         }
                       >
-                        Show all {categoryTools.length} {category} tools
+                        {categoryTools.length} {category} aracının tümünü göster
                       </Button>
                     )}
                 </ToolSection>
@@ -318,7 +317,7 @@ const ToolsDirectoryPage = ({
             })}
 
             {categorySections.length === 0 && fallbackTop.length > 0 && (
-              <ToolSection title="Most stacked">
+              <ToolSection title="En çok stack'lenenler">
                 {renderGrid(fallbackTop)}
               </ToolSection>
             )}
@@ -343,7 +342,7 @@ export async function getStaticProps(): Promise<
   GetStaticPropsResult<ToolsDirectoryProps & { seo: NextSeoProps }>
 > {
   const seoTitles = getPageSeoTitles(
-    'Developer tools directory — ranked by real stacks',
+    "Geliştirici araçları rehberi — gerçek stack'lere göre sıralı",
   );
 
   try {
@@ -410,7 +409,7 @@ export async function getStaticProps(): Promise<
           title: seoTitles.title,
           openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
           description:
-            'Explore the tools developers actually use: top tools per category, rising tools this quarter, and per-tool pages with adoption, squads and community takes on daily.dev.',
+            "Geliştiricilerin gerçekten kullandığı araçları keşfedin: kategori başına en popüler araçlar, bu çeyrekte yükselenler ve daily.dev topluluk yorumları.",
           ...(isEmpty ? noindexSeoProps : {}),
         },
       },
@@ -427,7 +426,7 @@ export async function getStaticProps(): Promise<
           title: seoTitles.title,
           openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
           description:
-            'Explore the tools developers actually use: top tools per category, rising tools this quarter, and per-tool pages with adoption, squads and community takes on daily.dev.',
+            "Geliştiricilerin gerçekten kullandığı araçları keşfedin: kategori başına en popüler araçlar, bu çeyrekte yükselenler ve daily.dev topluluk yorumları.",
           ...noindexSeoProps,
         },
       },

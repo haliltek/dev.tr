@@ -14,7 +14,7 @@ import { getFeedSettingsLayout } from '../../../components/layouts/SettingsLayou
 
 const AccountManageSubscriptionPage = (): ReactElement => {
   return (
-    <AccountPageContainer title="Content sources">
+    <AccountPageContainer title="İçerik kaynakları">
       <section className="flex flex-col gap-4">
         <FeedSettingsContentSourcesSection />
       </section>
@@ -22,7 +22,7 @@ const AccountManageSubscriptionPage = (): ReactElement => {
   );
 };
 
-const seoTitles = getPageSeoTitles('Content sources');
+const seoTitles = getPageSeoTitles('İçerik kaynakları');
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },

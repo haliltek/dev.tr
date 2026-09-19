@@ -136,18 +136,18 @@ export const getVisibleQuestRewards = (
 
 export const getQuestStatusLabel = (quest: UserQuest): string => {
   if (quest.status === QuestStatus.Claimed) {
-    return 'Claimed';
+    return 'Toplandı';
   }
 
   if (quest.claimable) {
-    return 'Ready to claim';
+    return 'Toplamaya hazır';
   }
 
   if (quest.status === QuestStatus.Completed) {
-    return quest.locked ? 'Plus required' : 'Completed';
+    return quest.locked ? 'Plus gerekli' : 'Tamamlandı';
   }
 
-  return 'In progress';
+  return 'Devam ediyor';
 };
 
 const QuestRewardChip = ({
@@ -252,13 +252,13 @@ export const QuestCard = ({
                   {quest.quest.name}
                 </p>
                 {shouldShowDestination && destination && onDestinationClick && (
-                  <Tooltip content={`Go to ${destination.label}`}>
+                  <Tooltip content={`${destination.label} sayfasına git`}>
                     <Button
                       variant={ButtonVariant.Tertiary}
                       size={ButtonSize.Small}
                       className="!flex-none"
                       icon={<ArrowIcon className="rotate-90" />}
-                      aria-label={`Go to ${destination.label}`}
+                      aria-label={`${destination.label} sayfasına git`}
                       onClick={() => onDestinationClick(destination)}
                     />
                   </Tooltip>
@@ -366,7 +366,7 @@ export const QuestCard = ({
                   );
                 }}
               >
-                Claim
+                Ödülü Al
               </Button>
             )}
           </div>
@@ -433,7 +433,7 @@ export const QuestCard = ({
                 className="font-black uppercase"
                 style={{ fontSize: '42px', letterSpacing: '0.22em' }}
               >
-                CLAIMED
+                ALINDI
               </text>
             </g>
           </svg>

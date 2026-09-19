@@ -8,12 +8,12 @@ import {
 import { defaultOpenGraph } from '../next-seo';
 import { getPageSeoTitles } from '../components/layouts/utils';
 
-const seoTitles = getPageSeoTitles('Most upvoted posts for developers');
+const seoTitles = getPageSeoTitles('Geliştiriciler için en çok upvote alan postlar');
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
   description:
-    'Find the most upvoted developer posts on daily.dev. Explore top-rated content in coding, tutorials, and tech news from the largest developer network in the world.',
+    'daily.dev üzerinde en çok upvote alan geliştirici postlarını keşfedin. Dünyanın en büyük geliştirici ağından kodlama, eğitim ve teknoloji haberlerini takip edin.',
 };
 
 const Upvoted = (): ReactElement => <></>;

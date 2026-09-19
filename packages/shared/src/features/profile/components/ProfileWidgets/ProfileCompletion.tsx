@@ -83,7 +83,7 @@ export const ProfileCompletion = ({
                 color={TypographyColor.Primary}
                 bold
               >
-                Profile Completion
+                Profil Tamamlama
               </Typography>
             </div>
             <div className="flex min-w-0 items-center gap-1">

@@ -14,7 +14,7 @@ import { getFeedSettingsLayout } from '../../../components/layouts/SettingsLayou
 
 const AccountManageSubscriptionPage = (): ReactElement => {
   return (
-    <AccountPageContainer title="Blocked content">
+    <AccountPageContainer title="Engellenen içerikler">
       <section className="flex flex-col gap-4">
         <FeedSettingsBlockingSection />
       </section>
@@ -22,7 +22,7 @@ const AccountManageSubscriptionPage = (): ReactElement => {
   );
 };
 
-const seoTitles = getPageSeoTitles('Blocked content');
+const seoTitles = getPageSeoTitles('Engellenen içerikler');
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },

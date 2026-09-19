@@ -49,7 +49,7 @@ import { getPageSeoTitles } from '../../components/layouts/utils';
 
 const seo: NextSeoProps = {
   ...defaultSeo,
-  ...getPageSeoTitles('Invite Friends'),
+  ...getPageSeoTitles('Arkadaşlarını Davet Et'),
   ...noindexSeoProps,
 };
 
@@ -100,15 +100,15 @@ const AccountInvitePage = (): ReactElement => {
   };
 
   return (
-    <AccountPageContainer title="Invite friends">
+    <AccountPageContainer title="Arkadaşlarını davet et">
       <AccountContentSection
         className={{ heading: 'mt-0' }}
-        title="Grow the community"
-        description="Share daily.dev with developers you know. When they join through your link, they'll show up in your referrals list below."
+        title="Topluluğu büyütün"
+        description="Tanıdığınız developer'larla daily.dev'i paylaşın. Bağlantınız üzerinden katıldıklarında aşağıdaki davet listesinde görünecekler."
       />
       <AccountContentSection
-        title="Share your invite link"
-        description="Copy your personal link or share it directly on social platforms."
+        title="Davet bağlantınızı paylaşın"
+        description="Kişisel bağlantınızı kopyalayın veya doğrudan sosyal platformlarda paylaşın."
       >
         <InviteLinkInput
           className={{ container: 'mt-4' }}
@@ -125,7 +125,7 @@ const AccountInvitePage = (): ReactElement => {
           bold
           className="my-4 p-0.5"
         >
-          or invite via
+          veya şununla davet et:
         </Typography>
         <div className="flex flex-row flex-wrap gap-2 gap-y-4">
           <SocialShareList
@@ -138,8 +138,8 @@ const AccountInvitePage = (): ReactElement => {
         </div>
       </AccountContentSection>
       <AccountContentSection
-        title="Your referrals"
-        description="Developers who joined through your invite link"
+        title="Davet ettikleriniz"
+        description="Davet bağlantınız üzerinden katılan developer'lar"
       >
         <UserList
           users={users}
@@ -159,7 +159,7 @@ const AccountInvitePage = (): ReactElement => {
                 loading="lazy"
               />
               <p className="mt-2 typo-body">
-                No one has joined yet. Share your link!
+                Henüz kimse katılmadı. Bağlantınızı paylaşın!
               </p>
             </div>
           }

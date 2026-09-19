@@ -24,7 +24,7 @@ import { getTemplatedTitle } from '../../components/layouts/utils';
 
 const seo: NextSeoProps = {
   ...defaultSeo,
-  title: getTemplatedTitle('Your Feedback'),
+  title: getTemplatedTitle('Geri Bildiriminiz'),
   ...noindexSeoProps,
 };
 
@@ -56,9 +56,9 @@ const AccountFeedbackPage = (): ReactElement => {
     content = (
       <div className="flex flex-col items-start gap-3 rounded-16 border border-border-subtlest-tertiary p-4">
         <Typography type={TypographyType.Body}>
-          No feedback submitted yet.
+          Henüz bir geri bildirim gönderilmedi.
         </Typography>
-        <Button onClick={openFeedbackModal}>Submit feedback</Button>
+        <Button onClick={openFeedbackModal}>Geri bildirim gönder</Button>
       </div>
     );
   } else {
@@ -93,7 +93,7 @@ const AccountFeedbackPage = (): ReactElement => {
 
   return (
     <AccountPageContainer
-      title="Your Feedback"
+      title="Geri Bildiriminiz"
       actions={
         <Button
           variant={ButtonVariant.Primary}
@@ -101,7 +101,7 @@ const AccountFeedbackPage = (): ReactElement => {
           icon={<PlusIcon />}
           onClick={openFeedbackModal}
         >
-          Submit feedback
+          Geri bildirim gönder
         </Button>
       }
     >

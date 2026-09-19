@@ -73,19 +73,19 @@ interface AccountSecurityDefaultProps {
 }
 
 const unlinkProviderPromptOptions: PromptOptions = {
-  title: 'Remove provider?',
-  description: "You won't be able to log in with this account anymore",
+  title: 'Giriş yöntemi kaldırılsın mı?',
+  description: 'Artık bu hesapla giriş yapamayacaksınız',
   okButton: {
-    title: 'Remove',
+    title: 'Kaldır',
     color: ButtonColor.Ketchup,
   },
 };
 const deleteAccountPromptOptions: PromptOptions = {
-  title: 'Delete account?',
+  title: 'Hesap silinsin mi?',
   description:
-    'This will permanently delete your account and all associated data. This cannot be undone.',
+    'Bu işlem hesabınızı ve ilişkili tüm verileri kalıcı olarak silecektir. Bu işlem geri alınamaz.',
   okButton: {
-    title: 'Yes, delete my account',
+    title: 'Evet, hesabımı sil',
     color: ButtonColor.Ketchup,
   },
 };
@@ -114,9 +114,9 @@ function AccountSecurityDefault({
     if (
       await showPrompt({
         ...unlinkProviderPromptOptions,
-        title: `Remove ${capitalize(provider)}?`,
+        title: `${capitalize(provider)} kaldırılsın mı?`,
         okButton: {
-          title: `Yes, remove ${capitalize(provider)}`,
+          title: `Evet, ${capitalize(provider)} kaldır`,
           color: ButtonColor.Ketchup,
         },
       })
@@ -151,25 +151,25 @@ function AccountSecurityDefault({
   };
 
   return (
-    <AccountPageContainer title="Account & Security">
+    <AccountPageContainer title="Hesap & Güvenlik">
       <AccountContentSection
         className={{ heading: 'mt-0' }}
-        title="Email"
-        description="Primary email for your account"
+        title="E-posta"
+        description="Hesabınız için birincil e-posta adresi"
       >
         <Tooltip
           side="bottom"
           visible={!hasPassword}
           content={
             <div className="w-60 py-2 typo-subhead">
-              Set a password first to change your email
+              E-postanızı değiştirmek için önce bir şifre belirleyin
             </div>
           }
         >
           <AccountTextField
             fieldType="tertiary"
             value={email}
-            label="Email"
+            label="E-posta"
             inputId="email"
             data-testid="current_email"
             leftIcon={<MailIcon />}
@@ -184,14 +184,14 @@ function AccountSecurityDefault({
             className="mt-6 w-fit"
             onClick={() => onSwitchDisplay(Display.ChangeEmail)}
           >
-            Change email
+            E-posta değiştir
           </Button>
         )}
       </AccountContentSection>
       <AccountLoginSection
         buttonVariant={ButtonVariant.Primary}
-        title="Login methods"
-        description="Link additional accounts for backup access and easier sign-in"
+        title="Giriş yöntemleri"
+        description="Yedek erişim ve daha kolay giriş için ek hesaplar bağlayın"
         providerActionType="link"
         providerAction={manageSocialProviders}
         providers={providers.filter(
@@ -199,8 +199,8 @@ function AccountSecurityDefault({
         )}
       />
       <AccountLoginSection
-        title="Connected accounts"
-        description="Accounts currently linked to your profile"
+        title="Bağlı hesaplar"
+        description="Profilinize şu anda bağlı olan hesaplar"
         providerAction={({ provider }) => unlinkProvider(provider)}
         providerActionType="unlink"
         className={{ button: 'hover:bg-accent-ketchup-default' }}
@@ -210,8 +210,8 @@ function AccountSecurityDefault({
         )}
       />
       <AccountContentSection
-        title="Password"
-        description="Set or update your account password"
+        title="Şifre"
+        description="Hesap şifrenizi belirleyin veya güncelleyin"
       >
         <form
           ref={updatePasswordRef}
@@ -223,7 +223,7 @@ function AccountSecurityDefault({
             minLength={6}
             className={{ container: 'mt-6 max-w-sm' }}
             inputId="new_password"
-            label="Password"
+            label="Şifre"
             name="password"
           />
           <Button
@@ -232,11 +232,11 @@ function AccountSecurityDefault({
             variant={ButtonVariant.Secondary}
             className="mt-6 w-fit"
           >
-            Set password
+            Şifre belirle
           </Button>
         </form>
       </AccountContentSection>
-      <AccountContentSection title="🚨 Danger zone">
+      <AccountContentSection title="🚨 Tehlikeli bölge">
         <AccountDangerZone
           onDelete={() => deleteAccountPrompt()}
           className="mt-6"

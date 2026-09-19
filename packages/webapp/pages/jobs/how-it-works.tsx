@@ -60,7 +60,7 @@ const JobsHowItWorksPage = (): ReactElement => {
           </Link>
         </div>
         <Typography type={TypographyType.Title3} bold>
-          How it works
+          Nasıl çalışır
         </Typography>
       </div>
       <FlexCol className="gap-8 px-4 py-6">

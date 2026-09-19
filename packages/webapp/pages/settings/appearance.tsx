@@ -98,14 +98,14 @@ const AccountManageSubscriptionPage = (): ReactElement => {
   );
 
   return (
-    <AccountPageContainer title="Appearance">
+    <AccountPageContainer title="Görünüm">
       <FlexCol className="gap-6">
         <ThemeSection />
 
         {isLaptop && (
           <FlexCol className="gap-2">
             <Typography bold type={TypographyType.Subhead}>
-              Layout
+              Yerleşim
             </Typography>
 
             <ToggleRadio
@@ -118,8 +118,8 @@ const AccountManageSubscriptionPage = (): ReactElement => {
                 label: 'font-normal text-text-secondary typo-callout',
               }}
               reverse
-              offLabel="Cards"
-              onLabel="List"
+              offLabel="Kartlar"
+              onLabel="Liste"
             />
 
             {isLayoutV2 && <SidebarDensitySection />}
@@ -130,7 +130,7 @@ const AccountManageSubscriptionPage = (): ReactElement => {
 
         <FlexCol className="gap-5">
           <Typography bold type={TypographyType.Subhead}>
-            Preferences
+            Tercihler
           </Typography>
 
           <SettingsSwitch
@@ -138,7 +138,7 @@ const AccountManageSubscriptionPage = (): ReactElement => {
             checked={sortingEnabled}
             onToggle={toggleSortingEnabled}
           >
-            Show feed sorting menu
+            Feed sıralama menüsünü göster
           </SettingsSwitch>
 
           <SettingsSwitch
@@ -146,7 +146,7 @@ const AccountManageSubscriptionPage = (): ReactElement => {
             checked={openNewTab}
             onToggle={toggleOpenNewTab}
           >
-            Open links in new tab
+            Bağlantıları yeni sekmede aç
           </SettingsSwitch>
 
           <SettingsSwitch
@@ -154,7 +154,7 @@ const AccountManageSubscriptionPage = (): ReactElement => {
             checked={!optOutCompanion}
             onToggle={toggleOptOutCompanion}
           >
-            Show companion widget on external sites
+            Harici sitelerde yardımcı pencereyi göster
           </SettingsSwitch>
 
           {showReaderToggle && (
@@ -163,7 +163,7 @@ const AccountManageSubscriptionPage = (): ReactElement => {
               checked={isReadInsideEnabled}
               onToggle={onToggleReadInside}
             >
-              Read articles inside daily.dev
+              Makaleleri daily.dev içinde oku
             </SettingsSwitch>
           )}
 
@@ -172,13 +172,13 @@ const AccountManageSubscriptionPage = (): ReactElement => {
             checked={!isHighlightCardsOptedOut}
             onToggle={toggleHighlightCards}
           >
-            Show hero cards for highlighted news
+            Öne çıkan haberler için büyük kartları göster
           </SettingsSwitch>
         </FlexCol>
 
         <FlexCol className="gap-5">
           <Typography bold type={TypographyType.Subhead}>
-            Accessibility
+            Erişilebilirlik
           </Typography>
 
           <SettingsSwitch
@@ -186,7 +186,7 @@ const AccountManageSubscriptionPage = (): ReactElement => {
             checked={autoDismissNotifications}
             onToggle={toggleAutoDismissNotifications}
           >
-            Auto-hide notifications after a few seconds
+            Bildirimleri birkaç saniye sonra otomatik gizle
           </SettingsSwitch>
         </FlexCol>
       </FlexCol>
@@ -196,7 +196,7 @@ const AccountManageSubscriptionPage = (): ReactElement => {
 
 const seo: NextSeoProps = {
   ...defaultSeo,
-  ...getPageSeoTitles('Appearance'),
+  ...getPageSeoTitles('Görünüm'),
   ...noindexSeoProps,
 };
 

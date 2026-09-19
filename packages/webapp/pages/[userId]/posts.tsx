@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import React, { useContext } from 'react';
 import { link } from '@dailydotdev/shared/src/lib/links';
 import { AUTHOR_FEED_QUERY } from '@dailydotdev/shared/src/graphql/feed';
@@ -56,17 +56,17 @@ const ProfilePostsPage = ({
       <MyProfileEmptyScreen
         className="items-center px-4 py-6 text-center tablet:px-6"
         image={cloudinaryCharmNoPosts}
-        imageAlt="daily.dev charm waiting for your first post"
-        text="Hardest part of being a developer? Where do we start – it’s everything. Go on, share with us your best rant."
-        cta="New post"
+        imageAlt="Henüz post paylaşılmadı"
+        text="Bir developer olmanın en zor kısmı ne mi? Nereden başlasak... Haydi, düşüncelerini veya deneyimlerini toplulukla paylaş."
+        cta="Yeni post"
         buttonProps={{ tag: 'a', href: link.post.create }}
       />
     ) : (
       <ProfileEmptyScreen
         image={cloudinaryCharmNoPosts}
-        imageAlt="daily.dev charm waiting for the first post"
-        title={`${user?.name ?? 'User'} hasn't posted yet`}
-        text="Once they do, those posts will show up here."
+        imageAlt="Henüz post paylaşılmadı"
+        title={`${user?.name ?? 'Kullanıcı'} henüz bir post paylaşmadı`}
+        text="Paylaşım yaptığında, o postlar burada görünecek."
       />
     ),
   };
@@ -75,7 +75,7 @@ const ProfilePostsPage = ({
     ...getProfileSeoDefaults(
       user,
       {
-        ...getPageSeoTitles(`Recent posts by ${user.name} (@${user.username})`),
+        ...getPageSeoTitles(`${user.name} (@${user.username}) postları`),
         noindex: true,
         nofollow: true,
       },
@@ -88,7 +88,7 @@ const ProfilePostsPage = ({
       <NextSeo {...seo} />
       <GoBackHeaderMobile>
         <Typography bold type={TypographyType.Body}>
-          Posts
+          Postlar
         </Typography>
       </GoBackHeaderMobile>
       <Feed
@@ -99,5 +99,8 @@ const ProfilePostsPage = ({
   );
 };
 
-ProfilePostsPage.getLayout = getProfileLayout;
+ProfilePostsPage.getLayout = (
+  page: ReactNode,
+  props: ProfileLayoutProps,
+): ReactNode => getProfileLayout(page, { ...props, pageHeaderTitle: 'Postlar' });
 export default ProfilePostsPage;

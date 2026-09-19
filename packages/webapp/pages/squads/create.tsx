@@ -15,7 +15,7 @@ import { getPageSeoTitles } from '../../components/layouts/utils';
 import { defaultOpenGraph, defaultSeo } from '../../next-seo';
 import { getLayout as getMainLayout } from '../../components/layouts/MainLayout';
 
-const seoTitles = getPageSeoTitles('Create post');
+const seoTitles = getPageSeoTitles('Post oluştur');
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },

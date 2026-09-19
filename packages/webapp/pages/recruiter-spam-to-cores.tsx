@@ -36,7 +36,7 @@ import { getLayout } from '../components/layouts/NoSidebarLayout';
 import ProtectedPage from '../components/ProtectedPage';
 
 const seo: NextSeoProps = {
-  title: 'daily.dev | Convert Recruiter Spam to Cores',
+  title: "daily.dev | Recruiter Spam Mesajlarını Cores'a Dönüştür",
   openGraph: { images: [{ url: recruiterSpamCampaignSEO }] },
   ...defaultSeo,
   nofollow: true,
@@ -49,14 +49,14 @@ const HeaderSection = (): ReactElement => {
   return (
     <FlexCol className="items-center gap-8">
       <Typography center type={TypographyType.Mega1} bold>
-        Convert Recruiter
-        <br /> Spam to Cores 💰
+        Recruiter Spam
+        <br /> Mesajlarını Cores'a Dönüştür 💰
       </Typography>
 
       <Image
         className="mb-5 rounded-16"
         src={recruiterSpamCampaign}
-        alt="Convert Recruiter Spam to Cores"
+        alt="Recruiter Spam Mesajlarını Cores'a Dönüştür"
       />
 
       <FlexCol className="items-center gap-6 text-center">
@@ -64,17 +64,14 @@ const HeaderSection = (): ReactElement => {
           type={TypographyType.Title3}
           color={TypographyColor.Primary}
         >
-          Every day, developers like you get bombarded by cold recruiter
-          messages that are irrelevant, pushy, or just plain AI-generated.
+          Her gün sizin gibi geliştiriciler; alakasız, ısrarcı veya yapay zeka tarafından üretilmiş soğuk recruiter mesajlarının bombardımanına tutuluyor.
         </Typography>
         <Typography
           type={TypographyType.Title3}
           color={TypographyColor.Primary}
         >
-          At <strong>daily.dev</strong>, we want to flip the script. For every
-          recruiter message you receive, you can now earn{' '}
-          <strong>1,000 Cores</strong>. They can be used to unlock features,
-          boost your content, or simply get rewarded for staying awesome.
+          <strong>daily.dev</strong> olarak bu durumu tersine çevirmek istiyoruz. Aldığınız her recruiter mesajı için artık{' '}
+          <strong>1.000 Cores</strong> kazanabilirsiniz. Bunları özellikleri açmak, içeriklerinizi öne çıkarmak veya topluluğa katkınız için ödüllendirilmek amacıyla kullanabilirsiniz.
         </Typography>
       </FlexCol>
     </FlexCol>
@@ -85,33 +82,33 @@ const howItWorksItems = [
   {
     icon: MailIcon,
     number: 1,
-    title: 'Check your LinkedIn DMs',
+    title: "LinkedIn DM'lerinizi kontrol edin",
     description:
-      'Got a cold message from a recruiter? Perfect - that’s your ticket.',
+      'Bir recruiter\'dan soğuk mesaj mı aldınız? Harika — bu sizin biletiniz.',
   },
   {
     icon: CopyIcon,
     number: 2,
-    title: 'Reply with our template',
+    title: 'Şablonumuzla yanıt verin',
     description:
-      'Copy-paste the template below (or write your own, add link to https://recruiter.daily.dev)',
+      'Aşağıdaki şablonu kopyalayıp yapıştırın (veya kendinizinkini yazıp https://recruiter.daily.dev bağlantısını ekleyin)',
   },
   {
     icon: UploadIcon,
     number: 3,
-    title: 'Submit the evidence',
+    title: 'Kanıtı gönderin',
     description:
-      'Upload the screenshot + recruiter profile link through this form',
+      'Ekran görüntüsünü ve recruiter profil bağlantısını bu form aracılığıyla yükleyin:',
     extra: true,
   },
   {
     icon: CoreIcon,
     number: 4,
-    title: 'Get your free Cores',
+    title: 'Ücretsiz Cores kazanın',
     description: (
       <>
-        Once verified, you&apos;ll receive Cores directly in your account.
-        <br /> We review applications every 14 days.
+        Doğrulandıktan sonra Cores doğrudan hesabınıza aktarılacaktır.
+        <br /> Başvuruları her 14 günde bir inceliyoruz.
       </>
     ),
   },
@@ -126,7 +123,7 @@ const HowItWorksSection = (): ReactElement => {
   return (
     <FlexCol className="gap-7">
       <Typography type={TypographyType.LargeTitle} center bold>
-        How it works 💡
+        Nasıl çalışır 💡
       </Typography>
       <FlexCol className="mb-12 gap-6">
         {howItWorksItems.map(
@@ -157,7 +154,7 @@ const HowItWorksSection = (): ReactElement => {
                         target="_blank"
                         rel={anchorDefaultRel}
                       >
-                        here
+                        buradan
                       </a>
                     )}
                   </Typography>
@@ -171,13 +168,13 @@ const HowItWorksSection = (): ReactElement => {
         <div className="mb-4 flex items-start justify-between gap-4">
           <FlexCol className="flex-1 gap-4">
             <Typography type={TypographyType.Title3} bold>
-              Pre-filled Response template
+              Hazır Yanıt Şablonu
             </Typography>
             <Typography
               type={TypographyType.Body}
               color={TypographyColor.Tertiary}
             >
-              Click to copy and paste into your LinkedIn reply
+              Kopyalamak ve LinkedIn yanıtınıza yapıştırmak için tıklayın
             </Typography>
           </FlexCol>
           <Button
@@ -200,7 +197,7 @@ const HowItWorksSection = (): ReactElement => {
           color={TypographyColor.Tertiary}
           className="mx-auto"
         >
-          Simple. Legit. Developer-first.
+          Basit. Gerçek. Geliştirici odaklı.
         </Typography>
       </FlexRow>
     </FlexCol>
@@ -210,35 +207,35 @@ const HowItWorksSection = (): ReactElement => {
 const finePrint = [
   {
     description:
-      'To ensure quality, all submissions are manually reviewed (once every 14 days).',
+      'Kaliteyi sağlamak için tüm başvurular manuel olarak incelenir (her 14 günde bir).',
   },
   {
-    description: 'Only cold recruiter messages via LinkedIn are accepted.',
+    description: 'Yalnızca LinkedIn üzerinden gelen soğuk recruiter mesajları kabul edilir.',
   },
   {
-    description: 'Messages must be received within the last 3 months',
-  },
-  {
-    description:
-      'For now, we are only able to accept entries from developers based in the US and Europe',
+    description: 'Mesajlar son 3 ay içinde alınmış olmalıdır.',
   },
   {
     description:
-      'Multiple entries are allowed (up to 10) and a maximum of 10,000 Cores can be earned per user.',
+      'Şimdilik yalnızca ABD ve Avrupa merkezli geliştiricilerin başvurularını kabul edebiliyoruz.',
   },
   {
     description:
-      'The screenshot you upload should provide a clear view of the message + recruiter identity.',
+      'Birden fazla başvuru yapılabilir (en fazla 10) ve kullanıcı başına en fazla 10.000 Cores kazanılabilir.',
   },
   {
     description:
-      'Developers found attempting to game the system or submit fraudulent content will be banned from future campaigns.',
+      'Yüklediğiniz ekran görüntüsü mesajı ve recruiter kimliğini net bir şekilde göstermelidir.',
+  },
+  {
+    description:
+      'Sistemi kötüye kullanmaya veya sahte içerik göndermeye çalışan geliştiriciler gelecekteki kampanyalardan men edilecektir.',
   },
 ];
 const FinePrintSection = (): ReactElement => (
   <FlexCol className="gap-7">
     <Typography type={TypographyType.LargeTitle} center bold>
-      Fine print 🛡️
+      Önemli detaylar 🛡️
     </Typography>
     <div className="gap-6">
       <ul className="list ml-6 list-disc space-y-2">
@@ -263,7 +260,7 @@ const GetStartedSection = (): ReactElement => {
   return (
     <FlexCol className="items-center gap-6">
       <Typography center type={TypographyType.Title3} bold>
-        Stop deleting recruiter spam. Start farming it!
+        Recruiter spam mesajlarını silmeyi bırakın. Cores kazanmaya başlayın!
       </Typography>
       <Button
         tag="a"
@@ -271,7 +268,7 @@ const GetStartedSection = (): ReactElement => {
         target="_blank"
         variant={ButtonVariant.Primary}
       >
-        I want my Cores
+        Cores'larımı İstiyorum
       </Button>
     </FlexCol>
   );

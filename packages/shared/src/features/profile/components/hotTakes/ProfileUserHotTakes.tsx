@@ -59,9 +59,9 @@ export function ProfileUserHotTakes({
     async (input: AddHotTakeInput) => {
       try {
         await add(input);
-        displayToast('Hot take added');
+        displayToast('Hot take eklendi');
       } catch (error) {
-        displayToast('Failed to add hot take');
+        displayToast('Hot take eklenemedi');
         throw error;
       }
     },
@@ -87,9 +87,9 @@ export function ProfileUserHotTakes({
             subtitle: input.subtitle || null,
           },
         });
-        displayToast('Hot take updated');
+        displayToast('Hot take güncellendi');
       } catch (error) {
-        displayToast('Failed to update hot take');
+        displayToast('Hot take güncellenemedi');
         throw error;
       }
     },
@@ -99,9 +99,9 @@ export function ProfileUserHotTakes({
   const handleDelete = useCallback(
     async (item: HotTake) => {
       const confirmed = await showPrompt({
-        title: 'Remove hot take?',
-        description: `Are you sure you want to remove "${item.title}"?`,
-        okButton: { title: 'Remove', variant: ButtonVariant.Primary },
+        title: 'Hot take kaldırılsın mı?',
+        description: `"${item.title}" öğesini kaldırmak istediğinize emin misiniz?`,
+        okButton: { title: 'Kaldır', variant: ButtonVariant.Primary },
       });
       if (!confirmed) {
         return;
@@ -109,9 +109,9 @@ export function ProfileUserHotTakes({
 
       try {
         await remove(item.id);
-        displayToast('Hot take removed');
+        displayToast('Hot take kaldırıldı');
       } catch (error) {
-        displayToast('Failed to remove hot take');
+        displayToast('Hot take kaldırılamadı');
       }
     },
     [remove, displayToast, showPrompt],
@@ -236,7 +236,7 @@ export function ProfileUserHotTakes({
                 onClick={handleOpenModal}
                 disabled={!canAddMore}
               >
-                Add
+                Ekle
               </Button>
             </span>
           </Tooltip>
@@ -267,13 +267,13 @@ export function ProfileUserHotTakes({
                 color={TypographyColor.Primary}
                 bold
               >
-                Share your hot takes
+                Hot take'lerinizi paylaşın
               </Typography>
               <Typography
                 type={TypographyType.Footnote}
                 color={TypographyColor.Tertiary}
               >
-                What are the opinions that define you as a developer?
+                Bir developer olarak sizi tanımlayan cesur fikirleriniz neler?
               </Typography>
             </div>
             <Button
@@ -283,7 +283,7 @@ export function ProfileUserHotTakes({
               icon={<PlusIcon />}
               onClick={handleOpenModal}
             >
-              Add your first hot take
+              İlk hot take'inizi ekleyin
             </Button>
           </div>
         )

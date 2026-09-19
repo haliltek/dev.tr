@@ -9,9 +9,9 @@ import { getLayout as getFooterNavBarLayout } from '../../components/layouts/Foo
 import { getLayout } from '../../components/layouts/MainLayout';
 import { defaultOpenGraph, defaultSeo } from '../../next-seo';
 
-const HIGHLIGHTS_TITLE = 'Highlights | daily.dev';
+const HIGHLIGHTS_TITLE = 'Öne Çıkanlar | daily.dev';
 const HIGHLIGHTS_DESCRIPTION =
-  'Curated highlights from across the developer ecosystem. Stay on top of the most important stories, releases, and discussions.';
+  'Geliştirici ekosisteminden özenle seçilmiş öne çıkanlar. En önemli gelişmeler, sürümler ve tartışmalardan haberdar olun.';
 
 const HighlightsPageWrapper = (): ReactElement => <HighlightsPage />;
 

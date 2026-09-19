@@ -9,13 +9,13 @@ import { defaultOpenGraph } from '../next-seo';
 import { getPageSeoTitles } from '../components/layouts/utils';
 
 const seoTitles = getPageSeoTitles(
-  'Real-time discussions in the developer community',
+  'Geliştirici topluluğunda gerçek zamanlı tartışmalar',
 );
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
   description:
-    'Stay on top of real-time developer discussions on daily.dev. Join conversations happening now and engage with the most active community members.',
+    'daily.dev üzerindeki gerçek zamanlı geliştirici tartışmalarını takip edin. Şu anda süren sohbetlere katılın ve en aktif topluluk üyeleriyle etkileşime geçin.',
 };
 
 const Discussed = (): ReactElement => <></>;

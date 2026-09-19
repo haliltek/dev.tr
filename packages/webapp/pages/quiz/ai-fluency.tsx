@@ -42,9 +42,9 @@ const tiersFadeOutDurationMs = 420;
 
 const seo: NextSeoProps = {
   ...defaultSeo,
-  ...getPageSeoTitles('AI Fluency Quiz'),
+  ...getPageSeoTitles('AI Yetkinlik Testi'),
   description:
-    'Assess your AI fluency tier and get actionable tips to improve your workflow.',
+    'AI yetkinlik seviyenizi değerlendirin ve iş akışınızı geliştirecek pratik ipuçları edinin.',
 };
 
 const getResultUrl = (userId: string, tier: string): string => {
@@ -278,7 +278,7 @@ const AiFluencyQuizPage = (): ReactElement => {
   const currentAnswer = currentQuestion
     ? answers[currentQuestion.id]
     : undefined;
-  const startButtonLabel = isLoggedIn ? 'Start test' : 'Sign in to take test';
+  const startButtonLabel = isLoggedIn ? 'Teste başla' : 'Testi çözmek için giriş yapın';
 
   const resetQuizState = () => {
     setStarted(false);
@@ -359,7 +359,7 @@ const AiFluencyQuizPage = (): ReactElement => {
     }
 
     await copyShareLink({
-      message: 'Result link copied to clipboard',
+      message: 'Sonuç bağlantısı panoya kopyalandı',
     });
 
     logEvent({
@@ -385,10 +385,10 @@ const AiFluencyQuizPage = (): ReactElement => {
 
       <header className="space-y-3">
         <h1 className="font-bold text-text-primary typo-title1">
-          AI Fluency Quiz
+          AI Yetkinlik Testi
         </h1>
         <p className="text-text-secondary typo-body">
-          Answer 10 questions to discover your current AI fluency tier.
+          Mevcut AI yetkinlik seviyenizi öğrenmek için 10 soruyu yanıtlayın.
         </p>
       </header>
 
@@ -396,16 +396,13 @@ const AiFluencyQuizPage = (): ReactElement => {
         <section className="rounded-16 border border-border-subtlest-secondary bg-background-subtle p-6 laptop:p-8">
           <div className="space-y-3">
             <h2 className="font-bold text-text-primary typo-title3">
-              Understand your AI fluency tier
+              AI yetkinlik seviyenizi öğrenin
             </h2>
             <p className="text-text-secondary typo-body">
-              This 10-question test evaluates how you use AI across prompting,
-              workflow design, quality control, automation, and collaboration.
+              Bu 10 soruluk test; prompt hazırlama, iş akışı tasarımı, kalite kontrolü, otomasyon ve iş birliği genelinde AI kullanımınızı değerlendirir.
             </p>
             <p className="text-text-tertiary typo-callout">
-              You&apos;ll get mapped to one of {aiFluencyTiers.length} tiers,
-              from Casual User to AI Pioneer, plus practical tips to strengthen
-              your next step.
+              Casual User&apos;dan AI Pioneer&apos;a kadar {aiFluencyTiers.length} seviyeden birine yerleştirilecek ve sonraki adımınızı güçlendirecek pratik ipuçları alacaksınız.
             </p>
           </div>
           <div className="mt-6">
@@ -425,7 +422,7 @@ const AiFluencyQuizPage = (): ReactElement => {
         <section className="rounded-16 border border-border-subtlest-secondary bg-background-subtle p-6 laptop:p-8">
           <div className="mb-6 flex items-center justify-between">
             <p className="text-text-tertiary typo-callout">
-              Question {currentQuestionIndex + 1} of {displayQuestions.length}
+              Soru {currentQuestionIndex + 1} / {displayQuestions.length}
             </p>
             <div className="h-2 w-36 overflow-hidden rounded-4 bg-border-subtlest-tertiary">
               <div
@@ -472,7 +469,7 @@ const AiFluencyQuizPage = (): ReactElement => {
               onClick={onBack}
               disabled={currentQuestionIndex === 0}
             >
-              Back
+              Geri
             </Button>
             <Button
               variant={ButtonVariant.Primary}
@@ -480,7 +477,7 @@ const AiFluencyQuizPage = (): ReactElement => {
               onClick={onNext}
               disabled={!currentAnswer}
             >
-              {isLastQuestion ? 'See result' : 'Next'}
+              {isLastQuestion ? 'Sonucu gör' : 'İleri'}
             </Button>
           </div>
         </section>
@@ -594,8 +591,8 @@ const AiFluencyQuizPage = (): ReactElement => {
             >
               <h3 className="font-bold text-text-primary typo-title3">
                 {nextTier
-                  ? `How to reach ${nextTier.label}`
-                  : 'How to stay at the top'}
+                  ? `${nextTier.label} seviyesine nasıl ulaşılır`
+                  : 'Zirvede nasıl kalınır'}
               </h3>
               <ul className="mt-3 flex list-disc flex-col gap-2 pl-5 text-text-secondary typo-body">
                 {aiFluencyTipsByTier[resolvedTier.key].map((tip) => (
@@ -612,14 +609,14 @@ const AiFluencyQuizPage = (): ReactElement => {
               onClick={onShareResult}
               disabled={!shareLink}
             >
-              {copyingShareLink ? 'Copied' : 'Share'}
+              {copyingShareLink ? 'Kopyalandı' : 'Paylaş'}
             </Button>
             <Button
               variant={ButtonVariant.Secondary}
               size={ButtonSize.Medium}
               onClick={onRetake}
             >
-              Retake quiz
+              Testi tekrar çöz
             </Button>
           </div>
         </section>

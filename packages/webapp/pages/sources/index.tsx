@@ -31,12 +31,12 @@ import { getLayout as getFooterNavBarLayout } from '../../components/layouts/Foo
 import { defaultOpenGraph } from '../../next-seo';
 import { getPageSeoTitles } from '../../components/layouts/utils';
 
-const seoTitles = getPageSeoTitles('Top sources for developer content');
+const seoTitles = getPageSeoTitles('Geliştirici içerikleri için en iyi kaynaklar');
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
   description:
-    'Explore the top sources for developer content on daily.dev. Find trending blogs, publications, YouTube channels and more from our trusted developer network.',
+    'daily.dev üzerindeki en iyi geliştirici içerik kaynaklarını keşfedin. Güvenilir ağımızdan trend blogları, yayınları, YouTube kanallarını ve daha fazlasını bulun.',
 };
 
 interface SourcesPageProps {
@@ -54,9 +54,9 @@ const getSourcesSchemas = (sources: Source[]): string =>
         '@type': 'CollectionPage',
         '@id': 'https://daily.dev/sources#collection',
         url: 'https://daily.dev/sources',
-        name: 'Top sources for developer content',
+        name: 'Geliştirici içerikleri için en iyi kaynaklar',
         description:
-          'Explore the top sources for developer content on daily.dev.',
+          'daily.dev üzerindeki en iyi geliştirici içerik kaynaklarını keşfedin.',
       },
       {
         '@type': 'ItemList',
@@ -117,7 +117,7 @@ const SourcesPage = ({
       }
       onClick={() => openModal({ type: LazyModal.NewSource })}
     >
-      Suggest new source
+      Yeni kaynak öner
     </Button>
   );
 
@@ -137,29 +137,29 @@ const SourcesPage = ({
         {!isV2Laptop && (
           <div className="flex justify-between">
             <BreadCrumbs>
-              <SitesIcon size={IconSize.XSmall} secondary /> Sources
+              <SitesIcon size={IconSize.XSmall} secondary /> Kaynaklar
             </BreadCrumbs>
             {suggestSourceButton}
           </div>
         )}
         <div className="grid grid-cols-1 gap-6 tablet:grid-cols-2 laptopXL:grid-cols-4">
           <SourceTopList
-            containerProps={{ title: 'Trending sources' }}
+            containerProps={{ title: 'Trend kaynaklar' }}
             items={trendingSources}
             isLoading={isLoading}
           />
           <SourceTopList
-            containerProps={{ title: 'Popular sources' }}
+            containerProps={{ title: 'Popüler kaynaklar' }}
             items={popularSources}
             isLoading={isLoading}
           />
           <SourceTopList
-            containerProps={{ title: 'Recently added sources' }}
+            containerProps={{ title: 'Yeni eklenen kaynaklar' }}
             items={mostRecentSources}
             isLoading={isLoading}
           />
           <SourceTopList
-            containerProps={{ title: 'Top video sources' }}
+            containerProps={{ title: 'En iyi video kaynakları' }}
             items={topVideoSources}
             isLoading={isLoading}
           />

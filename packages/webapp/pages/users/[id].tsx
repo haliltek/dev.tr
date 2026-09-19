@@ -91,7 +91,7 @@ const LeaderboardDetailPage = ({
                   variant={ButtonVariant.Tertiary}
                   size={ButtonSize.XSmall}
                   icon={<ArrowIcon className="-rotate-90" />}
-                  aria-label="Back to leaderboards"
+                  aria-label="Leaderboard'a geri dön"
                 />
               </Link>
               <strong className="min-w-0 flex-1 truncate typo-callout">

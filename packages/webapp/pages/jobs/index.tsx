@@ -32,10 +32,10 @@ import { getLayout as getFooterNavBarLayout } from '../../components/layouts/Foo
 import { getLayout } from '../../components/layouts/MainLayout';
 
 const JobsPageHeader = (): ReactElement => (
-  <PageHeader title="Jobs">
+  <PageHeader title="İş Fırsatları">
     <Link href={`${webappUrl}jobs/how-it-works`} passHref>
       <Button tag="a" variant={ButtonVariant.Tertiary} size={ButtonSize.Small}>
-        How it works
+        Nasıl çalışır
       </Button>
     </Link>
     <Link href={`${settingsUrl}/job-preferences`} passHref>
@@ -44,7 +44,7 @@ const JobsPageHeader = (): ReactElement => (
         variant={ButtonVariant.Tertiary}
         size={ButtonSize.Small}
         icon={<FilterIcon />}
-        aria-label="Job preferences"
+        aria-label="İş tercihleri"
       />
     </Link>
   </PageHeader>
@@ -130,7 +130,7 @@ const JobsPage = (): ReactElement | null => {
             {activeMatches.length > 0 ? (
               <OpportunityMatchList
                 matches={activeMatches}
-                title="Active matches"
+                title="Aktif eşleşmeler"
               />
             ) : (
               <OpportunityAllSet />
@@ -139,7 +139,7 @@ const JobsPage = (): ReactElement | null => {
             {matchHistory.length > 0 && (
               <OpportunityMatchList
                 matches={matchHistory}
-                title="Match history"
+                title="Eşleşme geçmişi"
               />
             )}
             {sidebarRendered && <OpportunityFAQ />}

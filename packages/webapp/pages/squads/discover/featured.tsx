@@ -27,11 +27,11 @@ export type Props = {
   initialData?: InfiniteData<SourcesQueryData<Squad>>;
 };
 
-const seoTitles = getPageSeoTitles('Explore the featured Squads');
+const seoTitles = getPageSeoTitles('Öne Çıkan Squad\'ları Keşfet');
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
-  description: `Explore daily.dev’s featured Squads, handpicked by our editors. Join the best developer communities and engage in top discussions today.`,
+  description: `Editörlerimiz tarafından özenle seçilmiş daily.dev öne çıkan Squad'larını keşfedin. En iyi geliştirici topluluklarına katılın ve tartışmalara dahil olun.`,
 };
 
 const Skeleton = (): ReactElement => (

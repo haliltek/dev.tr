@@ -61,11 +61,11 @@ const GamificationSettingsPage = (): ReactElement => {
   );
 
   return (
-    <AccountPageContainer title="Streaks & gamification">
+    <AccountPageContainer title="Seriler & oyunlaştırma">
       <div className="flex flex-col gap-6">
         <section className="flex flex-col gap-2 border-b border-border-subtlest-tertiary pb-6">
           <Typography bold type={TypographyType.Subhead}>
-            Show gamification features
+            Oyunlaştırma özelliklerini göster
           </Typography>
 
           <SettingsSwitch
@@ -73,14 +73,13 @@ const GamificationSettingsPage = (): ReactElement => {
             checked={isGamificationEnabled}
             onToggle={toggleAllGamification}
           >
-            Master toggle for all gamification features. Turning this off hides
-            streaks, levels, quests, and achievements across daily.dev.
+            Tüm oyunlaştırma özellikleri için ana anahtar. Bunu kapatmak; serileri, seviyeleri, quest'leri ve başarımları daily.dev genelinde gizler.
           </SettingsSwitch>
         </section>
 
         <section className="flex flex-col gap-2">
           <Typography bold type={TypographyType.Subhead}>
-            Show reading streaks
+            Okuma serilerini göster
           </Typography>
 
           <SettingsSwitch
@@ -88,8 +87,7 @@ const GamificationSettingsPage = (): ReactElement => {
             checked={!optOutReadingStreak}
             onToggle={toggleOptOutReadingStreak}
           >
-            Toggle to display or hide your daily reading streaks. Turning
-            streaks off will not affect your activity or progress.
+            Günlük okuma serilerinizi görüntülemek veya gizlemek için değiştirin. Serileri kapatmak etkinliğinizi veya ilerlemenizi etkilemez.
           </SettingsSwitch>
         </section>
 
@@ -100,21 +98,19 @@ const GamificationSettingsPage = (): ReactElement => {
           <section className="flex flex-col gap-3">
             <div className="flex flex-col gap-1">
               <Typography bold type={TypographyType.Subhead}>
-                Streak freezes
+                Seri dondurucuları
               </Typography>
               <Typography
                 type={TypographyType.Callout}
                 color={TypographyColor.Tertiary}
               >
-                Freezes automatically cover a missed reading day so your streak
-                survives. Buy packs with Cores below.
+                Dondurucular, kaçırılan bir okuma gününü otomatik olarak telafi eder, böylece seriniz bozulmaz. Aşağıdan Core ile paket satın alabilirsiniz.
               </Typography>
             </div>
 
             <div className="flex items-center justify-between gap-4 rounded-12 border border-border-subtlest-tertiary p-4">
               <Typography bold type={TypographyType.Body}>
-                {freezesAvailable} freeze{freezesAvailable === 1 ? '' : 's'}{' '}
-                available
+                {freezesAvailable} dondurucu kullanılabilir
               </Typography>
               <Button
                 type="button"
@@ -123,7 +119,7 @@ const GamificationSettingsPage = (): ReactElement => {
                   openModal({ type: LazyModal.StreakFreezePurchase })
                 }
               >
-                Buy freezes
+                Dondurucu satın al
               </Button>
             </div>
 
@@ -132,9 +128,7 @@ const GamificationSettingsPage = (): ReactElement => {
               checked={!optOutStreakFreeze}
               onToggle={toggleOptOutStreakFreeze}
             >
-              Automatically use streak freezes to cover missed reading days.
-              Turning this off means a missed day resets your streak instead
-              (you can still restore it with Cores).
+              Kaçırılan okuma günlerini telafi etmek için seri dondurucuları otomatik kullan. Bunu kapatmak, kaçırılan bir günde serinizin sıfırlanması anlamına gelir (daha sonra Core ile geri yükleyebilirsiniz).
             </SettingsSwitch>
           </section>
         )}
@@ -144,7 +138,7 @@ const GamificationSettingsPage = (): ReactElement => {
             separate above). */}
         <section className="flex flex-col gap-2 border-b border-border-subtlest-tertiary pb-6">
           <Typography bold type={TypographyType.Subhead}>
-            Show quests
+            Quest'leri göster
           </Typography>
 
           <SettingsSwitch
@@ -152,9 +146,7 @@ const GamificationSettingsPage = (): ReactElement => {
             checked={isQuestExperienceEnabled}
             onToggle={toggleQuestExperience}
           >
-            Toggle to display or hide quests, level/XP progress, and
-            achievements across daily.dev. Turning this off won&apos;t affect
-            your progress — you&apos;ll still earn everything in the background.
+            daily.dev genelinde quest'leri, seviye/XP ilerlemesini ve başarımları göstermek veya gizlemek için değiştirin. Bunu kapatmak ilerlemenizi etkilemez — her şeyi arka planda kazanmaya devam edersiniz.
           </SettingsSwitch>
         </section>
 
@@ -162,22 +154,20 @@ const GamificationSettingsPage = (): ReactElement => {
         <section className="flex flex-col gap-5">
           <div className="flex flex-col gap-1">
             <Typography bold type={TypographyType.Subhead}>
-              Time preference
+              Saat tercihi
             </Typography>
 
             <Typography
               type={TypographyType.Callout}
               color={TypographyColor.Tertiary}
             >
-              Select your time zone and the beginning of the weekend in your
-              area, so that we can be accurate in sending the notifications.
-              This will also effect the{' '}
+              Bildirimleri doğru zamanda gönderebilmemiz için saat diliminizi ve bölgenizdeki hafta sonu başlangıcını seçin. Bu ayrıca{' '}
               <ReadingStreakIcon
                 secondary
                 size={IconSize.Size16}
                 className="inline"
               />{' '}
-              Reading streak freeze days.
+              okuma serisi dondurma günlerini de etkileyecektir.
             </Typography>
           </div>
 
@@ -191,15 +181,14 @@ const GamificationSettingsPage = (): ReactElement => {
         <section className="flex flex-col gap-2">
           <div className="flex flex-col gap-1">
             <Typography bold type={TypographyType.Subhead}>
-              Weekend days
+              Hafta sonu günleri
             </Typography>
 
             <Typography
               type={TypographyType.Callout}
               color={TypographyColor.Tertiary}
             >
-              This will affect the personalized digest, reading reminders and
-              reading streak freeze days.
+              Bu ayar; kişiselleştirilmiş bülteni, okuma hatırlatıcılarını ve okuma serisi dondurma günlerini etkileyecektir.
             </Typography>
           </div>
 
@@ -212,7 +201,7 @@ const GamificationSettingsPage = (): ReactElement => {
 
 const seo: NextSeoProps = {
   ...defaultSeo,
-  title: getTemplatedTitle('Streaks & gamification'),
+  title: getTemplatedTitle('Seriler & oyunlaştırma'),
   ...noindexSeoProps,
 };
 

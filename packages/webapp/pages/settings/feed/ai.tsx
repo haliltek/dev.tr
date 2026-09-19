@@ -14,7 +14,7 @@ import { getFeedSettingsLayout } from '../../../components/layouts/SettingsLayou
 
 const AccountManageSubscriptionPage = (): ReactElement => {
   return (
-    <AccountPageContainer title="AI superpowers">
+    <AccountPageContainer title="Yapay zeka (AI) özellikleri">
       <section className="flex flex-col gap-4">
         <FeedSettingsAISection />
       </section>
@@ -22,7 +22,7 @@ const AccountManageSubscriptionPage = (): ReactElement => {
   );
 };
 
-const seoTitles = getPageSeoTitles('AI superpowers');
+const seoTitles = getPageSeoTitles('Yapay zeka (AI) özellikleri');
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },

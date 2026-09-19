@@ -9,12 +9,12 @@ import {
 import { defaultOpenGraph } from '../../next-seo';
 import { getPageSeoTitles } from '../../components/layouts/utils';
 
-const seoTitles = getPageSeoTitles('Most discussed developer posts');
+const seoTitles = getPageSeoTitles('En çok tartışılan geliştirici postları');
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
   description:
-    'Join the conversation with the most discussed posts on daily.dev. See what’s sparking the hottest debates and active discussions among developers.',
+    'En çok tartışılan postlarla sohbete katılın. Geliştiriciler arasındaki en hararetli tartışmaları ve fikir paylaşımlarını görün.',
 };
 
 const PostsDiscussed = (): ReactElement => {

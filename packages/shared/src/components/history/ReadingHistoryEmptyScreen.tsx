@@ -16,14 +16,14 @@ function ReadingHistoryEmptyScreen(): ReactElement {
         className={EmptyScreenIcon.className}
         style={EmptyScreenIcon.style}
       />
-      <EmptyScreenTitle>Your reading history is empty.</EmptyScreenTitle>
+      <EmptyScreenTitle>Okuma geçmişiniz boş.</EmptyScreenTitle>
       <EmptyScreenDescription>
-        Go back to your feed and read posts that spark your interest. Each post
-        you read will be listed here.
+        Feed'inize dönün ve ilginizi çeken postları okuyun. Okuduğunuz her post
+        burada listelenecektir.
       </EmptyScreenDescription>
       <Link href={process.env.NEXT_PUBLIC_WEBAPP_URL ?? '/'} passHref>
         <Button tag="a" className="mt-10" size={ButtonSize.Large}>
-          Back to feed
+          Feed'e geri dön
         </Button>
       </Link>
     </div>

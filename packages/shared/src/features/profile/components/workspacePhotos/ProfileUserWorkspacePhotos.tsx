@@ -98,7 +98,7 @@ export function ProfileUserWorkspacePhotos({
           position: index,
         })),
       ).catch(() => {
-        displayToast('Failed to reorder photos');
+        displayToast('Fotoğraflar yeniden sıralanamadı');
       });
     },
     [photos, reorder, displayToast],
@@ -108,9 +108,9 @@ export function ProfileUserWorkspacePhotos({
     async (input: AddUserWorkspacePhotoInput) => {
       try {
         await add(input);
-        displayToast('Photo added');
+        displayToast('Fotoğraf eklendi');
       } catch (error) {
-        displayToast('Failed to add photo');
+        displayToast('Fotoğraf eklenemedi');
         throw error;
       }
     },
@@ -121,9 +121,9 @@ export function ProfileUserWorkspacePhotos({
     async (input: AddGearInput) => {
       try {
         await addGear(input);
-        displayToast('Gear added');
+        displayToast('Ekipman eklendi');
       } catch (error) {
-        displayToast('Failed to add gear');
+        displayToast('Ekipman eklenemedi');
         throw error;
       }
     },
@@ -133,9 +133,9 @@ export function ProfileUserWorkspacePhotos({
   const handleDeletePhoto = useCallback(
     async (photo: { id: string; image: string }) => {
       const confirmed = await showPrompt({
-        title: 'Remove photo?',
-        description: 'Are you sure you want to remove this workspace photo?',
-        okButton: { title: 'Remove', variant: ButtonVariant.Primary },
+        title: 'Fotoğraf kaldırılsın mı?',
+        description: 'Bu çalışma alanı fotoğrafını kaldırmak istediğinize emin misiniz?',
+        okButton: { title: 'Kaldır', variant: ButtonVariant.Primary },
       });
       if (!confirmed) {
         return;
@@ -143,9 +143,9 @@ export function ProfileUserWorkspacePhotos({
 
       try {
         await remove(photo.id);
-        displayToast('Photo removed');
+        displayToast('Fotoğraf kaldırıldı');
       } catch (error) {
-        displayToast('Failed to remove photo');
+        displayToast('Fotoğraf kaldırılamadı');
       }
     },
     [remove, displayToast, showPrompt],
@@ -154,9 +154,9 @@ export function ProfileUserWorkspacePhotos({
   const handleDeleteGear = useCallback(
     async (item: Gear) => {
       const confirmed = await showPrompt({
-        title: 'Remove gear?',
-        description: `Are you sure you want to remove "${item.gear.name}" from your setup?`,
-        okButton: { title: 'Remove', variant: ButtonVariant.Primary },
+        title: 'Ekipman kaldırılsın mı?',
+        description: `"${item.gear.name}" ekipmanını kaldırmak istediğinize emin misiniz?`,
+        okButton: { title: 'Kaldır', variant: ButtonVariant.Primary },
       });
       if (!confirmed) {
         return;
@@ -164,9 +164,9 @@ export function ProfileUserWorkspacePhotos({
 
       try {
         await removeGear(item.id);
-        displayToast('Gear removed');
+        displayToast('Ekipman kaldırıldı');
       } catch (error) {
-        displayToast('Failed to remove gear');
+        displayToast('Ekipman kaldırılamadı');
       }
     },
     [removeGear, displayToast, showPrompt],
@@ -174,7 +174,7 @@ export function ProfileUserWorkspacePhotos({
 
   const handleOpenPhotoModal = useCallback(() => {
     if (!canAddMore) {
-      displayToast(`Maximum of ${MAX_WORKSPACE_PHOTOS} photos allowed`);
+      displayToast(`En fazla ${MAX_WORKSPACE_PHOTOS} fotoğrafa izin veriliyor`);
       return;
     }
     logEvent({
@@ -228,7 +228,7 @@ export function ProfileUserWorkspacePhotos({
           color={TypographyColor.Primary}
           bold
         >
-          My Setup
+          Çalışma Ortamım
         </Typography>
         {isOwner && (
           <div className="flex gap-2">
@@ -239,7 +239,7 @@ export function ProfileUserWorkspacePhotos({
                 icon={<CameraIcon />}
                 onClick={handleOpenPhotoModal}
               >
-                Photo
+                Fotoğraf
               </Button>
             )}
             <Button
@@ -248,7 +248,7 @@ export function ProfileUserWorkspacePhotos({
               icon={<SettingsIcon />}
               onClick={handleOpenGearModal}
             >
-              Gear
+              Ekipman
             </Button>
           </div>
         )}
@@ -309,13 +309,13 @@ export function ProfileUserWorkspacePhotos({
                 color={TypographyColor.Primary}
                 bold
               >
-                Show off your workspace
+                Çalışma ortamınızı sergileyin
               </Typography>
               <Typography
                 type={TypographyType.Footnote}
                 color={TypographyColor.Tertiary}
               >
-                Share photos of your desk and the gear you use
+                Masanızın ve kullandığınız ekipmanların fotoğraflarını paylaşın
               </Typography>
             </div>
             <div className="flex gap-2">
@@ -325,7 +325,7 @@ export function ProfileUserWorkspacePhotos({
                 icon={<CameraIcon />}
                 onClick={handleOpenPhotoModal}
               >
-                Add photo
+                Fotoğraf ekle
               </Button>
               <Button
                 variant={ButtonVariant.Secondary}
@@ -333,7 +333,7 @@ export function ProfileUserWorkspacePhotos({
                 icon={<SettingsIcon />}
                 onClick={handleOpenGearModal}
               >
-                Add gear
+                Ekipman ekle
               </Button>
             </div>
           </div>

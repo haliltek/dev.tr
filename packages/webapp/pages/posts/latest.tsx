@@ -9,12 +9,12 @@ import {
 import { defaultOpenGraph } from '../../next-seo';
 import { getPageSeoTitles } from '../../components/layouts/utils';
 
-const seoTitles = getPageSeoTitles('Latest developer posts across all topics');
+const seoTitles = getPageSeoTitles('Tüm konularda en yeni geliştirici postları');
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
   description:
-    'Explore the latest posts from developers worldwide. Stay current with fresh content on coding, dev tools, tech trends, and more on daily.dev.',
+    'Dünya genelindeki geliştiricilerin en yeni postlarını keşfedin. Kodlama, geliştirici araçları, teknoloji trendleri ve daha fazlasıyla güncel kalın.',
 };
 
 const PostsLatest = (): ReactElement => {

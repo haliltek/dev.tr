@@ -74,7 +74,7 @@ export function ProfileAchievementShowcase({
           color={TypographyColor.Primary}
           bold
         >
-          Achievement Showcase
+          Başarım Vitrini
         </Typography>
         {isOwner && (
           <Button
@@ -83,7 +83,7 @@ export function ProfileAchievementShowcase({
             icon={hasShowcase ? <EditIcon /> : <PlusIcon />}
             onClick={handleOpenModal}
           >
-            {hasShowcase ? 'Edit' : 'Add'}
+            {hasShowcase ? 'Düzenle' : 'Ekle'}
           </Button>
         )}
       </div>
@@ -145,7 +145,7 @@ export function ProfileAchievementShowcase({
               type={TypographyType.Callout}
               color={TypographyColor.Tertiary}
             >
-              Showcase your achievements on your profile
+              Başarımlarını profilinde sergile
             </Typography>
             <Button
               variant={ButtonVariant.Secondary}
@@ -153,7 +153,7 @@ export function ProfileAchievementShowcase({
               icon={<PlusIcon />}
               onClick={handleOpenModal}
             >
-              Add achievements
+              Başarımları ekle
             </Button>
           </div>
         )

@@ -39,10 +39,10 @@ export function TagDirectorySearch({
     <div className={classNames('flex w-full flex-col gap-3', className)}>
       <SearchField
         inputId="tag-directory-search"
-        placeholder="Search all tags"
+        placeholder="Tüm etiketlerde ara"
         value={inputValue}
         valueChanged={onValueChange}
-        aria-label="Search all tags"
+        aria-label="Tüm etiketlerde ara"
         autoComplete="off"
       />
       {!inputValue && recommendedTags.length > 0 && (
@@ -52,7 +52,7 @@ export function TagDirectorySearch({
             type={TypographyType.Footnote}
             color={TypographyColor.Tertiary}
           >
-            Recommended:
+            Önerilen:
           </Typography>
           {recommendedTags.map((tag) => (
             <Link key={tag} href={getTagPageLink(tag)} passHref>

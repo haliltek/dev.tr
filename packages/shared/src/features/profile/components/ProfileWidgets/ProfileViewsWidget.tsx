@@ -58,8 +58,8 @@ const ProfileViewsWidgetSkeleton = (): ReactElement => {
         bold
         className="flex items-center gap-1"
       >
-        Profile Activity
-        <Tooltip content="We started counting profile views from 23/01/2026">
+        Profil Etkinliği
+        <Tooltip content="Profil görüntülemeleri 23/01/2026 tarihinden itibaren sayılmaktadır">
           <div>
             <InfoIcon className="text-text-disabled" size={IconSize.Size16} />
           </div>
@@ -155,8 +155,8 @@ export const ProfileViewsWidget = ({
         bold
         className="flex items-center gap-1"
       >
-        Profile Activity
-        <Tooltip content="Profile views are counted from 23/01/2026">
+        Profil Etkinliği
+        <Tooltip content="Profil görüntülemeleri 23/01/2026 tarihinden itibaren sayılmaktadır">
           <div>
             <InfoIcon className="text-text-disabled" size={IconSize.Size16} />
           </div>
@@ -166,16 +166,16 @@ export const ProfileViewsWidget = ({
         <div className="flex gap-2">
           <SummaryCard
             count={largeNumberFormat(thisWeek)}
-            label="Views this week"
+            label="Bu haftaki görüntülemeler"
           />
           <SummaryCard
             count={largeNumberFormat(thisMonth)}
-            label="Views this month"
+            label="Bu ayki görüntülemeler"
           />
         </div>
         <SummaryCard
           count={largeNumberFormat(total)}
-          label="Total profile views"
+          label="Toplam profil görüntüleme"
         />
       </div>
     </ActivityContainer>

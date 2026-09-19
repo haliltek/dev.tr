@@ -110,11 +110,11 @@ export const QuestSection = ({
   claimedStampRotationIds,
   animatingClaimedStampRotationIds,
   deferredClaimedStampRotationIds,
-  emptyLabel = 'No active quests yet.',
+  emptyLabel = 'Henüz aktif quest yok.',
   layout = 'stack',
   initialVisibleCount,
-  showMoreLabel = 'Show more',
-  showLessLabel = 'Show less',
+  showMoreLabel = 'Daha fazla göster',
+  showLessLabel = 'Daha az göster',
   headerAddon,
 }: {
   title: string;
@@ -253,7 +253,7 @@ function QuestPlusUnlockButton(): ReactElement | null {
         className="!flex-none"
         onClick={onClick}
       >
-        Unlock
+        Kilidi Aç
       </Button>
     </Link>
   );
@@ -280,7 +280,7 @@ const PlusQuestSectionHeader = (): ReactElement => {
       {!isPlus && (
         <>
           <p className="max-w-72 text-text-secondary typo-callout">
-            Plus users have two additional quest slots
+            Plus kullanıcıları için iki ek quest yuvası bulunur
           </p>
           <QuestPlusUnlockButton />
         </>
@@ -481,7 +481,7 @@ const QuestDropdownPanel = ({
   return (
     <div className="flex flex-col">
       <header className="flex flex-col gap-2 border-b border-border-subtlest-tertiary p-3">
-        <p className="font-bold text-text-primary typo-callout">Quests</p>
+        <p className="font-bold text-text-primary typo-callout">Quest'ler</p>
         {showLevelSystem && (
           <div className="flex items-center justify-between gap-2 text-text-tertiary typo-caption1">
             <span>Level {renderedLevel}</span>
@@ -497,19 +497,19 @@ const QuestDropdownPanel = ({
 
       <div className="flex flex-col gap-4 p-3">
         {isPending && (
-          <p className="text-text-tertiary typo-caption1">Loading quests...</p>
+          <p className="text-text-tertiary typo-caption1">Quest'ler yükleniyor...</p>
         )}
 
         {isError && !data && (
           <p className="text-text-tertiary typo-caption1">
-            Quests are unavailable right now.
+            Quest'ler şu anda kullanılamıyor.
           </p>
         )}
 
         {!isPending && data && (
           <>
             <QuestSection
-              title="Daily"
+              title="Günlük"
               quests={data.daily.regular}
               showLevelSystem={showLevelSystem}
               onDestinationClick={onDestinationClick}
@@ -523,7 +523,7 @@ const QuestDropdownPanel = ({
               onClaim={onClaim}
             />
             <QuestSection
-              title="Weekly"
+              title="Haftalık"
               quests={data.weekly.regular}
               showLevelSystem={showLevelSystem}
               onDestinationClick={onDestinationClick}
@@ -541,7 +541,7 @@ const QuestDropdownPanel = ({
               <section className="flex flex-col gap-4">
                 <PlusQuestSectionHeader />
                 <QuestSection
-                  title="Daily"
+                  title="Günlük"
                   quests={data.daily.plus}
                   showLevelSystem={showLevelSystem}
                   onDestinationClick={onDestinationClick}
@@ -555,10 +555,10 @@ const QuestDropdownPanel = ({
                     deferredClaimedStampRotationIds
                   }
                   onClaim={onClaim}
-                  emptyLabel="No active plus quests yet."
+                  emptyLabel="Henüz aktif Plus quest'i yok."
                 />
                 <QuestSection
-                  title="Weekly"
+                  title="Haftalık"
                   quests={data.weekly.plus}
                   showLevelSystem={showLevelSystem}
                   onDestinationClick={onDestinationClick}
@@ -572,7 +572,7 @@ const QuestDropdownPanel = ({
                     deferredClaimedStampRotationIds
                   }
                   onClaim={onClaim}
-                  emptyLabel="No active plus quests yet."
+                  emptyLabel="Henüz aktif Plus quest'i yok."
                   headerAddon={<WeeklyQuestResetTimer />}
                 />
               </section>
@@ -631,8 +631,8 @@ export const QuestButton = ({
   const renderedLevel = animatedLevel ?? level;
   const renderedLevelProgress = animatedLevelProgress ?? levelProgress;
   const triggerTooltipContent = data?.level
-    ? `Total XP: ${data.level.totalXp.toLocaleString('de-DE')}`
-    : 'Quests';
+    ? `Toplam XP: ${data.level.totalXp.toLocaleString('de-DE')}`
+    : "Quest'ler";
   const triggerButtonSize = compact ? ButtonSize.Small : ButtonSize.Medium;
   const triggerButtonVariant = compact
     ? ButtonVariant.Tertiary
@@ -1082,10 +1082,10 @@ export const QuestButton = ({
               aria-expanded={isOpen}
               aria-label={
                 showLevelSystem
-                  ? `Quests, level ${renderedLevel}, ${Math.round(
+                  ? `Quest'ler, level ${renderedLevel}, %${Math.round(
                       renderedLevelProgress,
-                    )}% progress`
-                  : 'Quests'
+                    )} ilerleme`
+                  : "Quest'ler"
               }
             >
               {showLevelSystem ? (

@@ -193,9 +193,9 @@ export const seoTitle = (post: Post): string | undefined => {
   }
 
   const sourceName = isSourceUserSource(post?.source)
-    ? `by ${post?.author?.username}`
-    : `at ${post?.source?.name}`;
-  return `Shared post ${sourceName}`;
+    ? `${post?.author?.username} tarafından`
+    : `${post?.source?.name} kaynağında`;
+  return `Paylaşılan post (${sourceName})`;
 };
 
 export const PostPage = ({
@@ -574,7 +574,7 @@ export async function getStaticProps({
             url: getShareImageUrl('posts', post?.id ?? ''),
             width: 1200,
             height: 630,
-            alt: post?.title || 'Post cover image',
+            alt: post?.title || 'Post kapak görseli',
           },
         ],
         article: {

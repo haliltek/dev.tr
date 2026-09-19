@@ -12,7 +12,7 @@ import {
 } from '../../components/layouts/BookmarkFeedPage';
 
 const seo: NextSeoProps = {
-  title: `Your daily.dev bookmarks`,
+  title: `Yer İmleriniz - daily.dev`,
   openGraph: { ...defaultOpenGraph },
   ...defaultSeo,
   ...noindexSeoProps,

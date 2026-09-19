@@ -62,13 +62,12 @@ const DigestCTAContent = ({
       className={`flex items-center gap-2 px-4 py-2 text-text-tertiary typo-callout ${CTA_HEIGHT}`}
     >
       <span>
-        Get a {digest.frequency} digest of{' '}
         <Link href={source.permalink}>
           <a className="font-bold text-text-primary hover:underline">
             {displayName}
           </a>
         </Link>{' '}
-        news
+        haberlerinin {digest.frequency} özetini alın
       </span>
       <span className="ml-auto shrink-0">
         <SourceActionsNotify

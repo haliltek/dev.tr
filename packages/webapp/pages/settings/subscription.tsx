@@ -53,7 +53,7 @@ const PlusList = dynamic(() =>
 
 const seo: NextSeoProps = {
   ...defaultSeo,
-  ...getPageSeoTitles('Subscriptions'),
+  ...getPageSeoTitles('Abonelikler'),
   ...noindexSeoProps,
 };
 
@@ -65,15 +65,15 @@ const PlusInfo = (): ReactElement => {
     <>
       <div className="flex flex-col gap-1">
         <Typography bold type={TypographyType.Body}>
-          You&apos;re already a Plus member!
+          Zaten bir Plus üyesisiniz!
         </Typography>
         <Typography
           type={TypographyType.Callout}
           color={TypographyColor.Tertiary}
         >
-          {`Thank you for supporting daily.dev and unlocking the best experience
-          we offer. Manage your subscription to update your plan, payment
-          details, or preferences anytime.`}
+          {`daily.dev'i desteklediğiniz ve sunduğumuz en iyi deneyimin kilidini
+          açtığınız için teşekkür ederiz. Planınızı, ödeme bilgilerinizi veya
+          tercihlerinizi güncellemek için aboneliğinizi dilediğiniz zaman yönetebilirsiniz.`}
         </Typography>
 
         {!isIOSNative() &&
@@ -83,8 +83,8 @@ const PlusInfo = (): ReactElement => {
               color={TypographyColor.Tertiary}
               className="mt-2"
             >
-              Your plus subscription is managed via App Store, to manage it
-              please visit the App Store
+              Plus aboneliğiniz App Store üzerinden yönetilmektedir, yönetmek için
+              lütfen App Store'u ziyaret edin
             </Typography>
           )}
       </div>
@@ -121,7 +121,7 @@ const PlusInfo = (): ReactElement => {
             });
           }}
         >
-          Manage subscription
+          Aboneliği yönet
         </Button>
       </div>
     </>
@@ -134,7 +134,7 @@ const GiftPlusSection = (): ReactElement => {
 
   return (
     <AccountContentSection
-      title="Gift daily.dev Plus"
+      title="daily.dev Plus hediye et"
       description={defaultPlusInfoCopyControl[PlusType.Gift].description}
     >
       <Button
@@ -152,7 +152,7 @@ const GiftPlusSection = (): ReactElement => {
           });
         }}
       >
-        Buy as gift
+        Hediye olarak satın al
       </Button>
     </AccountContentSection>
   );
@@ -189,7 +189,7 @@ const AccountManageSubscriptionPage = (): ReactElement => {
   const { isValidRegion: isPlusAvailable } = useAuthContext();
 
   return (
-    <AccountPageContainer title="Payment & Subscription">
+    <AccountPageContainer title="Ödeme & Abonelik">
       <div className="flex flex-col gap-6">
         <PlusUser
           iconSize={IconSize.XSmall}

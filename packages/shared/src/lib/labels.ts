@@ -1,195 +1,195 @@
 export const labels = {
   reporting: {
-    reportFeedbackText: '🚨 Thanks for reporting!',
+    reportFeedbackText: '🚨 Bildirdiğiniz için teşekkürler!',
   },
   error: {
-    generic: '🚫 Something went wrong, please try again.',
-    rateLimit: '⌛️ Rate limit exceeded, please try again later.',
-    formInvalid: '🚫 Please fix the highlighted fields before saving.',
+    generic: '🚫 Bir şeyler ters gitti, lütfen tekrar deneyin.',
+    rateLimit: '⌛️ İstek limiti aşıldı, lütfen daha sonra tekrar deneyin.',
+    formInvalid: '🚫 Lütfen kaydetmeden önce vurgulanan alanları düzeltin.',
   },
   squads: {
-    forbidden: '🚫 You no longer have access to this Squad.',
+    forbidden: '🚫 Bu Squad\'a artık erişiminiz yok.',
     invalidInvitation:
-      '🚫 The invitation is no longer valid, please check with the person who shared this invite (or the Squad admin) for further information.',
+      '🚫 Davet bağlantısı artık geçerli değil, daha fazla bilgi için bu daveti paylaşan kişiyle (veya Squad yöneticisiyle) iletişime geçin.',
   },
   search: {
-    feedbackText: 'Thanks for your feedback!',
+    feedbackText: 'Geri bildiriminiz için teşekkürler!',
     shortDescription:
-      'Explore daily.dev Search, the AI-powered search engine for developers. Learn about its unique features, integration with the daily.dev platform, and how to get the most accurate search results. Your go-to guide for leveraging daily.dev Search in your coding journey.',
-    rateLimitExceeded: 'Rate limit exceeded. Please try again later.',
-    unexpectedError: 'It worked on my machine. Can you please try again?',
-    stoppedGenerating: 'Oops! We encountered an error! Can you try refreshing?',
+      'Developer\'lar için yapay zeka destekli arama motoru daily.dev Search\'ü keşfedin. Benzersiz özelliklerini, daily.dev platformuyla entegrasyonunu ve en doğru arama sonuçlarını nasıl alacağınızı öğrenin. Kodlama yolculuğunuzda rehberiniz.',
+    rateLimitExceeded: 'İstek limiti aşıldı. Lütfen daha sonra tekrar deneyin.',
+    unexpectedError: 'Benim ortamımda çalışıyordu. Lütfen tekrar deneyebilir misiniz?',
+    stoppedGenerating: 'Bir hatayla karşılaştık! Sayfayı yenilemeyi deneyebilir misiniz?',
   },
   auth: {
     error: {
-      invalidEmailOrPassword: 'Invalid email or password',
+      invalidEmailOrPassword: 'Geçersiz e-posta veya şifre',
       generic:
-        '❌ We ran into an unexpected error on our end. Please try again.',
+        '❌ Beklenmeyen bir hatayla karşılaştık. Lütfen tekrar deneyin.',
       existingEmail:
-        'That email is linked to a different sign-in method. Please try another provider.',
+        'Bu e-posta farklı bir giriş yöntemiyle ilişkilendirilmiş. Lütfen başka bir sağlayıcı deneyin.',
       githubEmailNotVerified:
-        'Your GitHub email address is not verified. Please verify it on GitHub and try again.',
+        'GitHub e-posta adresiniz doğrulanmamış. Lütfen GitHub üzerinden doğrulayıp tekrar deneyin.',
     },
   },
   referral: {
     generic: {
-      inviteText: `I'm using daily.dev to stay updated on developer news. I think you will find it helpful:`,
+      inviteText: `Developer haberlerini ve gelişmelerini takip etmek için daily.dev kullanıyorum. Senin de yararlı bulacağını düşünüyorum:`,
     },
   },
   devcard: {
     generic: {
-      shareText: `Check out my #DevCard by @dailydotdev! Flex yours (if it's flex-worthy)`,
-      emailTitle: 'Check out my Dev Card from daily.dev!',
+      shareText: `@dailydotdev tarafından oluşturulan #DevCard'ıma göz at!`,
+      emailTitle: 'daily.dev üzerindeki Dev Card\'ıma göz atın!',
     },
   },
   feed: {
     prompt: {
       discard: {
-        title: 'Discard changes',
-        description: 'You have unsaved changes that will be lost',
-        okButton: 'Yes, discard',
+        title: 'Değişiklikleri iptal et',
+        description: 'Kaydedilmemiş değişiklikleriniz kaybolacak',
+        okButton: 'Evet, vazgeç',
       },
       newDiscard: {
-        title: 'Cancel feed creation?',
+        title: 'Feed oluşturmaktan vazgeçilsin mi?',
         description:
-          "You've started customizing your feed. If you cancel now, your changes will be lost and the feed won't be created. Are you sure you want to proceed?",
+          "Feed'inizi özelleştirmeye başladınız. Şimdi iptal ederseniz değişiklikleriniz kaybolacak ve feed oluşturulmayacak. Devam etmek istediğinize emin misiniz?",
         descriptionPlus:
-          "You've made some changes to your feed. If you cancel now, your changes will be lost and the feed will be deleted. Are you sure you want to proceed?",
-        okButton: 'Yes, discard',
-        cancelButton: 'Keep editing',
+          "Feed'inizde bazı değişiklikler yaptınız. Şimdi iptal ederseniz değişiklikler kaybolacak ve feed silinecektir. Devam etmek istediğinize emin misiniz?",
+        okButton: 'Evet, vazgeç',
+        cancelButton: 'Düzenlemeye devam et',
       },
       delete: {
         description:
-          'Are you sure you want to delete your feed? This action cannot be undone.',
-        okButton: 'Yes, delete feed',
+          'Feed\'inizi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.',
+        okButton: 'Evet, feed\'i sil',
       },
       editPlusSubscribe: {
-        title: 'Upgrade to make changes',
+        title: 'Değişiklik yapmak için yükseltin',
         description:
-          'You are currently on the free version of daily.dev. You need to upgrade to Plus to change the feed settings.',
-        okButton: 'Upgrade to Plus',
-        cancelButton: 'Delete feed',
+          'Şu anda daily.dev\'in ücretsiz sürümündesiniz. Feed ayarlarını değiştirmek için Plus\'a yükseltmeniz gerekir.',
+        okButton: 'Plus\'a Yükselt',
+        cancelButton: 'Feed\'i sil',
       },
       createGenericFeed: {
-        title: 'Create a generic feed?',
+        title: 'Genel bir feed oluşturulsun mu?',
         description:
-          "It looks like you didn't add any customizations. We'll create a generic feed for you, are you sure this is what you want? If not, you can go back and customize it or edit it later using the “Feed settings” menu.",
-        okButton: 'Create feed',
-        cancelButton: 'Keep editing',
+          "Herhangi bir özelleştirme eklemediniz. Sizin için genel bir feed oluşturacağız, devam etmek istiyor musunuz? İsterseniz geri dönüp özelleştirebilir veya daha sonra “Feed ayarları” menüsünden düzenleyebilirsiniz.",
+        okButton: 'Feed oluştur',
+        cancelButton: 'Düzenlemeye devam et',
       },
     },
     error: {
       feedLimit: {
-        api: 'You have reached the maximum number of feeds.',
-        client: "Too many feeds, don't you think?",
+        api: 'Maksimum feed sayısına ulaştınız.',
+        client: 'Çok fazla feed olmadı mı sizce de?',
       },
       feedNameInvalid: {
-        api: 'Feed name should not contain special characters',
+        api: 'Feed adı özel karakter içermemelidir',
       },
     },
     settings: {
       globalPreferenceNotice: {
-        clickbaitShield: 'Clickbait shield has been applied for all feeds',
-        contentLanguage: 'New language preferences set for all feeds',
+        clickbaitShield: 'Clickbait koruması tüm feed\'ler için uygulandı',
+        contentLanguage: 'Yeni dil tercihleri tüm feed\'ler için ayarlandı',
         highlightsPlacement:
-          'Happening Now placement preference applied to all your feeds',
+          'Gündem yerleşim tercihi tüm feed\'lerinize uygulandı',
       },
     },
   },
   integrations: {
     prompt: {
       deleteIntegration: {
-        title: 'Delete integration',
+        title: 'Entegrasyonu sil',
         description:
-          'Are you sure you want to delete this integration? We will no longer have access to your Slack workspace.',
-        okButton: 'Yes, delete integration',
+          'Bu entegrasyonu silmek istediğinize emin misiniz? Slack çalışma alanınıza olan erişimimiz kaldırılacaktır.',
+        okButton: 'Evet, entegrasyonu sil',
       },
       deleteSourceIntegration: {
-        title: 'Delete source integration',
+        title: 'Kaynak entegrasyonunu sil',
         description:
-          'Are you sure you want to delete this integration? You will no longer receive updates from this source.',
-        okButton: 'Yes, delete integration',
+          'Bu entegrasyonu silmek istediğinize emin misiniz? Artık bu kaynaktan güncellemeler almayacaksınız.',
+        okButton: 'Evet, entegrasyonu sil',
       },
     },
     success: {
-      integrationSaved: 'Integration saved successfully',
+      integrationSaved: 'Entegrasyon başarıyla kaydedildi',
     },
     briefIntro: {
       title: 'Brief + Slack = 🔥',
-      description: 'Get instant updates in Slack',
+      description: 'Slack üzerinden anlık bildirimler alın',
     },
   },
   cores: {
     error: {
       transactionProcessing: {
-        title: 'Transaction processing',
+        title: 'İşlem yürütülüyor',
         description:
-          'Your transaction is being processed, please wait while it completes. If you want to close the window, you can check the status of your transaction in your Core Wallet. You will also receive an email when the transaction is completed.',
+          'İşleminiz gerçekleştiriliyor, lütfen tamamlanmasını bekleyin. Pencereyi kapatmak isterseniz işlem durumunu Core Wallet cüzdanınızdan takip edebilirsiniz. İşlem tamamlandığında bir e-posta da alacaksınız.',
       },
     },
   },
   analytics: {
     boost: {
-      activeTitle: 'Boosting in progress',
-      completedTitle: 'Boost completed',
-      activeDescription: `Your post is actively being promoted to developers who are most likely to engage based on our targeting engine. We're making sure it gets prime placement where it matters most, so you can focus on creating while we drive the visibility.`,
-      completedDescription: `Your post just wrapped up a boost and got in front of the right developers. Want to keep the momentum going? You can boost it again anytime to stay in the spotlight.`,
+      activeTitle: 'Boost devam ediyor',
+      completedTitle: 'Boost tamamlandı',
+      activeDescription: `Postunuz hedefleme motorumuza göre etkileşim olasılığı en yüksek olan developer'lara öne çıkarılıyor. En kritik yerlerde görünmesini sağlıyoruz.`,
+      completedDescription: `Postunuzun boost süreci tamamlandı ve doğru developer'ların önüne ulaştı. İlgi devam etsin isterseniz istediğiniz zaman tekrar boost uygulayabilirsiniz.`,
     },
   },
-  generatingUsername: 'Generating your cool username...',
+  generatingUsername: 'Harika kullanıcı adınız oluşturuluyor...',
   form: {
-    required: 'This field is required',
+    required: 'Bu alan zorunludur',
     discard: {
-      title: 'Discard changes?',
-      description: 'You have unsaved changes that will be lost',
-      okButton: 'Save changes',
-      cancelButton: 'Discard',
+      title: 'Değişiklikleri iptal et?',
+      description: 'Kaydedilmemiş değişiklikleriniz kaybolacak',
+      okButton: 'Değişiklikleri kaydet',
+      cancelButton: 'Vazgeç',
     },
   },
   opportunity: {
-    companyInfoEditNotice: 'Click "Edit" above to update company details',
+    companyInfoEditNotice: 'Şirket ayrıntılarını güncellemek için yukarıdaki "Düzenle" butonuna tıklayın',
     requiredMissingNotice: {
-      title: 'Almost there!',
-      description: 'Please make sure all the required fields are valid.',
-      okButton: 'Close',
+      title: 'Neredeyse bitti!',
+      description: 'Lütfen tüm zorunlu alanların geçerli olduğundan emin olun.',
+      okButton: 'Kapat',
     },
     approveNotice: {
-      title: 'Ready to Publish Job?',
+      title: 'İlanı Yayınlamaya Hazır mısınız?',
       description:
-        'Once approved, we will start matching this job to candidates and notify you in Slack when intros are ready.',
-      okButton: 'Approve & Publish',
-      cancelButton: 'Back to edit',
+        'Onaylandıktan sonra bu ilanı adaylarla eşleştirmeye başlayacağız ve eşleşmeler hazır olduğunda Slack üzerinden sizi bilgilendireceğiz.',
+      okButton: 'Onayla & Yayınla',
+      cancelButton: 'Düzenlemeye dön',
     },
     contentFields: {
       placeholders: {
-        overview: 'Tell us about the role',
-        responsibilities: 'List the key responsibilities',
-        requirements: 'Specify the requirements',
-        whatYoullDo: 'Describe what the candidate will do',
-        interviewProcess: 'Explain the interview process',
-        generic: 'Tell us more',
+        overview: 'Pozisyon hakkında bilgi verin',
+        responsibilities: 'Temel sorumlulukları listeleyin',
+        requirements: 'Gereksinimleri belirtin',
+        whatYoullDo: 'Adayın neler yapacağını açıklayın',
+        interviewProcess: 'Mülakat sürecini açıklayın',
+        generic: 'Daha fazla bilgi verin',
       },
     },
     assignSeat: {
-      title: 'Additional seats added',
-      description: 'Do you want to assign your new seat to this job?',
-      okButton: 'Continue',
-      cancelButton: 'Later',
+      title: 'Ek lisanslar eklendi',
+      description: 'Yeni lisansınızı bu ilana atamak istiyor musunuz?',
+      okButton: 'Devam Et',
+      cancelButton: 'Daha Sonra',
     },
   },
   postCreation: {
     warnings: {
       spammyPosts:
-        'Irrelevant or spammy posts may be flagged and could lead to lost posting rights.',
+        'Alakasız veya spam postlar işaretlenebilir ve post paylaşım hakkınızı kaybetmenize yol açabilir.',
     },
   },
   profile: {
     sources: {
       heading: {
-        empty: 'Recommended Squads',
-        activeIn: 'Active in these Squads',
+        empty: 'Önerilen Squad\'lar',
+        activeIn: 'Aktif olunan Squad\'lar',
       },
-      viewAll: 'Explore all Squads',
+      viewAll: 'Tüm Squad\'ları Keşfet',
     },
   },
 };

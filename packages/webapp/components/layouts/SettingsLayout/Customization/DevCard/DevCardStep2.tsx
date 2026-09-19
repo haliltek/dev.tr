@@ -182,7 +182,7 @@ export const DevCardStep2 = ({
           type={TypographyType.Title1}
           className="mx-3 mb-8 text-center"
         >
-          Share your #DevCard!
+          #DevCard'ını Paylaş!
         </Typography>
         <div className="flex grow-0 flex-row justify-center">
           <RadioItem
@@ -191,7 +191,7 @@ export const DevCardStep2 = ({
             checked={type === DevCardType.Vertical}
             onChange={() => onUpdateType(DevCardType.Vertical)}
           >
-            Vertical
+            Dikey
           </RadioItem>
 
           <RadioItem
@@ -200,7 +200,7 @@ export const DevCardStep2 = ({
             checked={type === DevCardType.Horizontal}
             onChange={() => onUpdateType(DevCardType.Horizontal)}
           >
-            Horizontal
+            Yatay
           </RadioItem>
         </div>
 
@@ -240,7 +240,7 @@ export const DevCardStep2 = ({
             href={devCardSrc}
             target={isMobile ? '_blank' : undefined}
           >
-            Download DevCard
+            DevCard'ı İndir
           </Button>
         )}
       </section>
@@ -256,7 +256,7 @@ export const DevCardStep2 = ({
               }
               onClick={() => setSelectedTab(0)}
             >
-              Embed
+              Yerleştir (Embed)
             </Button>
           </div>
 
@@ -269,7 +269,7 @@ export const DevCardStep2 = ({
               }
               onClick={() => setSelectedTab(1)}
             >
-              Customize
+              Özelleştir
             </Button>
           </div>
         </div>
@@ -281,8 +281,8 @@ export const DevCardStep2 = ({
                 type={TypographyType.Callout}
                 color={TypographyColor.Tertiary}
               >
-                Add your DevCard to GitHub, your website, or use it as your X
-                header image.
+                DevCard'ınızı GitHub profilinize, web sitenize ekleyin veya X
+                başlık görseli olarak kullanın.
               </Typography>
 
               <div>
@@ -293,7 +293,7 @@ export const DevCardStep2 = ({
                   className="flex"
                 >
                   <GitHubIcon className="mr-2" size={IconSize.Small} />
-                  Embed the DevCard on your GitHub profile
+                  DevCard'ı GitHub profilinize ekleyin
                 </Typography>
 
                 <Typography
@@ -301,8 +301,8 @@ export const DevCardStep2 = ({
                   color={TypographyColor.Tertiary}
                   className="mt-2 inline-block"
                 >
-                  Embed your DevCard in your GitHub README with auto-updates via
-                  GitHub Actions.{' '}
+                  GitHub Actions ile otomatik güncellenen DevCard'ınızı GitHub
+                  README dosyanıza yerleştirin.{' '}
                   <ClickableText
                     tag="a"
                     defaultTypo={false}
@@ -310,7 +310,7 @@ export const DevCardStep2 = ({
                     className="!inline typo-subhead"
                     target="_blank"
                   >
-                    Full tutorial{' '}
+                    Rehberi incele{' '}
                     <OpenLinkIcon
                       className="mb-1 inline-block"
                       size={IconSize.XXSmall}
@@ -335,7 +335,7 @@ export const DevCardStep2 = ({
                     });
                   }}
                 >
-                  {!copyingEmbed ? 'Copy code' : 'Copied!'}
+                  {!copyingEmbed ? 'Kodu kopyala' : 'Kopyalandı!'}
                 </Button>
               </div>
 
@@ -347,14 +347,14 @@ export const DevCardStep2 = ({
                   className="flex"
                 >
                   <TwitterIcon size={IconSize.Small} className="mr-1.5" />X
-                  header image
+                  başlık görseli
                 </Typography>
                 <Typography
                   type={TypographyType.Callout}
                   color={TypographyColor.Tertiary}
                   className="mt-2"
                 >
-                  Download a header-sized version for your X profile.
+                  X profiliniz için başlık boyutunda bir görsel indirin.
                 </Typography>
                 <Button
                   className="mt-5"
@@ -365,7 +365,7 @@ export const DevCardStep2 = ({
                   }
                   disabled={downloading || isLoading}
                 >
-                  Download X cover image
+                  X kapak görselini indir
                 </Button>
               </div>
             </>
@@ -380,7 +380,7 @@ export const DevCardStep2 = ({
                   type={TypographyType.Title4}
                   className="mb-2"
                 >
-                  Theme
+                  Tema
                 </Typography>
 
                 <div className="flex flex-row flex-wrap">
@@ -392,7 +392,7 @@ export const DevCardStep2 = ({
                         key={value}
                         content={
                           isLocked ? (
-                            `Earn ${requiredPoints[value]} reputation points to unlock ${value} theme`
+                            `${value} temasını açmak için ${requiredPoints[value]} itibar puanı kazanın`
                           ) : (
                             <span className="capitalize">{value}</span>
                           )
@@ -431,13 +431,13 @@ export const DevCardStep2 = ({
                   type={TypographyType.Title4}
                   className="mb-2"
                 >
-                  Cover image
+                  Kapak görseli
                 </Typography>
                 <Typography
                   type={TypographyType.Callout}
                   color={TypographyColor.Tertiary}
                 >
-                  Use the default or your profile cover image
+                  Varsayılanı veya profilinizin kapak görselini kullanın
                 </Typography>
 
                 <RadioItem
@@ -447,7 +447,7 @@ export const DevCardStep2 = ({
                   onChange={() => onUpdatePreference({ isProfileCover: false })}
                   className={{ content: 'my-1.5 truncate' }}
                 >
-                  Default
+                  Varsayılan
                 </RadioItem>
 
                 <RadioItem
@@ -457,7 +457,7 @@ export const DevCardStep2 = ({
                   onChange={() => onUpdatePreference({ isProfileCover: true })}
                   className={{ content: 'my-1.5 truncate' }}
                 >
-                  Use profile cover
+                  Profil kapağını kullan
                 </RadioItem>
               </div>
               <div>
@@ -467,7 +467,7 @@ export const DevCardStep2 = ({
                   type={TypographyType.Title4}
                   className="mb-2"
                 >
-                  Profile image
+                  Profil görseli
                 </Typography>
 
                 <Switch
@@ -480,7 +480,7 @@ export const DevCardStep2 = ({
                     onUpdatePreference({ showBorder: !showBorder })
                   }
                 >
-                  Show border
+                  Kenarlık göster
                 </Switch>
               </div>
 
@@ -493,7 +493,7 @@ export const DevCardStep2 = ({
                 }
                 loading={isLoading}
               >
-                Save
+                Kaydet
               </Button>
             </>
           )}

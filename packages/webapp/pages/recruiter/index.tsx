@@ -189,7 +189,7 @@ function RecruiterPage(): ReactElement {
       <div className="relative mx-4 mt-10 max-w-[47.875rem] tablet:mx-auto">
         <div className="flex flex-col items-center justify-center py-20">
           <Typography color={TypographyColor.Tertiary}>
-            Loading your opportunities...
+            Fırsatlarınız yükleniyor...
           </Typography>
         </div>
       </div>

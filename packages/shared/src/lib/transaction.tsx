@@ -47,21 +47,21 @@ export const getTransactionLabel = ({
   if (transaction.flags.error) {
     return (
       <span className="text-accent-ketchup-default">
-        {transaction.flags.error || 'Failed'}
+        {transaction.flags.error || 'Başarısız'}
       </span>
     );
   }
 
   if (UserTransactionStatus.Created === transaction.status) {
-    return 'Created';
+    return 'Oluşturuldu';
   }
 
   if (UserTransactionStatus.Processing === transaction.status) {
-    return 'Pending';
+    return 'Beklemede';
   }
 
   if (type === 'purchase') {
-    return 'Purchased';
+    return 'Satın Alındı';
   }
 
   if (
@@ -89,13 +89,13 @@ export const getTransactionLabel = ({
           />
           {transaction.product.type === ProductType.StreakFreeze
             ? transaction.product.name
-            : 'Award'}{' '}
+            : 'Ödül'}{' '}
         </div>
       );
     }
 
     if (transaction.flags.note === 'Streak restore') {
-      return transaction.flags.note;
+      return 'Streak kurtarma';
     }
   }
 

@@ -44,17 +44,17 @@ export enum ActivityTabIndex {
 export const activityTabs: ActivityTab[] = [
   {
     id: 'posts',
-    title: 'Posts',
+    title: 'Postlar',
     path: '/posts',
   },
   {
     id: 'replies',
-    title: 'Replies',
+    title: 'Yanıtlar',
     path: '/replies',
   },
   {
     id: 'upvoted',
-    title: 'Upvoted',
+    title: 'Upvote verilenler',
     path: '/upvoted',
   },
 ];
@@ -124,9 +124,9 @@ export const renderEmptyScreen = (
           <MyProfileEmptyScreen
             className="min-h-[27.125rem] items-center justify-center px-4 py-6 text-center tablet:px-6"
             image={cloudinaryCharmNoPosts}
-            imageAlt="daily.dev charm waiting for your first post"
-            text="Hardest part of being a developer? Where do we start – it's everything. Go on, share with us your best rant."
-            cta="New post"
+            imageAlt="Henüz post paylaşılmadı"
+            text="Bir developer olmanın en zor kısmı ne mi? Nereden başlasak... Haydi, düşüncelerini veya deneyimlerini toplulukla paylaş."
+            cta="Yeni post"
             buttonProps={{ tag: 'a', href: link.post.create }}
           />
         );
@@ -135,9 +135,9 @@ export const renderEmptyScreen = (
           <MyProfileEmptyScreen
             className="min-h-[27.125rem] items-center justify-center px-4 py-6 text-center tablet:px-6"
             image={cloudinaryCharmEmptyProfile}
-            imageAlt="daily.dev charm with an empty profile"
-            text="Trapped in endless meetings? Make the most of It - Find posts you love and upvote away!"
-            cta="Explore posts"
+            imageAlt="Henüz upvote verilmedi"
+            text="Bitmek bilmeyen toplantılarda mısın? Zamanı iyi değerlendir: Beğendiğin postları keşfet ve upvote ver!"
+            cta="Postları keşfet"
             buttonProps={{ tag: 'a', href: '/' }}
           />
         );
@@ -146,9 +146,9 @@ export const renderEmptyScreen = (
           <MyProfileEmptyScreen
             className="min-h-[27.125rem] items-center justify-center px-4 py-6 text-center tablet:px-6"
             image={cloudinaryCharmEmptyProfile}
-            imageAlt="daily.dev charm with an empty profile"
-            text="All tests have passed on the first try and you have no idea why? Time for a break. Browse the feed and join a discussion!"
-            cta="Explore posts"
+            imageAlt="Henüz yanıt verilmedi"
+            text="Tüm testler ilk seferde geçti ve nedenini bilmiyor musun? Biraz mola ver. Feed'e göz at ve tartışmalara katıl!"
+            cta="Postları keşfet"
             buttonProps={{ tag: 'a', href: '/' }}
           />
         );
@@ -163,27 +163,27 @@ export const renderEmptyScreen = (
       return (
         <ProfileEmptyScreen
           image={cloudinaryCharmNoPosts}
-          imageAlt="daily.dev charm waiting for the first post"
-          title={`${userName} hasn't posted yet`}
-          text="Once they do, those posts will show up here."
+          imageAlt="Henüz post paylaşılmadı"
+          title={`${userName} henüz bir post paylaşmadı`}
+          text="Paylaşım yaptığında, o postlar burada görünecek."
         />
       );
     case ActivityTabIndex.Upvoted:
       return (
         <ProfileEmptyScreen
           image={cloudinaryCharmEmptyProfile}
-          imageAlt="daily.dev charm with an empty profile"
-          title={`${userName} hasn't upvoted yet`}
-          text="Once they do, those posts will show up here."
+          imageAlt="Henüz upvote verilmedi"
+          title={`${userName} henüz bir posta upvote vermedi`}
+          text="Upvote verdiğinde, o postlar burada görünecek."
         />
       );
     case ActivityTabIndex.Replies:
       return (
         <ProfileEmptyScreen
           image={cloudinaryCharmEmptyProfile}
-          imageAlt="daily.dev charm with an empty profile"
-          title={`${userName} hasn't replied to any post yet`}
-          text="Once they do, those replies will show up here."
+          imageAlt="Henüz yanıt verilmedi"
+          title={`${userName} henüz hiçbir posta yanıt vermedi`}
+          text="Yanıt verdiğinde, o yanıtlar burada görünecek."
         />
       );
     default:

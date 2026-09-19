@@ -89,7 +89,7 @@ export const BlockedWords = (): ReactElement => {
         bold
         className="flex items-center gap-2"
       >
-        Blocked words{' '}
+        Engellenen kelimeler{' '}
         <Typography
           tag={TypographyTag.Span}
           type={TypographyType.Caption1}
@@ -103,12 +103,12 @@ export const BlockedWords = (): ReactElement => {
         color={TypographyColor.Tertiary}
         type={TypographyType.Callout}
       >
-        Filter out posts with titles containing words you never want to see
-        again. Life’s too short for unnecessary noise.
+        Görmek istemediğiniz kelimeleri içeren post başlıklarını filtreleyin.
+        Hayat gereksiz gürültü için çok kısa.
         {!isPlus ? (
           <>
             {' '}
-            To unlock this feature{' '}
+            Bu özelliğin kilidini açmak için{' '}
             <Link passHref href={plusUrl}>
               <Typography
                 className="inline-block first-letter:lowercase"
@@ -129,9 +129,9 @@ export const BlockedWords = (): ReactElement => {
       </Typography>
       <TextField
         inputId="blocked-words"
-        label="Add blocked words"
-        placeholder="Add blocked words"
-        hint="Add commas (,) to block multiple words. Press Enter to submit them."
+        label="Engellenecek kelimeleri ekleyin"
+        placeholder="Engellenecek kelimeleri ekleyin"
+        hint="Birden çok kelimeyi engellemek için virgül (,) ekleyin. Eklemek için Enter tuşuna basın."
         hintIcon={<FeedbackIcon />}
         onKeyDown={onKeyDown}
         disabled={!isPlus}

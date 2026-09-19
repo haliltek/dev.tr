@@ -20,8 +20,8 @@ const ProjectsPage = ({ user, noindex }: ProfileLayoutProps): ReactElement => {
       user={user}
       noindex={noindex}
       experiences={project}
-      title="Projects"
-      seoTitle={`Projects for ${user.name} (@${user.username})`}
+      title="Projeler"
+      seoTitle={`${user.name} (@${user.username}) projeleri`}
     />
   );
 };

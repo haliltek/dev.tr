@@ -47,9 +47,9 @@ const getBriefingLayout: typeof getLayout = (...props) =>
   getFooterNavBarLayout(getLayout(...props));
 
 const seo: NextSeoProps = {
-  ...getPageSeoTitles('Presidential briefings'),
+  ...getPageSeoTitles('Özel brifingler'),
   description:
-    'Fast, high-signal briefings delivered straight to you by your personal AI agent.',
+    'Kişisel AI agentınız tarafından size özel hazırlanan hızlı, yüksek sinyalli brifingler.',
   nofollow: true,
   noindex: true,
 };

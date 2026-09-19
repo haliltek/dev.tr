@@ -23,8 +23,8 @@ const VolunteeringPage = ({
       user={user}
       noindex={noindex}
       experiences={volunteering}
-      title="Volunteering"
-      seoTitle={`Volunteering experience for ${user.name} (@${user.username})`}
+      title="Gönüllülük"
+      seoTitle={`${user.name} (@${user.username}) gönüllülük deneyimi`}
     />
   );
 };

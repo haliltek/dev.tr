@@ -25,8 +25,8 @@ import useTagAndSource from '../../../../hooks/useTagAndSource';
 import { FeedType } from '../../../../graphql/feed';
 
 enum FeedSettingsTagsSectionTabs {
-  Suggested = 'Suggested',
-  MyTags = 'My tags',
+  Suggested = 'Önerilenler',
+  MyTags = 'Etiketlerim',
 }
 
 const tabs = Object.values(FeedSettingsTagsSectionTabs);
@@ -95,20 +95,20 @@ export const FeedSettingsTagsSection = (): ReactElement => {
   return (
     <div className="flex flex-col gap-6">
       <SearchField
-        aria-label="Search tags"
+        aria-label="Etiketlerde ara"
         className="border-none !bg-background-subtle"
         inputId="search-filters"
-        placeholder="Search tags"
+        placeholder="Etiketlerde ara"
         valueChanged={onSearch}
       />
       <Typography
         color={TypographyColor.Tertiary}
         type={TypographyType.Callout}
       >
-        Tags are a great way to tell the system what you&apos;re interested in.
-        They&apos;re a strong starting signal for your feed, and as you engage
-        with content over time, their weight gradually decreases in favor of
-        stronger signals based on your actual activity.
+        Etiketler (Tag), sisteme neleri beğendiğinizi bildirmenin harika bir
+        yoludur. Feed'iniz için güçlü bir başlangıç sinyalidir ve zamanla
+        içeriklerle etkileşime girdikçe, ağırlıkları gerçek etkinliklerinize
+        dayalı daha güçlü sinyaller lehine dengelenir.
       </Typography>
       <ModalPropsContext.Provider
         value={{

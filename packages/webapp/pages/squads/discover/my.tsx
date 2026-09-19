@@ -115,7 +115,7 @@ function MySquadsPage(): ReactElement | null {
           variant={ButtonVariant.Option}
           icon={<TimerIcon />}
         >
-          Pending posts
+          Bekleyen postlar
           <Typography
             color={TypographyColor.Tertiary}
             bold
@@ -126,10 +126,10 @@ function MySquadsPage(): ReactElement | null {
         </Button>
       )}
       {privilegedSquads.length > 0 && (
-        <SquadSection title="Admin and moderator" squads={privilegedSquads} />
+        <SquadSection title="Yönetici ve moderatör" squads={privilegedSquads} />
       )}
       {memberSquads.length > 0 && (
-        <SquadSection title="Member" squads={memberSquads} />
+        <SquadSection title="Üye" squads={memberSquads} />
       )}
     </SquadDirectoryLayout>
   );
@@ -137,7 +137,7 @@ function MySquadsPage(): ReactElement | null {
 
 const seo: NextSeoProps = {
   ...defaultSeo,
-  title: 'My Squads',
+  title: 'Squad\'larım',
   ...noindexSeoProps,
 };
 

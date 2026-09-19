@@ -23,8 +23,8 @@ const WorkExperiencePage = ({
       user={user}
       noindex={noindex}
       experiences={work}
-      title="Work Experience"
-      seoTitle={`Work experience for ${user.name} (@${user.username})`}
+      title="İş Deneyimi"
+      seoTitle={`${user.name} (@${user.username}) iş deneyimi`}
     />
   );
 };

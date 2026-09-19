@@ -81,7 +81,7 @@ const ProfileActions = ({ user, isPreviewMode }: HeaderProps): ReactElement => {
   const options: MenuItemProps[] = [
     {
       icon: <MenuIcon Icon={BlockIcon} />,
-      label: `${blocked ? 'Unblock' : 'Block'} ${user.username}`,
+      label: `${blocked ? 'Engeli Kaldır' : 'Engelle'} ${user.username}`,
       action: () =>
         blocked
           ? unblock({
@@ -97,7 +97,7 @@ const ProfileActions = ({ user, isPreviewMode }: HeaderProps): ReactElement => {
     },
     {
       icon: <MenuIcon Icon={FlagIcon} />,
-      label: 'Report',
+      label: 'Bildir',
       action: () => onReportUser(),
     },
   ];
@@ -105,7 +105,7 @@ const ProfileActions = ({ user, isPreviewMode }: HeaderProps): ReactElement => {
   if (!blocked && !user.isPlus) {
     options.push({
       icon: <MenuIcon Icon={GiftIcon} />,
-      label: 'Gift daily.dev Plus',
+      label: 'daily.dev Plus hediye et',
       action: () => {
         logSubscriptionEvent({
           event_name: LogEvent.GiftSubscription,
@@ -122,10 +122,10 @@ const ProfileActions = ({ user, isPreviewMode }: HeaderProps): ReactElement => {
   if (isPreviewMode) {
     return (
       <div className="flex h-12 items-center">
-        <Tooltip content="For preview purposes only" delayDuration={0}>
+        <Tooltip content="Yalnızca önizleme amaçlıdır" delayDuration={0}>
           <div className="flex flex-row gap-2">
             <Button variant={ButtonVariant.Primary} size={ButtonSize.Small}>
-              Follow
+              Takip Et
             </Button>
             <Button
               variant={ButtonVariant.Secondary}
@@ -133,13 +133,13 @@ const ProfileActions = ({ user, isPreviewMode }: HeaderProps): ReactElement => {
               color={ButtonColor.Cabbage}
               icon={<MedalBadgeIcon secondary />}
             >
-              Award
+              Ödül Ver
             </Button>
             <Button
               variant={ButtonVariant.Tertiary}
               size={ButtonSize.Small}
               icon={<DotsIcon />}
-              aria-label="Options"
+              aria-label="Seçenekler"
             />
           </div>
         </Tooltip>
@@ -164,7 +164,7 @@ const ProfileActions = ({ user, isPreviewMode }: HeaderProps): ReactElement => {
         {canAward && (
           <AwardButton
             type="USER"
-            copy="Award"
+            copy="Ödül Ver"
             entity={{
               id: user.id,
               receiver: user,
@@ -196,7 +196,7 @@ const ProfileActions = ({ user, isPreviewMode }: HeaderProps): ReactElement => {
             )
           }
           shareProps={{
-            text: `Check out ${user.name}'s profile on daily.dev`,
+            text: `${user.name} kullanıcısının daily.dev profiline göz at`,
             link: user.permalink,
             cid: ReferralCampaignKey.ShareProfile,
             logObject: () => ({

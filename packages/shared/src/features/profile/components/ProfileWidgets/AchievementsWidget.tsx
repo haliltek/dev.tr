@@ -125,7 +125,7 @@ function RecentAchievements({
       color={TypographyColor.Tertiary}
       className="mt-2"
     >
-      No achievements unlocked yet
+      Henüz açılmış başarım yok
     </Typography>
   );
 }
@@ -146,7 +146,7 @@ export function AchievementsWidget({
           className="flex items-center gap-1"
         >
           <MedalBadgeIcon className="size-4" />
-          Achievements
+          Başarımlar
         </Typography>
         <Link href={`/${user.username || user.id}/achievements`} passHref>
           <ClickableText tag="a">

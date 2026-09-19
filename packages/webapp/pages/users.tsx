@@ -30,12 +30,12 @@ import { getLayout } from '../components/layouts/MainLayout';
 import { defaultOpenGraph } from '../next-seo';
 import { getPageSeoTitles } from '../components/layouts/utils';
 
-const seoTitles = getPageSeoTitles('The official developer leaderboard');
+const seoTitles = getPageSeoTitles("Resmi geliştirici Leaderboard'u");
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
   description:
-    'Check out the top developer leaderboards on daily.dev. See the best performers, longest streaks, top referrers, and community leaders.',
+    "daily.dev'deki en iyi geliştirici leaderboard'larını keşfedin. En yüksek performans gösterenleri, en uzun serileri ve topluluk liderlerini görün.",
 };
 
 interface PageProps {
@@ -105,7 +105,7 @@ const LeaderboardPage = ({
           {isHighestLevelSupported && (
             <UserTopList
               containerProps={{
-                title: 'Highest level',
+                title: 'En yüksek Level',
                 titleHref: `/users/${LeaderboardType.HighestLevel}`,
               }}
               items={highestLevel}
@@ -115,7 +115,7 @@ const LeaderboardPage = ({
           )}
           <UserTopList
             containerProps={{
-              title: 'Highest reputation',
+              title: 'En yüksek itibar',
               titleHref: `/users/${LeaderboardType.HighestReputation}`,
             }}
             items={highestReputation}
@@ -124,7 +124,7 @@ const LeaderboardPage = ({
           />
           <UserTopList
             containerProps={{
-              title: 'Longest streak',
+              title: 'En uzun seri',
               titleHref: `/users/${LeaderboardType.LongestStreak}`,
             }}
             items={longestStreak}
@@ -134,7 +134,7 @@ const LeaderboardPage = ({
           />
           <UserTopList
             containerProps={{
-              title: 'Highest post views',
+              title: 'En çok görüntülenen postlar',
               titleHref: `/users/${LeaderboardType.HighestPostViews}`,
             }}
             items={highestPostViews}
@@ -142,7 +142,7 @@ const LeaderboardPage = ({
           />
           <UserTopList
             containerProps={{
-              title: 'Most upvoted',
+              title: 'En çok Upvote alanlar',
               titleHref: `/users/${LeaderboardType.MostUpvoted}`,
             }}
             items={mostUpvoted}
@@ -150,7 +150,7 @@ const LeaderboardPage = ({
           />
           <UserTopList
             containerProps={{
-              title: 'Most referrals',
+              title: 'En çok davet edenler',
               titleHref: `/users/${LeaderboardType.MostReferrals}`,
             }}
             items={mostReferrals}
@@ -158,7 +158,7 @@ const LeaderboardPage = ({
           />
           <UserTopList
             containerProps={{
-              title: 'Most reading days',
+              title: 'En çok okuma günü',
               titleHref: `/users/${LeaderboardType.MostReadingDays}`,
             }}
             items={mostReadingDays}
@@ -167,7 +167,7 @@ const LeaderboardPage = ({
           />
           <CompanyTopList
             containerProps={{
-              title: 'Most verified employees',
+              title: 'En çok doğrulanmış çalışan',
               titleHref: `/users/${LeaderboardType.MostVerifiedUsers}`,
             }}
             items={mostVerifiedUsers}
@@ -175,7 +175,7 @@ const LeaderboardPage = ({
           />
           <PopularHotTakesList
             containerProps={{
-              title: 'Most popular hot takes',
+              title: "En popüler Hot Take'ler",
             }}
             items={popularHotTakes}
             isLoading={isLoading}

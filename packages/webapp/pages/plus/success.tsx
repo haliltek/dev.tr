@@ -58,7 +58,7 @@ const PlusSuccessPage = (): ReactElement => {
             color={TypographyColor.Primary}
             bold
           >
-            Payment successful
+            Ödeme başarılı
           </Typography>
           <Typography
             tag={TypographyTag.Span}
@@ -66,7 +66,7 @@ const PlusSuccessPage = (): ReactElement => {
             color={TypographyColor.Tertiary}
             className="my-6"
           >
-            Success! Your payment is complete, you’re all set.
+            Harika! Ödemeniz tamamlandı, her şey hazır.
           </Typography>
           <span className="flex flex-col gap-4 tablet:flex-row">
             <Button
@@ -77,7 +77,7 @@ const PlusSuccessPage = (): ReactElement => {
               rel={anchorDefaultRel}
               target="_blank"
             >
-              See what&apos;s included in Plus
+              Plus kapsamındakileri gör
             </Button>
             <Button
               variant={ButtonVariant.Secondary}
@@ -85,7 +85,7 @@ const PlusSuccessPage = (): ReactElement => {
               href={webappUrl}
               size={ButtonSize.Large}
             >
-              Back to feed
+              Feed'e dön
             </Button>
           </span>
         </div>

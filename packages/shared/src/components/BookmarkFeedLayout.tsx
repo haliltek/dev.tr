@@ -63,8 +63,8 @@ const SharedBookmarksModal = dynamic(
 );
 
 const bookmarkSortOptions = [
-  { label: 'Newest first', value: BookmarkSort.TimeDesc },
-  { label: 'Oldest first', value: BookmarkSort.TimeAsc },
+  { label: 'En yeni önce', value: BookmarkSort.TimeDesc },
+  { label: 'En eski önce', value: BookmarkSort.TimeAsc },
 ];
 const bookmarkSortOptionLabels = bookmarkSortOptions.map(({ label }) => label);
 
@@ -76,7 +76,7 @@ export default function BookmarkFeedLayout({
   searchChildren,
   children,
   folder,
-  title = 'Bookmarks',
+  title = 'Yer İmleri',
   isReminderOnly,
 }: BookmarkFeedLayoutProps): ReactElement | null {
   const [isHydrated, setIsHydrated] = useState(false);
@@ -158,15 +158,15 @@ export default function BookmarkFeedLayout({
         <BookmarkEmptyScreen
           image={cloudinaryCharmReadLater}
           imageAlt="daily.dev charm kicking back to read posts later"
-          title="Nothing to read later yet"
-          description="Save posts to read later and they’ll be waiting for you right here."
+          title="Daha sonra okunacak bir şey yok"
+          description="Daha sonra okumak için postları kaydedin, burada sizi bekliyor olacaklar."
         />
       ) : (
         <BookmarkEmptyScreen
           {...(listId && {
-            title: 'Your folder is feeling a little empty',
+            title: 'Klasörünüz henüz boş görünüyor',
             description:
-              'Start saving bookmarks to keep everything you need, right where you want it.',
+              'İhtiyacınız olan her şeyi düzenli tutmak için yer imlerine kaydetmeye başlayın.',
           })}
         />
       ),
@@ -211,7 +211,7 @@ export default function BookmarkFeedLayout({
   );
   const shareButton = !isFolderPage && (
     <Button
-      aria-label="Share bookmarks"
+      aria-label="Yer imlerini paylaş"
       className={isV2Laptop ? undefined : 'ml-4 flex'}
       icon={
         <ShareIcon
@@ -224,7 +224,7 @@ export default function BookmarkFeedLayout({
       size={isV2Laptop ? ButtonSize.Small : ButtonSize.Medium}
       variant={isV2Laptop ? ButtonVariant.Tertiary : ButtonVariant.Secondary}
     >
-      {isLaptop ? <span>Share bookmarks</span> : null}
+      {isLaptop ? <span>Yer imlerini paylaş</span> : null}
     </Button>
   );
   const folderMenu = folder && !isReminderOnly && (

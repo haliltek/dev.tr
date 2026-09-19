@@ -209,15 +209,15 @@ export interface ToolPageProps {
 const FACT_STRIP_KEYS = ['pricingModel', 'license', 'integrations'] as const;
 
 const FACT_STRIP_LABELS: Record<(typeof FACT_STRIP_KEYS)[number], string> = {
-  pricingModel: 'Pricing',
-  license: 'License',
-  integrations: 'Integrates with',
+  pricingModel: 'Fiyatlandırma',
+  license: 'Lisans',
+  integrations: 'Entegrasyonlar',
 };
 
 const PRICING_MODEL_LABELS: Record<string, string> = {
-  free: 'Free',
+  free: 'Ücretsiz',
   freemium: 'Freemium',
-  paid: 'Paid',
+  paid: 'Ücretli',
   'open-core': 'Open core',
 };
 
@@ -230,7 +230,7 @@ const formatFactValue = (key: string, value: string): string => {
   }
 
   if (key === 'license' && value === 'proprietary') {
-    return 'Proprietary';
+    return 'Tescilli';
   }
 
   return value;
@@ -360,7 +360,7 @@ const ToolPage = ({
 
   const [copying, onShareOrCopy] = useShareOrCopyLink({
     link: getAbsoluteWebappUrl(`tools/${tool.slug}`),
-    text: `Check out ${tool.title} on daily.dev`,
+    text: `daily.dev üzerinde ${tool.title} aracına göz atın`,
     logObject: (provider) => ({
       event_name: LogEvent.ShareTool,
       target_id: tool.slug,
@@ -420,7 +420,7 @@ const ToolPage = ({
       if (context?.previous) {
         queryClient.setQueryData(voteKey, context.previous);
       }
-      displayToast('Failed to vote');
+      displayToast('Oy verilemedi');
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: voteKey }),
   });
@@ -504,7 +504,7 @@ const ToolPage = ({
       if (!result.claimedBy) {
         return;
       }
-      displayToast(`Page claimed for ${result.claimedBy.name}`);
+      displayToast(`Sayfa ${result.claimedBy.name} adına sahiplenildi`);
       logEvent({
         event_name: LogEvent.ClaimTool,
         target_type: TargetType.Tool,
@@ -527,11 +527,11 @@ const ToolPage = ({
       extra: JSON.stringify({ origin: Origin.ToolPage }),
     });
 
-    const companyName = claimCompanyName ?? 'your company';
+    const companyName = claimCompanyName ?? 'şirketiniz';
     const options: PromptOptions = {
-      title: `Claim this page for ${companyName}?`,
-      description: `This marks ${tool.title} as claimed by ${companyName} publicly, and can't be undone from the app.`,
-      okButton: { title: 'Claim page' },
+      title: `Bu sayfayı ${companyName} adına sahiplenmek istiyor musunuz?`,
+      description: `Bu işlem ${tool.title} sayfasını herkese açık olarak ${companyName} adına sahiplenilmiş gösterir ve uygulama içinden geri alınamaz.`,
+      okButton: { title: 'Sayfayı Sahiplen' },
     };
     const confirmed = await showPrompt(options);
 
@@ -689,7 +689,7 @@ const ToolPage = ({
             color={TypographyColor.Tertiary}
             className="flex w-full flex-wrap items-center justify-center gap-x-2 gap-y-1"
           >
-            <span>Tool</span>
+            <span>Araç</span>
             {metaParts.map((part) => (
               <React.Fragment key={(part as ReactElement).key}>
                 <MetaSeparator />
@@ -724,13 +724,13 @@ const ToolPage = ({
                       className="!mr-1.5"
                     />
                     {officialSource.type === SourceType.Squad
-                      ? 'Official squad'
-                      : 'Official source'}
+                      ? 'Resmi Squad'
+                      : 'Resmi Kaynak'}
                   </a>
                 </Link>
               )}
               {claimedByState && (
-                <Tooltip content={`Claimed by ${claimedByState.name}`}>
+                <Tooltip content={`Sahiplenen: ${claimedByState.name}`}>
                   <span className="flex items-center rounded-10 border border-accent-avocado-subtler bg-accent-avocado-flat px-3 py-1 font-bold text-accent-avocado-default typo-footnote">
                     <ProfilePicture
                       size={ProfileImageSize.Size16}
@@ -741,7 +741,7 @@ const ToolPage = ({
                         id: claimedByState.name,
                       }}
                     />
-                    Claimed by {claimedByState.name}
+                    Sahiplenen: {claimedByState.name}
                   </span>
                 </Tooltip>
               )}
@@ -784,18 +784,18 @@ const ToolPage = ({
               type={TypographyType.Caption1}
               color={TypographyColor.Quaternary}
             >
-              From public docs · checked{' '}
+              Herkese açık dokümanlardan · kontrol edildi:{' '}
               <span suppressHydrationWarning>
-                {publishTimeRelativeShort(newestFactVerifiedAt)} ago
+                {publishTimeRelativeShort(newestFactVerifiedAt)} önce
               </span>{' '}
               ·{' '}
               <a
                 href={`mailto:support@daily.dev?subject=${encodeURIComponent(
-                  `Tool page correction: ${tool.title}`,
+                  `Araç sayfası düzeltme: ${tool.title}`,
                 )}`}
                 className="text-text-link"
               >
-                See something wrong?
+                Bir hata mı gördünüz?
               </a>
             </Typography>
           )}
@@ -810,7 +810,7 @@ const ToolPage = ({
               disabled={isInStack}
               onClick={handleAddClick}
             >
-              {isInStack ? 'In your stack' : 'Add to my stack'}
+              {isInStack ? "Stack'inizde" : "Stack'ime ekle"}
             </Button>
             <Button
               variant={ButtonVariant.Float}
@@ -841,7 +841,7 @@ const ToolPage = ({
               icon={<DiscussIcon />}
               onClick={handleDiscussClick}
             >
-              Discuss
+              Tartış
             </Button>
             <Button
               variant={ButtonVariant.Float}
@@ -849,7 +849,7 @@ const ToolPage = ({
               icon={<ShareIcon secondary={copying} />}
               onClick={() => onShareOrCopy()}
             >
-              {copying ? 'Copied!' : 'Share'}
+              {copying ? 'Kopyalandı!' : 'Paylaş'}
             </Button>
           </div>
 
@@ -861,7 +861,7 @@ const ToolPage = ({
               disabled={isClaiming}
               onClick={handleClaimClick}
             >
-              {websiteHost ? `Work at ${websiteHost}? ` : ''}Claim this page
+              {websiteHost ? `${websiteHost} şirketinde mi çalışıyorsunuz? ` : ''}Bu sayfayı sahiplenin
             </Button>
           )}
         </header>
@@ -869,14 +869,14 @@ const ToolPage = ({
         <div className="h-px w-full bg-border-subtlest-tertiary" />
 
         <div className="flex flex-col">
-          <ToolSection title="Adoption on daily.dev">
+          <ToolSection title="daily.dev'de Kullanım">
             <div className="overflow-hidden rounded-16 border border-border-subtlest-tertiary">
               <div className="grid grid-cols-2 gap-x-4 gap-y-6 p-4 tablet:grid-cols-4">
                 <DataTile
                   className={{ container: '!rounded-none !border-0 !p-0' }}
-                  label="In stacks"
+                  label="Stack'lerde"
                   value={tool.stackCount}
-                  info={`How many developers have ${tool.title} on their daily.dev profile`}
+                  info={`Kaç geliştiricinin daily.dev profilinde ${tool.title} var`}
                   subtitle={
                     stackers.length > 0 && (
                       <span className="mt-1 flex flex-wrap items-center gap-2">
@@ -898,7 +898,7 @@ const ToolPage = ({
                             type={TypographyType.Caption1}
                             color={TypographyColor.Tertiary}
                           >
-                            {followedStackers.length} you follow
+                            Takip ettiğiniz {followedStackers.length} kişi
                           </Typography>
                         )}
                       </span>
@@ -908,9 +908,9 @@ const ToolPage = ({
                 {sentiment !== null && (
                   <DataTile
                     className={{ container: '!rounded-none !border-0 !p-0' }}
-                    label="Dev sentiment"
+                    label="Geliştirici eğilimi"
                     value={`${sentiment}%`}
-                    info="Share of votes on this page that are upvotes"
+                    info="Bu sayfadaki oyların upvote oranı"
                     subtitle={
                       <span className="mt-2 flex h-1.5 overflow-hidden rounded-6 bg-surface-float">
                         <span
@@ -924,18 +924,18 @@ const ToolPage = ({
                 {adoption && adoption.percentile !== null && (
                   <DataTile
                     className={{ container: '!rounded-none !border-0 !p-0' }}
-                    label="Adoption"
-                    value={`Top ${Math.max(
+                    label="Kullanım"
+                    value={`En iyi %${Math.max(
                       1,
                       Math.round((1 - adoption.percentile) * 100),
-                    )}%`}
-                    info="Where this tool ranks against every other tool by stack presence"
+                    )}`}
+                    info="Bu aracın stack varlığına göre diğer tüm araçlar arasındaki sıralaması"
                     subtitle={
                       <Typography
                         type={TypographyType.Caption1}
                         color={TypographyColor.Tertiary}
                       >
-                        of all tools on daily.dev
+                        daily.dev'deki tüm araçlar arasında
                       </Typography>
                     }
                   />
@@ -943,16 +943,16 @@ const ToolPage = ({
                 {!!adoption?.quarterGrowth && adoption.quarterGrowth > 0 && (
                   <DataTile
                     className={{ container: '!rounded-none !border-0 !p-0' }}
-                    label="This quarter"
+                    label="Bu çeyrek"
                     value={`+${Math.round(adoption.quarterGrowth)}%`}
-                    info="Growth in stack additions over the last quarter"
+                    info="Son çeyrekteki stack'e eklenme büyümesi"
                     valueClassName="text-accent-avocado-default"
                     subtitle={
                       <Typography
                         type={TypographyType.Caption1}
                         color={TypographyColor.Tertiary}
                       >
-                        new stack additions
+                        yeni stack eklemeleri
                       </Typography>
                     }
                   />
@@ -986,7 +986,7 @@ const ToolPage = ({
                     type={TypographyType.Footnote}
                     color={TypographyColor.Tertiary}
                   >
-                    Stack additions, trailing 12 months
+                    Stack eklemeleri, son 12 ay
                   </Typography>
                   {sparklineTrendDescription && (
                     <span className="sr-only">{sparklineTrendDescription}</span>
@@ -998,13 +998,13 @@ const ToolPage = ({
 
           {topPosts.length > 0 && tool.keyword && (
             <ToolSection
-              title="Trending posts"
+              title="Trend postlar"
               action={
                 <Link
                   href={`/tags/${encodeURIComponent(tool.keyword)}`}
                   passHref
                 >
-                  <a className="text-text-link typo-callout">See all</a>
+                  <a className="text-text-link typo-callout">Tümünü gör</a>
                 </Link>
               }
             >
@@ -1032,7 +1032,7 @@ const ToolPage = ({
                   above only exists after hydration, so crawlers and JS-off
                   visitors get these links instead. */}
               <ul className="flex flex-wrap items-center gap-x-2 gap-y-1 text-text-tertiary typo-footnote">
-                <li aria-hidden>Top reads:</li>
+                <li aria-hidden>En çok okunanlar:</li>
                 {topPosts
                   .filter((post) => !!post.title)
                   .map((post) => (
@@ -1049,7 +1049,7 @@ const ToolPage = ({
           )}
 
           {topSquads.length > 0 && (
-            <ToolSection title="Squads running it">
+            <ToolSection title="Kullanan Squad'lar">
               <ul className="grid grid-cols-1 gap-2 tablet:grid-cols-2 laptop:grid-cols-3">
                 {topSquads.map((squad) => (
                   <li key={squad.id} className="h-full">
@@ -1061,7 +1061,7 @@ const ToolPage = ({
           )}
 
           {takes.length > 0 && (
-            <ToolSection title="Community takes">
+            <ToolSection title="Topluluk yorumları">
               <ul className="flex flex-col gap-2">
                 {takes.map((take) => (
                   <li key={take.id} className={rowClassName}>
@@ -1078,7 +1078,7 @@ const ToolPage = ({
                         color={TypographyColor.Tertiary}
                         className="flex w-full flex-wrap items-center gap-x-1.5"
                       >
-                        <span>{take.user?.name ?? 'A developer'}</span>
+                        <span>{take.user?.name ?? 'Bir geliştirici'}</span>
                         <MetaSeparator />
                         <UpvoteIcon
                           size={IconSize.Size16}
@@ -1096,7 +1096,7 @@ const ToolPage = ({
           )}
 
           {alsoStacked.length > 0 && (
-            <ToolSection title="Devs also stack">
+            <ToolSection title="Geliştiricilerin birlikte kullandıkları">
               <div className="flex flex-wrap gap-2">
                 {alsoStacked.map((related) => (
                   <Link
@@ -1125,7 +1125,7 @@ const ToolPage = ({
           )}
 
           {alternatives.length > 0 && (
-            <ToolSection title={`Alternatives to ${tool.title}`}>
+            <ToolSection title={`${tool.title} alternatifleri`}>
               <div className="grid grid-cols-1 gap-2 tablet:grid-cols-2 laptop:grid-cols-3">
                 {alternatives.map((alternative) => (
                   <ToolCard
@@ -1138,7 +1138,7 @@ const ToolPage = ({
             </ToolSection>
           )}
 
-          <ToolSection id="discussion" title="Discussion">
+          <ToolSection id="discussion" title="Tartışma">
             <ToolDiscussion
               toolId={tool.id}
               toolTitle={tool.title}
@@ -1219,7 +1219,7 @@ export async function getStaticProps({
     ]);
 
     const seoTitles = getPageSeoTitles(
-      `${tool.title} — adoption, squads and posts for developers`,
+      `${tool.title} — geliştiriciler için kullanım, squad'lar ve postlar`,
     );
 
     return {
@@ -1238,7 +1238,7 @@ export async function getStaticProps({
         seo: {
           title: seoTitles.title,
           openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
-          description: `Discover how developers use ${tool.title}: adoption on daily.dev, squads discussing it, related tools, and the latest posts.`,
+          description: `Geliştiricilerin ${tool.title} aracını nasıl kullandığını keşfedin: daily.dev'deki kullanım, tartışan squad'lar, ilgili araçlar ve en yeni postlar.`,
           ...(tool.stackCount < MIN_INDEXABLE_STACKS ? noindexSeoProps : {}),
         },
       },

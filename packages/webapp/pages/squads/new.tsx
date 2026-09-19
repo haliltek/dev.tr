@@ -27,7 +27,7 @@ import { getLayout as getMainLayout } from '../../components/layouts/MainLayout'
 import { defaultOpenGraph, defaultSeo } from '../../next-seo';
 import { getPageSeoTitles } from '../../components/layouts/utils';
 
-const seoTitles = getPageSeoTitles('Create your Squad');
+const seoTitles = getPageSeoTitles('Squad\'ını Oluştur');
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
@@ -104,11 +104,11 @@ const NewSquad = (): ReactElement => {
           <div className="mx-6 my-5 flex flex-1 flex-col gap-2">
             <SquadTitle className="flex flex-row">
               <SourceIcon className="mr-0.5" size={IconSize.XLarge} />
-              Create new Squad
+              Yeni Squad Oluştur
             </SquadTitle>
             <SquadSubTitle>
-              Create a group where you can learn and interact privately with
-              other developers around topics that matter to you
+              Sizin için önemli olan konularda diğer geliştiricilerle özel olarak
+              etkileşim kurabileceğiniz ve öğrenebileceğiniz bir grup oluşturun
             </SquadSubTitle>
           </div>
           <img

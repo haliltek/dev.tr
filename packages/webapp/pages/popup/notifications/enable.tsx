@@ -87,25 +87,24 @@ function Enable(): React.ReactElement | null {
     <main className="flex h-screen max-h-[100%] w-screen max-w-[100%] flex-col items-center justify-center overflow-hidden bg-theme-overlay-float-cabbage px-20 text-center">
       <h1 className="relative bg-transparent font-bold typo-mega3">
         <div className="absolute inset-0 -z-1 size-52 -translate-y-[25%] rounded-50 bg-accent-cabbage-bolder opacity-64 blur-[3.125rem]" />
-        Click allow
+        "İzin ver"e tıklayın
       </h1>
       <p className="mt-6 text-text-secondary typo-body">
-        Enable web push notifications to be notified of important events such as
-        replies, mentions, updates, etc.
+        Yanıtlar, bahsetmeler ve güncellemeler gibi önemli olaylardan anında haberdar olmak için web bildirimlerini etkinleştirin.
       </p>
       <Description className="mt-28 font-bold">
-        Didn&apos;t get the popup?
+        Açılır pencereyi görmediniz mi?
       </Description>
       <div>
         <InstructionContainer className="mb-1">
-          <Description>1. Click on the icon in the search bar</Description>
+          <Description>1. Arama çubuğundaki simgeye tıklayın</Description>
           <BrowserIcon
             className={classNames(iconClasses, 'h-8 w-full max-w-[18.75rem]')}
           />
         </InstructionContainer>
         <InstructionContainer>
           <Description>
-            2. Enable the toggle button under the notifications section
+            2. Bildirimler bölümündeki anahtarı etkinleştirin
           </Description>
           <NotificationToggleIcon
             className={classNames(iconClasses, 'h-8 w-52')}

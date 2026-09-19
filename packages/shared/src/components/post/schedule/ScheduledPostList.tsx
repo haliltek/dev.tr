@@ -36,9 +36,9 @@ export function ScheduledPostList(): ReactElement {
       <MyProfileEmptyScreen
         className="items-center px-4 py-6 text-center tablet:px-6"
         image={cloudinaryCharmNoPosts}
-        imageAlt="daily.dev charm waiting for a scheduled post"
-        text="You have no scheduled posts. Schedule a post and it will show up here until it goes live."
-        cta="New post"
+        imageAlt="Planlanan bir post bekleyen daily.dev maskotu"
+        text="Planlanmış bir postunuz bulunmuyor. Bir post planladığınızda yayına girene kadar burada görünecektir."
+        cta="Yeni post"
         buttonProps={{ tag: 'a', href: link.post.create }}
       />
     );
@@ -48,14 +48,13 @@ export function ScheduledPostList(): ReactElement {
     <div className="flex flex-col">
       <div className="flex flex-col gap-1 px-4 py-4">
         <Typography type={TypographyType.Title3} bold>
-          Scheduled posts
+          Planlanan postlar
         </Typography>
         <Typography
           type={TypographyType.Callout}
           color={TypographyColor.Tertiary}
         >
-          Posts waiting to go live. Select one to edit or reschedule it, or
-          delete it before it goes live.
+          Yayına girmeyi bekleyen postlar. Düzenlemek, yeniden planlamak veya yayına girmeden önce silmek için birini seçin.
         </Typography>
       </div>
       <InfiniteScrolling

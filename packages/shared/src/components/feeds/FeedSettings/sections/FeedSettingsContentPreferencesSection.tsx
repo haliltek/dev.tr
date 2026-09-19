@@ -54,20 +54,20 @@ export const FeedSettingsContentPreferencesSection = (): ReactElement => {
         type={TypographyType.Callout}
         color={TypographyColor.Tertiary}
       >
-        Shape your feed by choosing which types and categories of content appear
-        in it. These are hard filters, so anything you turn off here won&apos;t
-        show up at all.
+        Hangi tür ve kategorideki içeriklerin görüneceğini seçerek feed'inizi
+        şekillendirin. Bunlar kesin filtrelerdir, bu nedenle burada
+        kapattığınız hiçbir içerik feed'inizde gösterilmez.
       </Typography>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <Typography bold type={TypographyType.Body}>
-            Content types
+            İçerik türleri
           </Typography>
           <Typography
             type={TypographyType.Callout}
             color={TypographyColor.Tertiary}
           >
-            Select the types of content you want to include in your feed.
+            Feed'inize dahil etmek istediğiniz içerik türlerini seçin.
           </Typography>
         </div>
         <div className="flex flex-col">
@@ -81,10 +81,18 @@ export const FeedSettingsContentPreferencesSection = (): ReactElement => {
               CUSTOM_FEEDS_ONLY.includes(title) &&
               feed?.type !== FeedType.Custom;
 
+            const localizedTitle: Record<string, string> = {
+              Videos: 'Videolar',
+              Polls: 'Anketler',
+              Social: 'Sosyal Gönderiler',
+              Article: 'Makaleler',
+              Articles: 'Makaleler',
+            };
+
             if (isDisabled) {
               return (
                 <FilterCheckbox key={id} name={title} disabled checked>
-                  Articles
+                  Makaleler
                 </FilterCheckbox>
               );
             }
@@ -100,7 +108,7 @@ export const FeedSettingsContentPreferencesSection = (): ReactElement => {
                   )
                 }
               >
-                {title}
+                {localizedTitle[title] ?? title}
               </FilterCheckbox>
             );
           })}
@@ -109,14 +117,14 @@ export const FeedSettingsContentPreferencesSection = (): ReactElement => {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <Typography bold type={TypographyType.Body}>
-            Post types
+            Post türleri
           </Typography>
           <Typography
             type={TypographyType.Callout}
             color={TypographyColor.Tertiary}
           >
-            These are the types of posts that can appear in your feed. Turn off
-            the ones you&apos;d rather not see.
+            Feed'inizde görünebilecek post türleridir. Görmek istemediklerinizi
+            kapatabilirsiniz.
           </Typography>
         </div>
         {contentSourceList?.map(({ id, title, description, options }) => {

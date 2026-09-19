@@ -37,12 +37,12 @@ import { getPageSeoTitles } from '../../components/layouts/utils';
 
 const seo: NextSeoProps = {
   ...defaultSeo,
-  ...getPageSeoTitles('Account & Security'),
+  ...getPageSeoTitles('Hesap & Güvenlik'),
   ...noindexSeoProps,
 };
 
 const BETTER_AUTH_CHANGE_EMAIL_MESSAGE =
-  'If that email is available, we sent a verification code.';
+  'Bu e-posta adresi uygunsa doğrulama kodu gönderildi.';
 
 const AccountSecurityPage = (): ReactElement => {
   const updatePasswordRef = useRef<HTMLFormElement | null>(null);
@@ -59,7 +59,7 @@ const AccountSecurityPage = (): ReactElement => {
     queryFn: () => getBetterAuthProviders(),
   });
   const onSetPassword = () => {
-    displayToast('Password changed successfully!');
+    displayToast('Şifre başarıyla değiştirildi!');
     updatePasswordRef.current?.reset();
   };
 
@@ -67,7 +67,7 @@ const AccountSecurityPage = (): ReactElement => {
 
   const onUpdatePassword = async ({ password }: ChangePasswordParams) => {
     if (hasPassword) {
-      displayToast('Use forgot password to update your existing password');
+      displayToast('Mevcut şifrenizi güncellemek için şifremi unuttum özelliğini kullanın');
       return;
     }
     const result = await betterAuthSetPassword(password);
@@ -80,13 +80,13 @@ const AccountSecurityPage = (): ReactElement => {
   };
   const onVerifyCodeBetterAuth = async (code: string) => {
     if (!pendingEmail) {
-      throw new Error('Request a verification code first');
+      throw new Error('Önce bir doğrulama kodu isteyin');
     }
     const result = await betterAuthVerifyChangeEmail(pendingEmail, code);
     if (result.error) {
       throw new Error(result.error);
     }
-    displayToast('Your email address has been updated.');
+    displayToast('E-posta adresiniz güncellendi.');
     setPendingEmail(undefined);
     setActiveDisplay(Display.Default);
     await refetchBoot?.();
@@ -129,7 +129,7 @@ const AccountSecurityPage = (): ReactElement => {
           }
         }
       } else {
-        displayToast('You must have at least one provider');
+        displayToast('En az bir giriş sağlayıcınız olmalıdır');
       }
     }
   };
@@ -166,14 +166,14 @@ const AccountSecurityPage = (): ReactElement => {
       </Tab>
       <Tab label={Display.ChangeEmail}>
         <EmailFormPage
-          title="Change email"
+          title="E-posta değiştir"
           onSubmit={onChangeEmail}
           onSwitchDisplay={setActiveDisplay}
           hint={hint}
           setHint={setHint}
           onVerifyCode={onVerifyCodeBetterAuth}
           onVerifySuccess={async () => {
-            displayToast('Your email address has been updated.');
+            displayToast('E-posta adresiniz güncellendi.');
             setActiveDisplay(Display.Default);
           }}
         />

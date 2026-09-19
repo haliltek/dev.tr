@@ -158,7 +158,7 @@ const Page = (): ReactElement => {
   return (
     <ProtectedPage>
       {isV2Laptop && (
-        <PageHeader title="Presidential briefings">
+        <PageHeader title="Özel brifingler">
           {isNotPlus && !emptyFeed && !hasTodayBrief && (
             <Button
               icon={<MagicIcon aria-hidden />}
@@ -166,7 +166,7 @@ const Page = (): ReactElement => {
               variant={ButtonVariant.Primary}
               size={ButtonSize.Small}
             >
-              Generate Brief
+              Brief Oluştur
             </Button>
           )}
           <Button
@@ -197,18 +197,18 @@ const Page = (): ReactElement => {
                 type={TypographyType.Title3}
                 bold
               >
-                Presidential briefings
+                Özel brifingler
               </Typography>
               <div className="flex shrink-0 items-center gap-2">
                 {isNotPlus && !emptyFeed && !hasTodayBrief && (
                   <Button
-                    aria-label="Generate Brief"
+                    aria-label="Brief Oluştur"
                     icon={<MagicIcon aria-hidden />}
                     onClick={() => router.push('/briefing/generate')}
                     size={isMobile ? ButtonSize.Small : ButtonSize.Medium}
                     variant={ButtonVariant.Primary}
                   >
-                    {isMobile ? null : 'Generate Brief'}
+                    {isMobile ? null : 'Brief Oluştur'}
                   </Button>
                 )}
                 <Button
@@ -290,7 +290,7 @@ const Page = (): ReactElement => {
                               title={post.title}
                               pill={
                                 index === 0 && !post.read
-                                  ? { label: 'Just in' }
+                                  ? { label: 'Yeni' }
                                   : undefined
                               }
                               readTime={post.readTime}
@@ -366,9 +366,9 @@ const getBriefingLayout: typeof getLayout = (...props) =>
   getFooterNavBarLayout(getLayout(...props));
 
 const seo: NextSeoProps = {
-  ...getPageSeoTitles('Presidential briefings'),
+  ...getPageSeoTitles('Özel brifingler'),
   description:
-    'Fast, high-signal briefings delivered straight to you by your personal AI agent.',
+    'Kişisel AI agentınız tarafından size özel hazırlanan hızlı, yüksek sinyalli brifingler.',
   nofollow: true,
   noindex: true,
 };

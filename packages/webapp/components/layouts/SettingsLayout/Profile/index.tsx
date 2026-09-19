@@ -42,7 +42,7 @@ const ProfileIndex = (): ReactElement => {
     <FormProvider {...methods}>
       <form className="flex flex-1" onSubmit={handleSubmit}>
         <AccountPageContainer
-          title="Profile"
+          title="Profil"
           actions={
             <Button
               type="button"
@@ -53,7 +53,7 @@ const ProfileIndex = (): ReactElement => {
               loading={isLoading}
               onClick={handleSubmit}
             >
-              Save
+              Kaydet
             </Button>
           }
         >
@@ -76,24 +76,24 @@ const ProfileIndex = (): ReactElement => {
             <Section className="mt-6">
               <ControlledTextField
                 name="name"
-                label="Name"
+                label="İsim Soyisim"
                 leftIcon={<UserIcon />}
               />
               <ControlledTextField
                 name="username"
-                label="Username"
+                label="Kullanıcı Adı"
                 leftIcon={<AtIcon />}
               />
-              <ControlledTextarea name="bio" label="Headline" />
+              <ControlledTextarea name="bio" label="Unvan / Başlık" />
               <ExperienceSelect
                 icon={<TerminalIcon />}
                 name="experienceLevel"
-                placeholder="Experience Level"
+                placeholder="Deneyim Seviyesi"
               />
               <ControlledSwitch
                 name="hideExperience"
-                label="Hide work history"
-                description="Your work experience and education won't be visible on your public profile"
+                label="İş geçmişini gizle"
+                description="İş deneyiminiz ve eğitiminiz herkese açık profilinizde görünmez"
               />
             </Section>
             <HorizontalSeparator />
@@ -107,14 +107,14 @@ const ProfileIndex = (): ReactElement => {
             <Section>
               <div>
                 <Typography type={TypographyType.Body} bold>
-                  About
+                  Hakkında
                 </Typography>
                 <Typography
                   type={TypographyType.Callout}
                   color={TypographyColor.Secondary}
                 >
-                  Share your background, what you&apos;re working on, or what
-                  you&apos;re learning. Markdown supported.
+                  Geçmişinizi, ne üzerinde çalıştığınızı veya neler
+                  öğrendiğinizi paylaşın. Markdown desteklenir.
                 </Typography>
               </div>
               <ControlledMarkdownInput
@@ -126,8 +126,8 @@ const ProfileIndex = (): ReactElement => {
             <Section>
               <SocialLinksInput
                 name="socialLinks"
-                label="Links"
-                hint="Paste any URL and we'll auto-detect the platform"
+                label="Bağlantılar"
+                hint="Herhangi bir URL yapıştırın, platformu otomatik olarak tespit edelim"
               />
             </Section>
           </div>

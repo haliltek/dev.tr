@@ -15,8 +15,8 @@ import { Tab, TabContainer } from '../tabs/TabContainer';
 import { DigestCTA } from './DigestCTA';
 import { HighlightItem } from './HighlightItem';
 
-const MAJOR_HEADLINES_LABEL = 'Headlines';
-const ALL_HIGHLIGHTS_LABEL = 'All';
+const MAJOR_HEADLINES_LABEL = 'Manşetler';
+const ALL_HIGHLIGHTS_LABEL = 'Tümü';
 const SKELETON_COUNT = 5;
 const HIGHLIGHTS_BASE_URL = '/highlights';
 const ALL_HIGHLIGHTS_URL = `${HIGHLIGHTS_BASE_URL}/all`;
@@ -68,7 +68,7 @@ const HighlightFeedList = ({
   if (highlights.length === 0) {
     return (
       <p className="px-4 py-8 text-center text-text-tertiary typo-body">
-        No highlights yet
+        Henüz öne çıkan içerik yok
       </p>
     );
   }

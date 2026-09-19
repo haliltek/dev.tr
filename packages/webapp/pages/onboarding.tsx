@@ -67,7 +67,7 @@ import { getPageSeoTitles } from '../components/layouts/utils';
 import { FunnelSwipeOnboardingStep } from '../components/onboarding/FunnelSwipeOnboardingStep';
 import { defaultOpenGraph, defaultSeo } from '../next-seo';
 
-const seoTitles = getPageSeoTitles('Get started');
+const seoTitles = getPageSeoTitles('Başlayın');
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },

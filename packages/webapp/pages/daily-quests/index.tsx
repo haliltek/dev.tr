@@ -21,12 +21,12 @@ import { getPageSeoTitles } from '../../components/layouts/utils';
 import ProtectedPage from '../../components/ProtectedPage';
 import { defaultOpenGraph } from '../../next-seo';
 
-const seoTitles = getPageSeoTitles('Daily quests');
+const seoTitles = getPageSeoTitles("Günlük Quest'ler");
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
   description:
-    'Complete your daily and weekly quests to earn rewards, climb levels, and keep your streak going.',
+    "Ödüller kazanmak, level atlamak ve serinizi devam ettirmek için günlük ve haftalık quest'lerinizi tamamlayın.",
   nofollow: true,
   noindex: true,
 };
@@ -37,7 +37,7 @@ function DailyQuestsPage(): ReactElement {
 
   return (
     <ProtectedPage>
-      {isV2Laptop && <PageHeader title="Daily quests" />}
+      {isV2Laptop && <PageHeader title="Günlük Quest'ler" />}
       <div className="mx-auto w-full max-w-[42.5rem]">
         {!isV2Laptop && (
           <LayoutHeader
@@ -49,7 +49,7 @@ function DailyQuestsPage(): ReactElement {
               color={TypographyColor.Primary}
               className="flex-1"
             >
-              Daily quests
+              Günlük Quest'ler
             </Typography>
           </LayoutHeader>
         )}

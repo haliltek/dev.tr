@@ -24,7 +24,7 @@ const OpensourcePage = ({
       noindex={noindex}
       experiences={opensource}
       title="Open Source"
-      seoTitle={`Open source contributions for ${user.name} (@${user.username})`}
+      seoTitle={`${user.name} (@${user.username}) Open Source katkıları`}
     />
   );
 };

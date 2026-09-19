@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import React, { useContext } from 'react';
 import type { FeedProps } from '@dailydotdev/shared/src/components/Feed';
 import Feed from '@dailydotdev/shared/src/components/Feed';
@@ -55,17 +55,17 @@ const ProfileUpvotedPage = ({
       <MyProfileEmptyScreen
         className="items-center px-4 py-6 text-center tablet:px-6"
         image={cloudinaryCharmEmptyProfile}
-        imageAlt="daily.dev charm with an empty profile"
-        text="Trapped in endless meetings? Make the most of It - Find posts you love and upvote away!"
-        cta="Explore posts"
+        imageAlt="Henüz upvote verilmedi"
+        text="Bitmek bilmeyen toplantılarda mısın? Zamanı iyi değerlendir: Beğendiğin postları keşfet ve upvote ver!"
+        cta="Postları keşfet"
         buttonProps={{ tag: 'a', href: '/' }}
       />
     ) : (
       <ProfileEmptyScreen
         image={cloudinaryCharmEmptyProfile}
-        imageAlt="daily.dev charm with an empty profile"
-        title={`${user?.name ?? 'User'} hasn't upvoted yet`}
-        text="Once they do, those posts will show up here."
+        imageAlt="Henüz upvote verilmedi"
+        title={`${user?.name ?? 'Kullanıcı'} henüz bir posta upvote vermedi`}
+        text="Upvote verdiğinde, o postlar burada görünecek."
       />
     ),
   };
@@ -75,7 +75,7 @@ const ProfileUpvotedPage = ({
       user,
       {
         ...getPageSeoTitles(
-          `Posts upvoted by ${user.name} (@${user.username})`,
+          `${user.name} (@${user.username}) tarafından upvote verilen postlar`,
         ),
         noindex: true,
         nofollow: true,
@@ -89,7 +89,7 @@ const ProfileUpvotedPage = ({
       <NextSeo {...seo} />
       <GoBackHeaderMobile>
         <Typography bold type={TypographyType.Body}>
-          Upvoted posts
+          Upvote verilen postlar
         </Typography>
       </GoBackHeaderMobile>
       <Feed
@@ -100,5 +100,9 @@ const ProfileUpvotedPage = ({
   );
 };
 
-ProfileUpvotedPage.getLayout = getProfileLayout;
+ProfileUpvotedPage.getLayout = (
+  page: ReactNode,
+  props: ProfileLayoutProps,
+): ReactNode =>
+  getProfileLayout(page, { ...props, pageHeaderTitle: 'Upvote verilen postlar' });
 export default ProfileUpvotedPage;

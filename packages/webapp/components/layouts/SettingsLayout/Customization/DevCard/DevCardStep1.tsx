@@ -41,16 +41,17 @@ export const DevCardStep1 = ({ onGenerateImage }: Step1Props): ReactElement => {
     <div className="flex flex-col items-center">
       <DevCardPlaceholder profileImage={user!.image} />
       <Typography bold tag={TypographyTag.H1} type={TypographyType.Title1}>
-        Generate your DevCard
+        DevCard'ını oluştur
       </Typography>
       <Typography
         className="mt-4 max-w-[23.5rem] text-center"
         type={TypographyType.Subhead}
         color={TypographyColor.Secondary}
       >
-        Flexing is fun, and doing it with a DevCard takes it to the next level.
-        Generate a DevCard to showcase your activity on daily.dev, including
-        your reading habits, top topics, and more.
+        Gelişiminizi paylaşmak harika bir histir ve bunu bir DevCard ile yapmak
+        çıtayı bir üst seviyeye taşır. Okuma alışkanlıklarınız, en çok
+        ilgilendiğiniz konular ve platformdaki etkinliğinizi sergilemek için bir
+        DevCard oluşturun.
       </Typography>
       <div className="mt-10 h-12">
         <Button
@@ -59,7 +60,7 @@ export const DevCardStep1 = ({ onGenerateImage }: Step1Props): ReactElement => {
           onClick={() => onGenerate()}
           loading={isLoading}
         >
-          Generate now
+          Şimdi oluştur
         </Button>
       </div>
     </div>

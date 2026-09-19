@@ -20,8 +20,8 @@ const EducationPage = ({ user, noindex }: ProfileLayoutProps): ReactElement => {
       user={user}
       noindex={noindex}
       experiences={education}
-      title="Education"
-      seoTitle={`Education for ${user.name} (@${user.username})`}
+      title="Eğitim"
+      seoTitle={`${user.name} (@${user.username}) eğitim geçmişi`}
     />
   );
 };

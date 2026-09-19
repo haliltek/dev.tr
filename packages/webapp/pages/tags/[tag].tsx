@@ -52,7 +52,7 @@ const getTagPageJsonLd = ({
   const tagTitle = initialData.flags?.title || formatKeyword(tag);
   const tagDescription =
     initialData.flags?.description ||
-    `Find all the recent posts, videos, updates and discussions about ${tagTitle}`;
+    `${tagTitle} ile ilgili en güncel postları, videoları, güncellemeleri ve tartışmaları keşfedin`;
   const tagUrl = `${appOrigin}/tags/${encodedTag}`;
 
   return JSON.stringify({
@@ -87,13 +87,13 @@ const getTagPageJsonLd = ({
           {
             '@type': 'ListItem',
             position: 1,
-            name: 'Home',
+            name: 'Ana Sayfa',
             item: appOrigin,
           },
           {
             '@type': 'ListItem',
             position: 2,
-            name: 'Tags',
+            name: 'Etiketler',
             item: `${appOrigin}/tags`,
           },
           {
@@ -140,7 +140,7 @@ interface TagPageParams extends ParsedUrlQuery {
 const getSeoData = (
   tag: string,
   title: string,
-  description = `Find all the recent posts, videos, updates and discussions about ${title}`,
+  description = `${title} ile ilgili en güncel postları, videoları, güncellemeleri ve tartışmaları keşfedin`,
   tagSlug = title,
 ): NextSeoProps => {
   const seoTitles = getPageSeoTitles(getTagSeoTitle(tag, title));

@@ -105,9 +105,9 @@ export function ProfileUserStack({
     async (input: AddUserStackInput) => {
       try {
         await add(input);
-        displayToast('Added to your stack');
+        displayToast('Stack\'inize eklendi');
       } catch (error) {
-        displayToast('Failed to add item');
+        displayToast('Öğe eklenemedi');
         throw error;
       }
     },
@@ -133,9 +133,9 @@ export function ProfileUserStack({
             startedAt: input.startedAt || null,
           },
         });
-        displayToast('Stack item updated');
+        displayToast('Stack öğesi güncellendi');
       } catch (error) {
-        displayToast('Failed to update item');
+        displayToast('Öğe güncellenemedi');
         throw error;
       }
     },
@@ -146,9 +146,9 @@ export function ProfileUserStack({
     async (item: UserStack) => {
       const displayTitle = item.title ?? item.tool.title;
       const confirmed = await showPrompt({
-        title: 'Remove from stack?',
-        description: `Are you sure you want to remove "${displayTitle}" from your stack?`,
-        okButton: { title: 'Remove', variant: ButtonVariant.Primary },
+        title: 'Stack\'ten kaldırılsın mı?',
+        description: `"${displayTitle}" öğesini stack'inizden kaldırmak istediğinize emin misiniz?`,
+        okButton: { title: 'Kaldır', variant: ButtonVariant.Primary },
       });
       if (!confirmed) {
         return;
@@ -156,9 +156,9 @@ export function ProfileUserStack({
 
       try {
         await remove(item.id);
-        displayToast('Removed from your stack');
+        displayToast('Stack\'inizden kaldırıldı');
       } catch (error) {
-        displayToast('Failed to remove item');
+        displayToast('Öğe kaldırılamadı');
       }
     },
     [remove, displayToast, showPrompt],
@@ -171,7 +171,7 @@ export function ProfileUserStack({
 
   const handleOpenModal = useCallback(() => {
     if (!canAddMore) {
-      displayToast(`Maximum of ${MAX_STACK_ITEMS} stack items allowed`);
+      displayToast(`En fazla ${MAX_STACK_ITEMS} stack öğesine izin veriliyor`);
       return;
     }
     logEvent({
@@ -225,7 +225,7 @@ export function ProfileUserStack({
         await reorder(nextItems);
       } catch (error) {
         resetSections(stackItems);
-        displayToast('Failed to reorder stack items');
+        displayToast('Stack öğeleri yeniden sıralanamadı');
       }
     },
     [displayToast, reorder, resetSections, stackItems],
@@ -243,7 +243,7 @@ export function ProfileUserStack({
 
   const [, onShareStack] = useShareOrCopyLink({
     link: `${apiUrl}/og/stack/${user.id}.png`,
-    text: 'Check out my developer stack on daily.dev!',
+    text: 'daily.dev üzerindeki developer stack\'ime göz at!',
     logObject: (provider) => ({
       event_name: LogEvent.ShareUserStack,
       target_id: user.id,
@@ -264,7 +264,7 @@ export function ProfileUserStack({
           color={TypographyColor.Primary}
           bold
         >
-          Stack & Tools
+          Stack & Araçlar
         </Typography>
         <div className="flex items-center gap-1">
           {isOwner && hasItems && (
@@ -274,7 +274,7 @@ export function ProfileUserStack({
               icon={<ShareIcon />}
               onClick={() => onShareStack()}
             >
-              Share
+              Paylaş
             </Button>
           )}
           {isOwner && canAddMore && (
@@ -284,7 +284,7 @@ export function ProfileUserStack({
               icon={<PlusIcon />}
               onClick={handleOpenModal}
             >
-              Add
+              Ekle
             </Button>
           )}
         </div>
@@ -326,7 +326,7 @@ export function ProfileUserStack({
               type={TypographyType.Callout}
               color={TypographyColor.Tertiary}
             >
-              Share your stack & tools with the community
+              Stack ve araçlarınızı toplulukla paylaşın
             </Typography>
             <Button
               variant={ButtonVariant.Secondary}
@@ -334,7 +334,7 @@ export function ProfileUserStack({
               icon={<PlusIcon />}
               onClick={handleOpenModal}
             >
-              Add your first item
+              İlk öğenizi ekleyin
             </Button>
           </div>
         )

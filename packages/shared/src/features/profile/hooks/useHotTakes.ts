@@ -20,8 +20,8 @@ import { LogEvent } from '../../../lib/log';
 import type { Connection } from '../../../graphql/common';
 
 export const MAX_HOT_TAKES = 5;
-export const HOT_TAKE_LIMIT_HINT = `You can add up to ${MAX_HOT_TAKES} hot takes`;
-export const HOT_TAKE_LIMIT_REACHED_MESSAGE = `You already have all ${MAX_HOT_TAKES} hot takes. Remove one to add a new one.`;
+export const HOT_TAKE_LIMIT_HINT = `En fazla ${MAX_HOT_TAKES} hot take ekleyebilirsiniz`;
+export const HOT_TAKE_LIMIT_REACHED_MESSAGE = `Zaten ${MAX_HOT_TAKES} hot take eklediniz. Yeni eklemek için birini kaldırın.`;
 
 const sortHotTakes = (left: HotTake, right: HotTake) => {
   if (left.position !== right.position) {

@@ -55,7 +55,7 @@ const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
   description:
-    'Reading builds your world. See who reads the same topics you do.',
+    'Okumak dünyanızı inşa eder. Sizinle aynı konuları okuyanları görün.',
 };
 
 const RANKING_LIMIT = 10;
@@ -357,14 +357,14 @@ function WorldIndexPage(): ReactElement {
   };
 
   const subject = isWholeDomain
-    ? (domain?.name ?? 'this field').toLowerCase()
-    : topic?.title ?? 'topic';
+    ? (domain?.name ?? 'bu alan').toLowerCase()
+    : topic?.title ?? 'konu';
   const allTimeDescription = isWholeDomain
-    ? `Ranked by every ${subject} article read, added up across the whole field. Somebody who reads broadly places here even when no single topic would show them.`
-    : `Ranked by every ${subject} article read. Someone who only reads one topic can beat someone who reads a bit of everything.`;
+    ? `Tüm alanda okunan her ${subject} makalesine göre sıralanmıştır. Kapsamlı okuma yapanlar tek bir konuya bağlı kalmadan burada listelenir.`
+    : `Okunan her ${subject} makalesine göre sıralanmıştır. Belirli bir alanda uzmanlaşan okuyucular burada öne çıkar.`;
   const rankingDescription =
     period === WorldRankPeriod.Week
-      ? `Ranked by ${subject} articles read in the last seven days. The count starts over every week, so a good week is enough to place.`
+      ? `Son 7 günde okunan ${subject} makalelerine göre sıralanmıştır. Sayaç her hafta sıfırlanır, bu yüzden iyi bir hafta sıralamaya girmek için yeterlidir.`
       : allTimeDescription;
 
   return (
@@ -386,8 +386,8 @@ function WorldIndexPage(): ReactElement {
           {/* ---------- pick a topic ---------- */}
           <section className="flex flex-col gap-4">
             <SectionHeader
-              title="Browse by field"
-              description="Six fields, forty topics. Pick a field for its whole leaderboard, or a topic inside it."
+              title="Alana göre göz at"
+              description="Altı alan, kırk konu. Tüm Leaderboard'u görmek için bir alan veya içindeki bir konuyu seçin."
             />
 
             {isCataloguePending ? (
@@ -432,7 +432,7 @@ function WorldIndexPage(): ReactElement {
                       color={TypographyColor.Tertiary}
                       className="mt-auto tabular-nums"
                     >
-                      {item.readers.toLocaleString()} readers
+                      {item.readers.toLocaleString()} okur
                     </Typography>
                   </button>
                 ))}
@@ -443,9 +443,9 @@ function WorldIndexPage(): ReactElement {
           {/* ---------- the ranking ---------- */}
           <section className="flex flex-col gap-4">
             <SectionHeader
-              title={`Top in ${
-                isWholeDomain ? domain?.name ?? 'this field' : topic.title
-              }`}
+              title={`${
+                isWholeDomain ? domain?.name ?? 'Bu alan' : topic.title
+              } Liderleri`}
               description={rankingDescription}
               action={
                 <div className="flex gap-1">
@@ -456,7 +456,7 @@ function WorldIndexPage(): ReactElement {
                     pressed={period === WorldRankPeriod.Week}
                     onClick={() => setPeriod(WorldRankPeriod.Week)}
                   >
-                    This week
+                    Bu hafta
                   </Button>
                   <Button
                     type="button"
@@ -465,7 +465,7 @@ function WorldIndexPage(): ReactElement {
                     pressed={period === WorldRankPeriod.All}
                     onClick={() => setPeriod(WorldRankPeriod.All)}
                   >
-                    All time
+                    Tüm zamanlar
                   </Button>
                 </div>
               }
@@ -480,7 +480,7 @@ function WorldIndexPage(): ReactElement {
                 onClick={() => setTopicSlug(null)}
                 className="shrink-0"
               >
-                All of {domain?.name ?? 'this field'}
+                Tümü ({domain?.name ?? 'bu alan'})
               </Button>
               {topics.map((item: WorldNicheSummary) => (
                 <Button
@@ -507,7 +507,7 @@ function WorldIndexPage(): ReactElement {
                     type={TypographyType.Caption1}
                     color={TypographyColor.Tertiary}
                   >
-                    in {domain?.name ?? ''}
+                    {domain?.name ?? ''} alanında
                   </Typography>
                 )}
                 {/* An all-time count whichever period is showing, because it
@@ -522,7 +522,7 @@ function WorldIndexPage(): ReactElement {
                     ? domain?.readers ?? 0
                     : topic.readers
                   ).toLocaleString()}{' '}
-                  readers all time
+                  toplam okur
                 </Typography>
               </div>
 
@@ -566,7 +566,7 @@ function WorldIndexPage(): ReactElement {
                       color={TypographyColor.Tertiary}
                       className="px-2 py-6 text-center"
                     >
-                      Nobody has read enough of this yet. Be the first.
+                      Henüz kimse bu konuda yeterince okuma yapmadı. İlk siz olun.
                     </Typography>
                   )}
                 </ol>
@@ -578,8 +578,8 @@ function WorldIndexPage(): ReactElement {
           {(isLevelUpsPending || !!levelUps.length) && (
             <section className="flex flex-col gap-4">
               <SectionHeader
-                title="Just leveled up"
-                description="Topics that reached a new level today. Small worlds level up far more often than big ones, so this list changes daily."
+                title="Az önce Level atlayanlar"
+                description="Bugün yeni bir Level'a ulaşan konular. Küçük World'ler büyüklere göre çok daha sık Level atlar, bu liste günlük olarak değişir."
               />
 
               {isLevelUpsPending ? (
@@ -590,7 +590,7 @@ function WorldIndexPage(): ReactElement {
                     <WorldIndexCard
                       key={`${entry.world.user.id}-${entry.niche.id}`}
                       world={entry.world}
-                      event={`${entry.niche.title} hit level ${entry.level}`}
+                      event={`${entry.niche.title} Level ${entry.level} seviyesine ulaştı`}
                       className="w-64 shrink-0 tablet:w-80"
                     />
                   ))}
@@ -603,8 +603,8 @@ function WorldIndexPage(): ReactElement {
           {isLoggedIn && (isFollowedPending || !!followed.length) && (
             <section className="flex flex-col gap-4">
               <SectionHeader
-                title="People you follow"
-                description="Worlds built by the people you follow."
+                title="Takip ettiğiniz kişiler"
+                description="Takip ettiğiniz kişilerin oluşturduğu World'ler."
               />
 
               {isFollowedPending ? (
@@ -626,7 +626,7 @@ function WorldIndexPage(): ReactElement {
                   onClick={() => fetchMoreFollowed()}
                   className="self-center"
                 >
-                  Show more
+                  Daha fazla göster
                 </Button>
               )}
             </section>

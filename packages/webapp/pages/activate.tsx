@@ -8,7 +8,7 @@ import { ErrorBoundary } from '@dailydotdev/shared/src/components/ErrorBoundary'
 import { getPageSeoTitles } from '../components/layouts/utils';
 import { defaultOpenGraph, defaultSeo } from '../next-seo';
 
-const seoTitles = getPageSeoTitles('Activate your new tab');
+const seoTitles = getPageSeoTitles('Yeni sekmenizi etkinleştirin');
 const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },

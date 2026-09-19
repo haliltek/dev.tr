@@ -67,10 +67,10 @@ const hasUnread = (data: InfiniteData<NotificationsData>) =>
 // Coarse time buckets (Instagram/TikTok/X style) that give the feed rhythm and
 // breathing room without per-day noise. First match wins.
 const TIME_GROUPS = [
-  { key: 'today', label: 'Today', maxDays: 0 },
-  { key: 'week', label: 'This week', maxDays: 7 },
-  { key: 'month', label: 'This month', maxDays: 30 },
-  { key: 'earlier', label: 'Earlier', maxDays: Number.POSITIVE_INFINITY },
+  { key: 'today', label: 'Bugün', maxDays: 0 },
+  { key: 'week', label: 'Bu hafta', maxDays: 7 },
+  { key: 'month', label: 'Bu ay', maxDays: 30 },
+  { key: 'earlier', label: 'Daha önce', maxDays: Number.POSITIVE_INFINITY },
 ] as const;
 
 export const NotificationsFeed = (): ReactElement => {
@@ -212,7 +212,7 @@ export const NotificationsFeed = (): ReactElement => {
 
   return (
     <ProtectedPage>
-      {isV2Laptop && <PageHeader title="Notifications" />}
+      {isV2Laptop && <PageHeader title="Bildirimler" />}
       <main
         className={classNames(
           !isV2Laptop && pageBorders,
@@ -228,7 +228,7 @@ export const NotificationsFeed = (): ReactElement => {
               className="font-bold typo-body"
               data-testid="notification_page-title"
             >
-              Notifications
+              Bildirimler
             </h2>
             <Link href={`${webappUrl}notifications/settings`} passHref>
               <Button
@@ -236,7 +236,7 @@ export const NotificationsFeed = (): ReactElement => {
                 icon={<SettingsIcon />}
                 variant={ButtonVariant.Tertiary}
                 size={ButtonSize.Small}
-                aria-label="Notification settings"
+                aria-label="Bildirim ayarları"
               />
             </Link>
           </div>
@@ -286,9 +286,9 @@ export const NotificationsFeed = (): ReactElement => {
             filtered.length === 0 &&
             activeCategory && (
               <p className="px-4 py-10 text-center text-text-tertiary typo-callout">
-                No{' '}
+                Henüz{' '}
                 {notificationFilterCategoryLabel[activeCategory].toLowerCase()}{' '}
-                notifications yet.
+                bildirimi yok.
               </p>
             )}
           {isFetched &&

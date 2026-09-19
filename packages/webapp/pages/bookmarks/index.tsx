@@ -8,7 +8,7 @@ import {
 import { defaultOpenGraph, defaultSeo, noindexSeoProps } from '../../next-seo';
 
 const seo: NextSeoProps = {
-  title: `Your daily.dev bookmarks`,
+  title: `Yer İmleriniz - daily.dev`,
   openGraph: { ...defaultOpenGraph },
   ...defaultSeo,
   ...noindexSeoProps,

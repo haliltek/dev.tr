@@ -52,7 +52,7 @@ export function ScheduledPostItem({
           />
           <div className="flex min-w-0 flex-1 flex-col">
             <Typography type={TypographyType.Body} bold truncate>
-              {post.title || 'Untitled post'}
+              {post.title || 'Başlıksız post'}
             </Typography>
             {post.source?.name && (
               <Typography
@@ -77,7 +77,7 @@ export function ScheduledPostItem({
           </div>
         </a>
       </Link>
-      <Tooltip content="Delete scheduled post">
+      <Tooltip content="Planlanan postu sil">
         <Button
           type="button"
           size={ButtonSize.Small}
@@ -85,7 +85,7 @@ export function ScheduledPostItem({
           icon={<TrashIcon />}
           onClick={() => deleteScheduledPost(post.id)}
           disabled={isDeleting}
-          aria-label="Delete scheduled post"
+          aria-label="Planlanan postu sil"
         />
       </Tooltip>
     </div>

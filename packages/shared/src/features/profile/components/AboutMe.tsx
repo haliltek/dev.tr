@@ -55,7 +55,7 @@ export function AboutMe({
         color={TypographyColor.Primary}
         bold
       >
-        About me
+        Hakkımda
       </Typography>
 
       {shouldShowSocialLinks && (

@@ -28,7 +28,7 @@ const getScheduledLayout: typeof getLayout = (...props) =>
   getFooterNavBarLayout(getLayout(...props));
 
 const seo: NextSeoProps = {
-  title: 'Scheduled posts',
+  title: 'Planlanan Postlar',
   nofollow: true,
   noindex: true,
 };

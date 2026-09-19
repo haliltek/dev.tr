@@ -61,7 +61,7 @@ export function ReadingHistory(): ReactElement {
     >
       <PostsSearch
         autoFocus={false}
-        placeholder="Search reading history"
+        placeholder="Okuma geçmişinde ara"
         suggestionType="searchReadingHistorySuggestions"
         className="m-4"
       />

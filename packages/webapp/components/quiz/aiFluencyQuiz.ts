@@ -60,41 +60,41 @@ export const aiFluencyTiers: AiFluencyTier[] = [
   {
     key: 'casualUser',
     label: 'Casual User',
-    summary: 'Uses AI for quick answers and light one-shot help.',
+    summary: 'Hızlı cevaplar ve hafif tek seferlik yardım için AI kullanır.',
   },
   {
     key: 'promptDeveloper',
     label: 'Prompt Developer',
-    summary: 'Uses structured prompts and iteration to produce better output.',
+    summary: 'Daha iyi çıktılar üretmek için yapılandırılmış promptlar ve iterasyon kullanır.',
   },
   {
     key: 'agenticDeveloper',
     label: 'Agentic Developer',
-    summary: 'Works with multi-step AI workflows and context-aware prompting.',
+    summary: 'Çok adımlı AI iş akışları ve bağlam duyarlı promptlama ile çalışır.',
   },
   {
     key: 'aiEngineer',
     label: 'AI Engineer',
     summary:
-      'Builds production-grade AI features with evaluation, safety, and reliability in mind.',
+      'Değerlendirme, güvenlik ve güvenilirlik odaklı prodüksiyon düzeyinde AI özellikleri geliştirir.',
   },
   {
     key: 'aiSystemArchitect',
     label: 'AI System Architect',
     summary:
-      'Designs end-to-end AI systems with orchestration, governance, and operating standards.',
+      'Orkestrasyon, yönetişim ve işletim standartları ile uçtan uca AI sistemleri tasarlar.',
   },
   {
     key: 'aiPlatformDeveloper',
     label: 'AI Platform Developer',
     summary:
-      'Creates reusable AI platforms, internal tooling, and scalable training for teams.',
+      'Ekipler için yeniden kullanılabilir AI platformları, dahili araçlar ve ölçeklenebilir eğitimler oluşturur.',
   },
   {
     key: 'aiPioneer',
     label: 'AI Pioneer',
     summary:
-      'Shapes new AI practices, drives innovation, and influences organizational strategy.',
+      'Yeni AI pratiklerini şekillendirir, inovasyonu yönlendirir ve kurumsal stratejiyi etkiler.',
   },
 ];
 
@@ -106,346 +106,346 @@ const aiFluencyTierByKey = aiFluencyTiers.reduce((acc, tier) => {
 export const aiFluencyQuestions: AiFluencyQuestion[] = [
   {
     id: 'task-start',
-    prompt: 'How do you start a new task with AI?',
+    prompt: 'AI ile yeni bir göreve nasıl başlarsınız?',
     options: [
       {
         id: 'task-start-quick-answer',
         label:
-          'I open a new chat, ask a quick question, and copy whatever looks useful.',
+          'Yeni bir sohbet açar, hızlıca bir soru sorar ve işe yarayan kısımları kopyalarım.',
         tier: 'casualUser',
       },
       {
         id: 'task-start-prompt-template',
         label:
-          'I pick a prompt from my library or saved project, then iterate until the output is solid.',
+          'Kütüphanemden veya kayıtlı projelerimden bir prompt seçer, çıktı oturana kadar iterate ederim.',
         tier: 'promptDeveloper',
       },
       {
         id: 'task-start-plan-workflow',
-        label: 'I ask AI to break tasks into steps and keep context.',
+        label: "AI'dan görevleri adımlara bölmesini ve bağlamı korumasını isterim.",
         tier: 'agenticDeveloper',
       },
       {
         id: 'task-start-evals',
         label:
-          'Before building, I define success criteria, edge cases, and repeatable tests.',
+          'Geliştirmeye başlamadan önce başarı kriterlerini, uç durumları ve tekrarlanabilir testleri tanımlarım.',
         tier: 'aiEngineer',
       },
       {
         id: 'task-start-systems',
         label:
-          'I evaluate how the task fits into our existing AI architecture before starting.',
+          'Başlamadan önce görevin mevcut AI mimarimizle nasıl uyum sağladığını değerlendiririm.',
         tier: 'aiSystemArchitect',
       },
     ],
   },
   {
     id: 'context-management',
-    prompt: 'How do you manage context across longer AI sessions?',
+    prompt: 'Uzun AI oturumlarında bağlamı (context) nasıl yönetirsiniz?',
     options: [
       {
         id: 'context-management-none',
-        label: 'I usually start a fresh chat each time.',
+        label: 'Genellikle her seferinde sıfırdan yeni bir sohbet başlatırım.',
         tier: 'casualUser',
       },
       {
         id: 'context-management-manual',
         label:
-          'I copy-paste relevant context from earlier chats or docs into my prompt when needed.',
+          "Gerektiğinde önceki sohbetlerden veya dokümanlardan ilgili bağlamı prompt'uma kopyalayıp yapıştırırım.",
         tier: 'promptDeveloper',
       },
       {
         id: 'context-management-structured',
         label:
-          'I use tools or techniques to keep context fresh across longer workflows.',
+          'Daha uzun iş akışlarında bağlamı güncel tutmak için araçlar ve teknikler kullanırım.',
         tier: 'agenticDeveloper',
       },
       {
         id: 'context-management-state',
-        label: 'I use memory/state patterns for reliable multi-step work.',
+        label: 'Güvenilir çok adımlı çalışmalar için bellek/durum (state) desenleri kullanırım.',
         tier: 'aiEngineer',
       },
       {
         id: 'context-management-platform',
-        label: 'I define shared context standards for teams and tools.',
+        label: 'Ekipler ve araçlar için paylaşılan bağlam standartları tanımlarım.',
         tier: 'aiPlatformDeveloper',
       },
     ],
   },
   {
     id: 'quality-check',
-    prompt: 'How do you check AI output quality?',
+    prompt: 'AI çıktı kalitesini nasıl kontrol edersiniz?',
     options: [
       {
         id: 'quality-check-skim',
         label:
-          'I skim the output and use it if it looks reasonable. I rarely verify details.',
+          'Çıktıya göz gezdiririm ve makul görünüyorsa kullanırım. Ayrıntıları nadiren doğrularım.',
         tier: 'casualUser',
       },
       {
         id: 'quality-check-manual',
-        label: 'I manually test obvious cases and fix issues as they come up.',
+        label: 'Belirgin durumları manuel olarak test eder ve sorun çıktıkça düzeltirim.',
         tier: 'promptDeveloper',
       },
       {
         id: 'quality-check-checklist',
-        label: 'I use a checklist for accuracy, security, and style.',
+        label: 'Doğruluk, güvenlik ve stil için bir kontrol listesi (checklist) kullanırım.',
         tier: 'agenticDeveloper',
       },
       {
         id: 'quality-check-evals',
         label:
-          'I run repeatable quality checks and track pass/fail trends over time.',
+          'Tekrarlanabilir kalite kontrolleri çalıştırır ve zaman içindeki başarı/başarısızlık eğilimlerini takip ederim.',
         tier: 'aiEngineer',
       },
       {
         id: 'quality-check-org-standard',
         label:
-          'I define org-wide evaluation standards, guardrails, and service-level indicators for AI quality.',
+          "AI kalitesi için kurum genelinde değerlendirme standartları, guardrail'lar ve SLI göstergeleri tanımlarım.",
         tier: 'aiSystemArchitect',
       },
     ],
   },
   {
     id: 'tooling',
-    prompt: 'Which best describes your AI tools setup?',
+    prompt: 'AI araçları kurulumunuzu en iyi hangisi tanımlar?',
     options: [
       {
         id: 'tooling-single-chat',
         label:
-          'I use one chat tool like ChatGPT or Copilot whenever something comes up.',
+          'İhtiyaç duydukça ChatGPT veya Copilot gibi tek bir sohbet aracı kullanırım.',
         tier: 'casualUser',
       },
       {
         id: 'tooling-multi-tool',
         label:
-          'I use a few tools (chat, code assistant, maybe a local model) with a loose workflow between them.',
+          'Aralarında esnek bir iş akışı bulunan birkaç araç (sohbet, kod asistanı, belki yerel bir model) kullanırım.',
         tier: 'promptDeveloper',
       },
       {
         id: 'tooling-agent-workflow',
-        label: 'A toolchain with clear roles (research, draft, review).',
+        label: 'Net rollere sahip bir araç zinciri (araştırma, taslak, inceleme).',
         tier: 'agenticDeveloper',
       },
       {
         id: 'tooling-service-integration',
-        label: 'Integrated AI services with monitoring and fallbacks.',
+        label: 'İzleme ve fallback mekanizmalarına sahip entegre AI servisleri.',
         tier: 'aiEngineer',
       },
       {
         id: 'tooling-platform',
-        label: 'An internal platform teams can reuse across the org.',
+        label: 'Kurum genelinde ekiplerin yeniden kullanabileceği dahili bir platform.',
         tier: 'aiPlatformDeveloper',
       },
     ],
   },
   {
     id: 'automation',
-    prompt: 'How much do you automate AI workflows?',
+    prompt: 'AI iş akışlarını ne kadar otomatikleştiriyorsunuz?',
     options: [
       {
         id: 'automation-none',
         label:
-          "Almost none. I type prompts by hand each time and don't reuse or script anything.",
+          "Neredeyse hiç. Her seferinde promptları elle yazarım, hiçbir şeyi yeniden kullanmam veya script'e dökmem.",
         tier: 'casualUser',
       },
       {
         id: 'automation-basic',
         label:
-          'I have simple scripts or saved templates that handle my most repeated prompts automatically.',
+          'En sık tekrarladığım promptları otomatik olarak işleyen basit scriptlerim veya kayıtlı şablonlarım var.',
         tier: 'promptDeveloper',
       },
       {
         id: 'automation-agent',
-        label: 'Semi-automated agents with checkpoints and approvals.',
+        label: "Kontrol noktaları ve onay mekanizmaları olan yarı otomatik agent'lar.",
         tier: 'agenticDeveloper',
       },
       {
         id: 'automation-production',
         label:
-          'Reliable production automation with monitoring and the ability to undo changes.',
+          'İzleme ve değişiklikleri geri alma yeteneğine sahip güvenilir prodüksiyon otomasyonu.',
         tier: 'aiEngineer',
       },
       {
         id: 'automation-program',
-        label: 'Enterprise automation standards used by multiple teams.',
+        label: 'Birden fazla ekip tarafından kullanılan kurumsal otomasyon standartları.',
         tier: 'aiSystemArchitect',
       },
     ],
   },
   {
     id: 'collaboration',
-    prompt: 'How do you work with teammates on AI tasks?',
+    prompt: 'AI görevlerinde ekip arkadaşlarınızla nasıl çalışırsınız?',
     options: [
       {
         id: 'collaboration-solo',
         label:
-          'I use AI on my own. If I find something useful, I might mention it in passing.',
+          "AI'ı kendi başıma kullanırım. Yararlı bir şey bulursam laf arasında bahsedebilirim.",
         tier: 'casualUser',
       },
       {
         id: 'collaboration-share-prompts',
-        label: 'I share useful prompts and examples in docs or chat.',
+        label: 'Yararlı promptları ve örnekleri dokümanlarda veya sohbette paylaşırım.',
         tier: 'promptDeveloper',
       },
       {
         id: 'collaboration-repeatable-playbooks',
-        label: 'I maintain shared playbooks for repeatable AI workflows.',
+        label: "Tekrarlanabilir AI iş akışları için paylaşılan playbook'lar yürütürüm.",
         tier: 'agenticDeveloper',
       },
       {
         id: 'collaboration-review-process',
         label:
-          'I lead code reviews that cover AI output quality and prompt logic.',
+          'AI çıktı kalitesini ve prompt mantığını kapsayan kod incelemelerine liderlik ederim.',
         tier: 'aiEngineer',
       },
       {
         id: 'collaboration-enable-org',
-        label: 'I lead training and standards for AI adoption across teams.',
+        label: 'Ekipler genelinde AI adaptasyonu için eğitim ve standartlara öncülük ederim.',
         tier: 'aiPlatformDeveloper',
       },
     ],
   },
   {
     id: 'risk-and-safety',
-    prompt: 'How do you handle AI risk and safety?',
+    prompt: 'AI riskini ve güvenliğini nasıl ele alırsınız?',
     options: [
       {
         id: 'risk-and-safety-reactive',
         label:
-          "I don't think about AI risk upfront. I just fix problems if and when they show up.",
+          'AI riskini önceden düşünmem. Yalnızca ortaya çıktıklarında sorunları düzeltirim.',
         tier: 'casualUser',
       },
       {
         id: 'risk-and-safety-basic-checks',
         label:
-          'I double-check sensitive output and watch for obvious hallucinations before using it.',
+          'Hassas çıktıları iki kez kontrol eder ve kullanmadan önce bariz halüsinasyonlara dikkat ederim.',
         tier: 'promptDeveloper',
       },
       {
         id: 'risk-and-safety-scenarios',
-        label: 'I test common failure cases and document fixes.',
+        label: 'Yaygın hata senaryolarını test eder ve çözümleri dokümante ederim.',
         tier: 'agenticDeveloper',
       },
       {
         id: 'risk-and-safety-production',
         label:
-          'I build safety checks and content filters into production features.',
+          'Prodüksiyon özelliklerine güvenlik kontrolleri ve içerik filtreleri dahil ederim.',
         tier: 'aiEngineer',
       },
       {
         id: 'risk-and-safety-guardrails',
         label:
-          'I set up safety rules, stress-test for failures, and define escalation paths.',
+          'Güvenlik kuralları kurar, hatalar için stres testleri yapar ve eskalasyon yolları belirlerim.',
         tier: 'aiSystemArchitect',
       },
       {
         id: 'risk-and-safety-frontier',
         label:
-          'I help define advanced safety practices for new model behavior.',
+          'Yeni model davranışları için gelişmiş güvenlik pratiklerinin tanımlanmasına yardımcı olurum.',
         tier: 'aiPioneer',
       },
     ],
   },
   {
     id: 'measurement',
-    prompt: 'How do you measure impact from AI usage?',
+    prompt: 'AI kullanımının yarattığı etkiyi nasıl ölçüyorsunuz?',
     options: [
       {
         id: 'measurement-feel',
-        label: 'I rely on gut feel and personal productivity gains.',
+        label: 'İçgüdülerime ve kişisel üretkenlik kazanımlarıma güvenirim.',
         tier: 'casualUser',
       },
       {
         id: 'measurement-basic-metrics',
-        label: 'I track a few simple metrics manually (time saved, output).',
+        label: 'Birkaç basit metriği manuel olarak takip ederim (zaman tasarrufu, çıktı adedi).',
         tier: 'promptDeveloper',
       },
       {
         id: 'measurement-team-metrics',
-        label: 'I track team outcomes tied to specific workflows.',
+        label: 'Belirli iş akışlarına bağlı ekip çıktılarını takip ederim.',
         tier: 'agenticDeveloper',
       },
       {
         id: 'measurement-product-metrics',
         label:
-          'I track model quality with product and business metrics in dashboards.',
+          'Model kalitesini panolarda ürün ve iş metrikleriyle birlikte izlerim.',
         tier: 'aiEngineer',
       },
       {
         id: 'measurement-strategy',
         label:
-          'I define success metrics for AI programs across teams and products.',
+          'Ekipler ve ürünler genelinde AI programları için başarı metrikleri tanımlarım.',
         tier: 'aiSystemArchitect',
       },
     ],
   },
   {
     id: 'ai-mistakes',
-    prompt: 'How do you deal with AI getting things wrong?',
+    prompt: 'AI hata yaptığında durumu nasıl yönetirsiniz?',
     options: [
       {
         id: 'ai-mistakes-trust',
         label:
-          'I usually trust the output and fix things if I notice a mistake.',
+          'Genellikle çıktıya güvenirim ve bir hata fark edersem düzeltirim.',
         tier: 'casualUser',
       },
       {
         id: 'ai-mistakes-rephrase',
         label:
-          "I double-check important output and rephrase my prompt if it's off.",
+          "Önemli çıktıları iki kez kontrol eder ve sorunluysa prompt'umu yeniden ifade ederim.",
         tier: 'promptDeveloper',
       },
       {
         id: 'ai-mistakes-model-selection',
         label:
-          'I pick the right model for the job and structure prompts to reduce errors.',
+          'İş için doğru modeli seçer ve hataları azaltmak için promptları yapılandırırım.',
         tier: 'agenticDeveloper',
       },
       {
         id: 'ai-mistakes-automated-checks',
         label:
-          'I build automated checks that catch bad output before it reaches users.',
+          'Kötü çıktıların kullanıcılara ulaşmasını engelleyen otomatik kontroller oluştururum.',
         tier: 'aiEngineer',
       },
       {
         id: 'ai-mistakes-containment',
         label:
-          "I design systems where AI failures are contained and don't cascade.",
+          'AI hatalarının izole edildiği ve ardışık krizlere yol açmadığı sistemler tasarlarım.',
         tier: 'aiSystemArchitect',
       },
     ],
   },
   {
     id: 'future-readiness',
-    prompt: 'How do you stay current as AI changes quickly?',
+    prompt: 'AI hızla değişirken güncel kalmayı nasıl başarıyorsunuz?',
     options: [
       {
         id: 'future-readiness-occasional',
         label:
-          "I hear about new AI tools through social media or coworkers, but I don't actively track changes.",
+          'Yeni AI araçlarını sosyal medyadan veya iş arkadaşlarımdan duyarım, ancak değişiklikleri aktif olarak takip etmem.',
         tier: 'casualUser',
       },
       {
         id: 'future-readiness-routine',
         label:
-          'I try out new models and prompting techniques when they gain traction, and adopt what works.',
+          'Yeni modeller ve prompt teknikleri popülerlik kazandığında dener, işe yarayanları benimserim.',
         tier: 'promptDeveloper',
       },
       {
         id: 'future-readiness-deliberate',
-        label: 'I run planned experiments and capture what I learn.',
+        label: 'Planlı deneyler yürütür ve öğrendiklerimi kaydederim.',
         tier: 'agenticDeveloper',
       },
       {
         id: 'future-readiness-roadmap',
-        label: 'I maintain a roadmap to adopt advanced capabilities safely.',
+        label: 'Gelişmiş yetenekleri güvenle benimsemek için bir yol haritası yürütürüm.',
         tier: 'aiSystemArchitect',
       },
       {
         id: 'future-readiness-shape-market',
         label:
-          'I publish and prototype, and shape how others adopt new AI patterns.',
+          'Prototip geliştirir, yayınlar yapar ve başkalarının yeni AI kalıplarını nasıl benimsediğini şekillendiririm.',
         tier: 'aiPioneer',
       },
     ],
@@ -475,39 +475,39 @@ const optionTierById = aiFluencyQuestions.reduce((acc, question) => {
 
 export const aiFluencyTipsByTier: Record<AiFluencyTierKey, string[]> = {
   casualUser: [
-    'Use a simple prompt template: context, task, constraints, expected output.',
-    'Compare at least two prompt variations before choosing an answer.',
-    'Review output for correctness and edge cases before applying it.',
+    'Basit bir prompt şablonu kullanın: bağlam, görev, kısıtlamalar, beklenen çıktı.',
+    'Bir cevap seçmeden önce en az iki farklı prompt varyasyonunu karşılaştırın.',
+    'Uygulamadan önce çıktıyı doğruluk ve uç durumlar açısından gözden geçirin.',
   ],
   promptDeveloper: [
-    'Break complex tasks into multi-step prompts with explicit checkpoints.',
-    'Store reusable prompts and examples in a shared playbook.',
-    'Start measuring quality and time saved for your most frequent workflows.',
+    'Karmaşık görevleri açık kontrol noktaları olan çok adımlı promptlara bölün.',
+    "Yeniden kullanılabilir promptları ve örnekleri paylaşılan bir playbook'ta saklayın.",
+    'En sık kullandığınız iş akışları için kaliteyi ve kazanılan zamanı ölçmeye başlayın.',
   ],
   agenticDeveloper: [
-    'Add lightweight quality checks to verify outputs across common scenarios.',
-    'Introduce guardrails for security, privacy, and hallucination risks.',
-    'Automate repetitive AI workflows with clear human approval points.',
+    'Yaygın senaryolarda çıktıları doğrulamak için hafif kalite kontrolleri ekleyin.',
+    "Güvenlik, gizlilik ve halüsinasyon riskleri için guardrail'lar uygulayın.",
+    'Tekrarlayan AI iş akışlarını net insan onay noktaları ile otomatikleştirin.',
   ],
   aiEngineer: [
-    'Standardize evaluation datasets and pass/fail thresholds.',
-    'Instrument production usage with monitoring and error classification.',
-    'Document model selection criteria and fallback behavior for reliability.',
+    'Değerlendirme veri kümelerini ve geçme/kalma eşiklerini standartlaştırın.',
+    'Prodüksiyon kullanımını izleme ve hata sınıflandırmasıyla donatın.',
+    'Güvenilirlik için model seçim kriterlerini ve fallback davranışlarını dokümante edin.',
   ],
   aiSystemArchitect: [
-    'Codify AI architecture standards shared across teams and products.',
-    'Create governance processes for risk reviews and policy enforcement.',
-    'Build capability maps so teams can self-serve approved AI patterns.',
+    'Ekipler ve ürünler arasında paylaşılan AI mimari standartlarını belirleyin.',
+    'Risk incelemeleri ve politika denetimi için yönetişim süreçleri oluşturun.',
+    'Ekiplerin onaylanmış AI kalıplarından self-servis yararlanabilmesi için yetenek haritaları oluşturun.',
   ],
   aiPlatformDeveloper: [
-    'Invest in reusable platform primitives to accelerate safe experimentation.',
-    'Expand internal developer education for advanced AI workflows.',
-    'Benchmark emerging models and techniques against strategic objectives.',
+    'Güvenli denemeleri hızlandırmak için yeniden kullanılabilir platform bileşenlerine yatırım yapın.',
+    'Gelişmiş AI iş akışları için şirket içi geliştirici eğitimlerini genişletin.',
+    'Gelişen modelleri ve teknikleri stratejik hedeflere göre benchmark edin.',
   ],
   aiPioneer: [
-    'Keep publishing reference architectures and lessons learned.',
-    'Mentor AI leads and scale decision-making frameworks organization-wide.',
-    'Push frontier experiments while preserving safety and governance rigor.',
+    'Referans mimarileri ve edinilen dersleri yayınlamaya devam edin.',
+    'AI liderlerine mentorluk yapın ve karar alma çerçevelerini kurum genelinde ölçeklendirin.',
+    'Güvenlik ve yönetişim titizliğini korurken öncü deneylerin sınırlarını zorlayın.',
   ],
 };
 

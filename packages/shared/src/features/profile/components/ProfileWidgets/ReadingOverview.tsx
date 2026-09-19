@@ -31,20 +31,20 @@ const readHistoryToTooltip = (
   value: UserReadHistory,
   date: Date,
 ): ReactNode => {
-  const formattedDate = date.toLocaleString('en-US', {
+  const formattedDate = date.toLocaleString('tr-TR', {
     month: 'short',
     day: '2-digit',
     year: 'numeric',
   });
   if (!value?.reads) {
-    return `No posts read on ${formattedDate}`;
+    return `${formattedDate} tarihinde okunan post yok`;
   }
   return (
     <>
       <strong>
-        {value.reads} {pluralize('article', value.reads)} read
+        {value.reads} post okundu
       </strong>
-      &nbsp;on {formattedDate}
+      &nbsp;({formattedDate})
     </>
   );
 };
@@ -89,7 +89,7 @@ export function ReadingOverview({
         bold
         className="flex items-center"
       >
-        Reading Overview
+        Okuma Özeti
       </Typography>
       <ClickableText
         tag="a"
@@ -97,7 +97,7 @@ export function ReadingOverview({
         href={migrateUserToStreaks}
         rel={anchorDefaultRel}
       >
-        Learn more
+        Daha fazla bilgi
       </ClickableText>
 
       {!!streak && <ReadingStreaksSection streak={streak} />}
@@ -110,7 +110,7 @@ export function ReadingOverview({
         color={TypographyColor.Tertiary}
         className="mb-3"
       >
-        Posts read in the last months
+        Son aylarda okunan postlar
         {totalReads >= 0 && ` (${largeNumberFormat(totalReads)})`}
       </Typography>
       {Array.isArray(readHistory) && (

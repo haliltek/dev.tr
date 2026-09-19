@@ -46,10 +46,10 @@ const ProfileAchievementsPage = ({
     ...getProfileSeoDefaults(
       user,
       {
-        ...getPageSeoTitles(`Achievements by ${user.name} (@${user.username})`),
-        description: `View ${
-          isSameUser ? 'your' : `${user.name}'s`
-        } achievements on daily.dev`,
+        ...getPageSeoTitles(`${user.name} (@${user.username}) başarımları`),
+        description: `${
+          isSameUser ? 'Kendi' : `${user.name} kullanıcısının`
+        } başarımlarını devcore üzerinde görüntüleyin`,
         noindex: true,
         nofollow: true,
       },
@@ -62,7 +62,7 @@ const ProfileAchievementsPage = ({
       <NextSeo {...seo} />
       <GoBackHeaderMobile>
         <Typography bold type={TypographyType.Body}>
-          Achievements
+          Başarımlar
         </Typography>
       </GoBackHeaderMobile>
       <div className="p-6">
@@ -76,5 +76,5 @@ ProfileAchievementsPage.getLayout = (
   page: ReactNode,
   props: ProfileLayoutProps,
 ): ReactNode =>
-  getProfileLayout(page, { ...props, pageHeaderTitle: 'Achievements' });
+  getProfileLayout(page, { ...props, pageHeaderTitle: 'Başarımlar' });
 export default ProfileAchievementsPage;

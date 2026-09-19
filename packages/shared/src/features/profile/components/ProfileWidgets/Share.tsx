@@ -45,7 +45,7 @@ interface ShareProps {
 
 export const Share = ({ permalink, className }: ShareProps): ReactElement => {
   const { logEvent } = useLogContext();
-  const shareText = 'Check out my profile on daily.dev!';
+  const shareText = 'daily.dev profilime göz at!';
 
   const getLogObject = (provider: ShareProvider) => ({
     event_name: LogEvent.ShareProfile,
@@ -65,7 +65,7 @@ export const Share = ({ permalink, className }: ShareProps): ReactElement => {
 
   const handleNativeShare = async () => {
     await navigator.share({
-      title: 'My daily.dev profile',
+      title: 'daily.dev profilim',
       text: shareText,
       url: permalink,
     });
@@ -75,37 +75,37 @@ export const Share = ({ permalink, className }: ShareProps): ReactElement => {
   const socialShareConfig = [
     {
       icon: <TwitterIcon />,
-      tooltip: 'Share on X',
+      tooltip: 'X\'te paylaş',
       href: getTwitterShareLink(permalink, shareText),
       provider: ShareProvider.Twitter,
     },
     {
       icon: <WhatsappIcon />,
-      tooltip: 'Share on WhatsApp',
+      tooltip: 'WhatsApp\'ta paylaş',
       href: getWhatsappShareLink(permalink),
       provider: ShareProvider.WhatsApp,
     },
     {
       icon: <FacebookIcon />,
-      tooltip: 'Share on Facebook',
+      tooltip: 'Facebook\'ta paylaş',
       href: getFacebookShareLink(permalink),
       provider: ShareProvider.Facebook,
     },
     {
       icon: <RedditIcon />,
-      tooltip: 'Share on Reddit',
+      tooltip: 'Reddit\'te paylaş',
       href: getRedditShareLink(permalink, shareText),
       provider: ShareProvider.Reddit,
     },
     {
       icon: <LinkedInIcon />,
-      tooltip: 'Share on LinkedIn',
+      tooltip: 'LinkedIn\'de paylaş',
       href: getLinkedInShareLink(permalink),
       provider: ShareProvider.LinkedIn,
     },
     {
       icon: <TelegramIcon />,
-      tooltip: 'Share on Telegram',
+      tooltip: 'Telegram\'da paylaş',
       href: getTelegramShareLink(permalink, shareText),
       provider: ShareProvider.Telegram,
     },
@@ -125,7 +125,7 @@ export const Share = ({ permalink, className }: ShareProps): ReactElement => {
             color={TypographyColor.Primary}
             bold
           >
-            Public profile & URL
+            Herkese açık profil & URL
           </Typography>
           <Typography
             type={TypographyType.Subhead}
@@ -135,13 +135,13 @@ export const Share = ({ permalink, className }: ShareProps): ReactElement => {
             {permalink}
           </Typography>
         </div>
-        <Tooltip content={copying ? 'Copied!' : 'Copy link'}>
+        <Tooltip content={copying ? 'Kopyalandı!' : 'Bağlantıyı kopyala'}>
           <Button
             variant={ButtonVariant.Tertiary}
             size={ButtonSize.XSmall}
             icon={<CopyIcon secondary={copying} />}
             onClick={onShareOrCopy}
-            aria-label={copying ? 'Copied!' : 'Copy link'}
+            aria-label={copying ? 'Kopyalandı!' : 'Bağlantıyı kopyala'}
           />
         </Tooltip>
       </div>
@@ -153,7 +153,7 @@ export const Share = ({ permalink, className }: ShareProps): ReactElement => {
           type={TypographyType.Subhead}
           color={TypographyColor.Tertiary}
         >
-          Share
+          Paylaş
         </Typography>
         {socialShareConfig.map(({ icon, tooltip, href, provider }) => (
           <Tooltip content={tooltip} key={provider}>
@@ -171,13 +171,13 @@ export const Share = ({ permalink, className }: ShareProps): ReactElement => {
           </Tooltip>
         ))}
         {!!globalThis?.navigator?.share && (
-          <Tooltip content="Share via...">
+          <Tooltip content="Diğer yollarla paylaş...">
             <Button
               variant={ButtonVariant.Tertiary}
               size={ButtonSize.XSmall}
               icon={<MenuIcon className="rotate-90" />}
               onClick={handleNativeShare}
-              aria-label="Share via..."
+              aria-label="Diğer yollarla paylaş..."
             />
           </Tooltip>
         )}

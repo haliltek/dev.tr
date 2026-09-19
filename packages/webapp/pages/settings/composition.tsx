@@ -28,11 +28,11 @@ const PostingSettingsPage = (): ReactElement => {
   const { updateFlag, flags } = useSettingsContext();
 
   return (
-    <AccountPageContainer title="Posting">
+    <AccountPageContainer title="Post Paylaşımı">
       <div id="compose" aria-hidden />
       <FlexCol className="gap-2">
         <Typography bold type={TypographyType.Subhead}>
-          Default new post type
+          Varsayılan yeni post türü
         </Typography>
 
         <Radio
@@ -60,7 +60,7 @@ const PostingSettingsPage = (): ReactElement => {
 
 const seo: NextSeoProps = {
   ...defaultSeo,
-  ...getPageSeoTitles('Posting'),
+  ...getPageSeoTitles('Post Paylaşımı'),
   ...noindexSeoProps,
 };
 

@@ -99,24 +99,24 @@ const useAccountPageItems = ({ onClose }: { onClose?: () => void } = {}) => {
           title: null,
           items: {
             profile: {
-              title: 'Profile details',
+              title: 'Profil ayrıntıları',
               icon: UserIcon,
               href: `${settingsUrl}/profile`,
             },
             account: {
-              title: 'Account & Security',
+              title: 'Hesap & Güvenlik',
               icon: MailIcon,
               href: `${settingsUrl}/security`,
             },
             notifications: {
-              title: 'Notifications',
+              title: 'Bildirimler',
               icon: BellIcon,
               href: `${settingsUrl}/notifications`,
             },
             ...(isJobsEnabled
               ? {
                   'job-preferences': {
-                    title: 'Job preferences',
+                    title: 'İş tercihleri',
                     icon: JobIcon,
                     href: `${settingsUrl}/job-preferences`,
                     onClick: () => {
@@ -129,72 +129,72 @@ const useAccountPageItems = ({ onClose }: { onClose?: () => void } = {}) => {
                 }
               : {}),
             appearance: {
-              title: 'Appearance',
+              title: 'Görünüm',
               icon: NewTabIcon,
               href: `${settingsUrl}/appearance`,
             },
             composition: {
-              title: 'Posting',
+              title: 'Post Paylaşımı',
               icon: FeatherIcon,
               href: `${settingsUrl}/composition`,
             },
             invite: {
-              title: 'Invite Friends',
+              title: 'Arkadaşlarını Davet Et',
               icon: InviteIcon,
               href: `${settingsUrl}/invite`,
             },
           },
         },
         feed: {
-          title: 'Feed settings',
+          title: 'Feed ayarları',
           items: {
             general: {
-              title: 'General',
+              title: 'Genel',
               icon: EditIcon,
               href: `${settingsUrl}/feed/general`,
             },
             tags: {
-              title: 'Tags',
+              title: 'Etiketler',
               icon: HashtagIcon,
               href: `${settingsUrl}/feed/tags`,
             },
             sources: {
-              title: 'Content sources',
+              title: 'İçerik kaynakları',
               icon: AddUserIcon,
               href: `${settingsUrl}/feed/sources`,
             },
             preferences: {
-              title: 'Content preferences',
+              title: 'İçerik tercihleri',
               icon: AppIcon,
               href: `${settingsUrl}/feed/preferences`,
             },
             ai: {
-              title: 'AI superpowers',
+              title: 'Yapay zeka güçleri',
               icon: MagicIcon,
               href: `${settingsUrl}/feed/ai`,
             },
             blocked: {
-              title: 'Blocked content',
+              title: 'Engellenen içerikler',
               icon: BlockIcon,
               href: `${settingsUrl}/feed/blocked`,
             },
           },
         },
         career: {
-          title: 'Career',
+          title: 'Kariyer',
           items: {
             work: {
-              title: 'Work Experience',
+              title: 'İş Deneyimi',
               icon: JobIcon,
               href: `${settingsUrl}/profile/experience/work`,
             },
             education: {
-              title: 'Education',
+              title: 'Eğitim',
               icon: GraduationIcon,
               href: `${settingsUrl}/profile/experience/education`,
             },
             certification: {
-              title: 'Certifications',
+              title: 'Sertifikalar',
               icon: MedalIcon,
               href: `${settingsUrl}/profile/experience/certification`,
             },
@@ -204,19 +204,19 @@ const useAccountPageItems = ({ onClose }: { onClose?: () => void } = {}) => {
               href: `${settingsUrl}/profile/experience/opensource`,
             },
             project: {
-              title: 'Projects & Publications',
+              title: 'Projeler & Yayınlar',
               icon: TourIcon,
               href: `${settingsUrl}/profile/experience/project`,
             },
             volunteering: {
-              title: 'Volunteering',
+              title: 'Gönüllülük',
               icon: VolunteeringIcon,
               href: `${settingsUrl}/profile/experience/volunteering`,
             },
           },
         },
         playground: {
-          title: 'Gamification',
+          title: 'Oyunlaştırma',
           items: {
             ...(!shouldHideGameCenter && {
               gameCenter: {
@@ -227,13 +227,13 @@ const useAccountPageItems = ({ onClose }: { onClose?: () => void } = {}) => {
               },
             }),
             gamification: {
-              title: 'Feature visibility',
+              title: 'Özellik görünürlüğü',
               icon: EyeIcon,
               href: `${settingsUrl}/customization/gamification`,
             },
             ...(!optOutAchievements && {
               achievements: {
-                title: 'Achievements',
+                title: 'Başarımlar',
                 icon: MedalBadgeIcon,
                 href: `${webappUrl}${user?.username}/achievements`,
                 external: true,
@@ -257,30 +257,30 @@ const useAccountPageItems = ({ onClose }: { onClose?: () => void } = {}) => {
           },
         },
         customization: {
-          title: 'Developers',
+          title: 'Geliştiriciler',
           items: {
             api: {
-              title: 'API Access',
+              title: 'API Erişimi',
               icon: TerminalIcon,
               href: `${settingsUrl}/api`,
             },
             integrations: {
-              title: 'Integrations',
+              title: 'Entegrasyonlar',
               icon: EmbedIcon,
               href: `${settingsUrl}/customization/integrations`,
             },
           },
         },
         billing: {
-          title: 'Billing and Monetization',
+          title: 'Faturalandırma ve Kazanç',
           items: {
             subscription: {
-              title: 'Subscriptions',
+              title: 'Abonelikler',
               icon: CreditCardIcon,
               href: `${settingsUrl}/subscription`,
             },
             organization: {
-              title: 'Organizations',
+              title: 'Organizasyonlar',
               icon: OrganizationIcon,
               href: `${settingsUrl}/organization`,
             },
@@ -291,39 +291,39 @@ const useAccountPageItems = ({ onClose }: { onClose?: () => void } = {}) => {
               external: true,
             },
             adsDashboard: {
-              title: 'Ads dashboard',
+              title: 'Reklam paneli',
               icon: TrendingIcon,
               onClick: () => openModal({ type: LazyModal.AdsDashboard }),
             } as ProfileSectionItemPropsWithoutHref,
           },
         },
         help: {
-          title: 'Help center',
+          title: 'Yardım merkezi',
           items: {
             feedback: {
-              title: 'Your Feedback',
+              title: 'Geri Bildiriminiz',
               icon: FeedbackIcon,
               href: `${settingsUrl}/feedback`,
             },
             privacy: {
-              title: 'Privacy',
+              title: 'Gizlilik',
               icon: PrivacyIcon,
               href: `${settingsUrl}/privacy`,
             },
             reputation: {
-              title: 'Reputation',
+              title: 'Reputasyon',
               icon: ReputationLightningIcon,
               href: reputation,
               external: true,
             },
             apps: {
-              title: 'Apps',
+              title: 'Uygulamalar',
               icon: PhoneIcon,
               href: appsUrl,
               external: true,
             },
             docs: {
-              title: 'Docs',
+              title: 'Dokümanlar',
               icon: DocsIcon,
               href: docs,
               external: true,
@@ -334,7 +334,7 @@ const useAccountPageItems = ({ onClose }: { onClose?: () => void } = {}) => {
           title: null,
           items: {
             logout: {
-              title: 'Log out',
+              title: 'Çıkış yap',
               icon: ExitIcon,
               onClick: () => logout(LogoutReason.ManualLogout),
             },
@@ -414,7 +414,7 @@ export function ProfileSettingsMenuMobile({
 }: ProfileSettingsMenuProps): ReactElement {
   return (
     <NavDrawer
-      header="Settings"
+      header="Ayarlar"
       shouldKeepOpen={shouldKeepOpen}
       drawerProps={{
         isOpen,

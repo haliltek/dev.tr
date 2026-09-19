@@ -21,10 +21,10 @@ import { BlockedUserList } from '../components/BlockedUserList';
 import { BlockedTagList } from '../components/BlockedTagList';
 
 enum FeedSettingsBlockingSectionTabs {
-  Sources = 'Sources',
-  Squads = 'Squads',
-  Users = 'Users',
-  Tags = 'Tags',
+  Sources = 'Kaynaklar',
+  Squads = 'Squad\'lar',
+  Users = 'Kullanıcılar',
+  Tags = 'Etiketler',
 }
 
 const tabs = Object.values(FeedSettingsBlockingSectionTabs);
@@ -45,18 +45,19 @@ export const FeedSettingsBlockingSection = (): ReactElement => {
   return (
     <div className="flex flex-col gap-6">
       <SearchField
-        aria-label="Search sources, squads, users, or tags"
+        aria-label="Kaynak, Squad, kullanıcı veya etiket ara"
         className="border-none !bg-background-subtle"
         inputId="search-filters"
-        placeholder="Search sources, squads, users, or tags"
+        placeholder="Kaynak, Squad, kullanıcı veya etiket ara"
         valueChanged={onSearch}
       />
       <Typography
         color={TypographyColor.Tertiary}
         type={TypographyType.Callout}
       >
-        Block sources, squads, users, or tags you never want to see. Anything
-        blocked here is removed from your feed entirely.
+        Görmek istemediğiniz kaynakları, Squad'ları, kullanıcıları veya
+        etiketleri engelleyin. Burada engellenen her şey feed'inizden tamamen
+        kaldırılır.
       </Typography>
       <BlockedWords />
       <ModalPropsContext.Provider

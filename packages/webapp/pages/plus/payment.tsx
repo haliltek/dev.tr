@@ -86,7 +86,7 @@ const PlusPaymentPage = (): ReactElement => {
         {isLaptop && selectedProduct && (
           <div className="flex flex-col items-center gap-4">
             <Typography type={TypographyType.Title2} bold>
-              Plan details
+              Plan detayları
             </Typography>
             <PlusProductList
               className="w-full"

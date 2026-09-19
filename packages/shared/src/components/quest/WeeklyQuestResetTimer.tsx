@@ -20,8 +20,8 @@ export const WeeklyQuestResetTimer = (): ReactElement => {
     );
 
     return {
-      label: `${getDaysUntilWeeklyQuestReset(now)}d left`,
-      tooltip: `Weekly quests reset ${formattedDate}`,
+      label: `${getDaysUntilWeeklyQuestReset(now)} gün kaldı`,
+      tooltip: `Haftalık quest'ler sıfırlanma tarihi: ${formattedDate}`,
     };
   }, []);
 

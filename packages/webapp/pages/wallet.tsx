@@ -201,21 +201,21 @@ const Wallet = (): ReactElement | null => {
         }),
       )}
     >
-      Buy Cores
+      Core Satın Al
     </Button>
   ) : null;
 
   return (
     <ProtectedPage>
       {isV2Laptop && (
-        <PageHeader title="Core wallet">{buyCoresButton}</PageHeader>
+        <PageHeader title="Core Cüzdanı">{buyCoresButton}</PageHeader>
       )}
       <div className="m-auto flex w-full max-w-screen-laptop flex-col pb-12 tablet:pb-0 laptop:min-h-page laptop:flex-row laptop:border-l laptop:border-r laptop:border-border-subtlest-tertiary laptop:pb-6 laptopL:pb-0">
         <main className="relative flex flex-1 flex-col tablet:border-r tablet:border-border-subtlest-tertiary">
           {!isV2Laptop && (
             <header className="flex items-center justify-between border-b border-border-subtlest-tertiary px-4 py-2">
               <Typography type={TypographyType.Title3} bold>
-                Core wallet
+                Core Cüzdanı
               </Typography>
               {buyCoresButton}
             </header>
@@ -224,8 +224,8 @@ const Wallet = (): ReactElement | null => {
             <section className="flex w-full flex-wrap gap-4">
               <BalanceBlock
                 Icon={<CoreIcon size={IconSize.Small} />}
-                title="Balance"
-                description="Your current balance"
+                title="Bakiye"
+                description="Mevcut bakiyeniz"
                 balance={user.balance.amount}
               />
               <BalanceBlock
@@ -234,8 +234,8 @@ const Wallet = (): ReactElement | null => {
                     <CreditCardIcon size={IconSize.Small} />
                   </div>
                 }
-                title="Purchased"
-                description="Amount of cores you have purchased"
+                title="Satın Alınan"
+                description="Satın aldığınız Core miktarı"
                 balance={transactionSummary?.purchased || 0}
               />
               <BalanceBlock
@@ -244,8 +244,8 @@ const Wallet = (): ReactElement | null => {
                     <PlusIcon size={IconSize.Small} />
                   </div>
                 }
-                title="Received"
-                description="Amount of cores you have received"
+                title="Alınan"
+                description="Kazandığınız veya aldığınız Core miktarı"
                 balance={transactionSummary?.received || 0}
               />
               <BalanceBlock
@@ -254,15 +254,15 @@ const Wallet = (): ReactElement | null => {
                     <MinusIcon size={IconSize.Small} />
                   </div>
                 }
-                title="Spent"
-                description="Amount of cores you have spent"
+                title="Harcanan"
+                description="Harcadığınız Core miktarı"
                 balance={transactionSummary?.spent || 0}
               />
             </section>
             <Divider />
             <section className="flex w-full flex-col gap-6">
               <Typography type={TypographyType.Body} bold>
-                Transaction history
+                İşlem geçmişi
               </Typography>
               {isPendingTransactions && (
                 <div className="flex flex-1 flex-col gap-4">
@@ -281,7 +281,7 @@ const Wallet = (): ReactElement | null => {
                 <>
                   {!hasTransactions && (
                     <Typography type={TypographyType.Callout}>
-                      You have no transactions yet.
+                      Henüz bir işleminiz bulunmuyor.
                     </Typography>
                   )}
                   {hasTransactions && (
@@ -358,7 +358,7 @@ const Wallet = (): ReactElement | null => {
                 variant={ButtonVariant.Tertiary}
                 size={ButtonSize.Small}
               >
-                Docs
+                Dokümanlar
               </Button>
               <ListCardDivider className="mx-3" />
               <Button
@@ -370,7 +370,7 @@ const Wallet = (): ReactElement | null => {
                 variant={ButtonVariant.Tertiary}
                 size={ButtonSize.Small}
               >
-                Terms
+                Şartlar
               </Button>
             </div>
           </WidgetContainer>
@@ -384,9 +384,9 @@ const getWalletLayout: typeof getLayout = (...props) =>
   getFooterNavBarLayout(getLayout(...props));
 
 const seo: NextSeoProps = {
-  ...getPageSeoTitles('Core Wallet'),
+  ...getPageSeoTitles('Core Cüzdanı'),
   description:
-    'Manage your Core Wallet on daily.dev. Check your balance, track activity, and buy Cores to support developers and power the community.',
+    'Core Cüzdanınızı devcore üzerinde yönetin. Bakiyenizi kontrol edin, hareketleri takip edin ve topluluğu desteklemek için Core edinin.',
   nofollow: true,
   noindex: true,
 };

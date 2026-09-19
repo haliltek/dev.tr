@@ -42,7 +42,7 @@ const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
   description:
-    'The daily.dev watercooler: casual conversations, questions, and hot takes from the developer community.',
+    'Geliştirici topluluğundan samimi sohbetler, sorular ve görüşler.',
   // The same posts are already indexed on the squad page this feed reads from.
   ...noindexSeoProps,
 };
