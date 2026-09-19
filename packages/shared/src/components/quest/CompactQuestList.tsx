@@ -149,7 +149,7 @@ export const CompactQuestRow = ({
           {!canClaim && isClaimed && (
             <span className="flex items-center gap-1 font-bold text-accent-avocado-default typo-caption1">
               <VIcon secondary size={IconSize.XSmall} />
-              Claimed
+              Alındı
             </span>
           )}
           {!canClaim && !isClaimed && (
@@ -208,7 +208,7 @@ export const CompactQuestList = (): ReactElement | null => {
         color={TypographyColor.Tertiary}
         className="py-2"
       >
-        You&apos;re all caught up — new quests tomorrow.
+        Tüm görevleri tamamladınız — yeni questler yarın gelecek.
       </Typography>
     );
   }

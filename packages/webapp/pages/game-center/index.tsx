@@ -122,7 +122,7 @@ const isQuestCompletionStatsSchemaMissing = (error: GraphQLError): boolean => {
 };
 
 const formatQuestCompletionCount = (count: number): string => {
-  return count === 1 ? '1 completion' : `${count.toLocaleString()} completions`;
+  return count === 1 ? '1 tamamlama' : `${count.toLocaleString()} tamamlama`;
 };
 
 const SectionHeader = ({
@@ -227,7 +227,7 @@ const seo: NextSeoProps = {
   title: seoTitles.title,
   openGraph: { ...seoTitles.openGraph, ...defaultOpenGraph },
   description:
-    'Track your quests, XP, achievements, badges, awards, and community standing in one place.',
+    'Questlerinizi, XP, başarımlarınızı, badge, ödül ve topluluk sıralamanızı tek bir yerden takip edin.',
   nofollow: true,
   noindex: true,
 };
@@ -361,13 +361,13 @@ function GameCenterPage({
     highestReputation.length > 0 || mostQuestsCompleted.length > 0;
   const milestoneHash = `#${gameCenterMilestoneSectionId}`;
   let mostEarnedBadgeSubtitle =
-    'Read in a topic more than once to see a favorite';
+    'Favorinizi görmek için bir konuyu birden fazla kez okuyun';
 
   if (badgeSummary.mostEarnedBadge) {
     mostEarnedBadgeSubtitle =
       badgeSummary.mostEarnedBadgeCount === 1
-        ? 'earned once'
-        : `earned ${badgeSummary.mostEarnedBadgeCount.toLocaleString()} times`;
+        ? '1 kez kazanıldı'
+        : `${badgeSummary.mostEarnedBadgeCount.toLocaleString()} kez kazanıldı`;
   }
 
   const isFeaturedAchievementTrackable =
@@ -441,14 +441,14 @@ function GameCenterPage({
   if (isQuestPending) {
     milestoneQuestContent = (
       <EmptyStateCard
-        title="Loading milestone quests"
-        description="Your longer-running quest progress is on the way."
+        title="Milestone questleri yükleniyor"
+        description="Uzun süreli quest ilerlemeniz yükleniyor."
       />
     );
   } else if (milestoneQuests.length > 0) {
     milestoneQuestContent = (
       <QuestSection
-        title="Milestones"
+        title="Milestone'lar"
         quests={milestoneQuests}
         layout="grid"
         showLevelSystem={showLevelSystem}
@@ -464,8 +464,8 @@ function GameCenterPage({
   } else {
     milestoneQuestContent = (
       <EmptyStateCard
-        title="No milestone quests yet"
-        description="When milestone quests are available, they will appear here with progress and claim actions."
+        title="Henüz milestone questi yok"
+        description="Milestone questleri erişilebilir olduğunda ilerleme ve claim aksiyonlarıyla birlikte burada görünecek."
       />
     );
   }
@@ -475,8 +475,8 @@ function GameCenterPage({
   if (isAchievementsPending) {
     achievementShelfContent = (
       <EmptyStateCard
-        title="Loading achievements"
-        description="Your unlock history is on the way."
+        title="Başarımlar yükleniyor"
+        description="Kilit açma geçmişiniz hazırlanıyor."
       />
     );
   } else if (featuredAchievements.length > 0) {
@@ -510,8 +510,8 @@ function GameCenterPage({
   } else {
     achievementShelfContent = (
       <EmptyStateCard
-        title="No achievements to surface yet"
-        description="Once your profile achievements load, this section will highlight your rarest and closest milestones."
+        title="Henüz gösterilecek başarım yok"
+        description="Profil başarımlarınız yüklendiğinde en nadir ve tamamlanmaya en yakın milestone'larınız burada vurgulanacak."
       />
     );
   }
@@ -521,8 +521,8 @@ function GameCenterPage({
   if (isBadgesPending) {
     badgeCaseContent = (
       <EmptyStateCard
-        title="Loading badges"
-        description="We are pulling in your latest top-reader wins."
+        title="Badge'ler yükleniyor"
+        description="En son top-reader başarılarınız getiriliyor."
       />
     );
   } else if (topReaderBadges.length > 0) {
@@ -530,14 +530,14 @@ function GameCenterPage({
       <>
         <div className="grid gap-4 tablet:grid-cols-3">
           <DataTile
-            label="Latest badge"
+            label="Son badge"
             value={
               badgeSummary.latestBadge
                 ? getTopReaderTopicLabel(badgeSummary.latestBadge)
-                : 'No badge yet'
+                : 'Henüz badge yok'
             }
             valueClassName="truncate"
-            info="Your most recently earned top-reader badge."
+            info="En son kazandığınız top-reader badge'i."
             subtitle={
               <Typography
                 type={TypographyType.Caption1}
@@ -549,14 +549,14 @@ function GameCenterPage({
                       value: badgeSummary.latestBadge.issuedAt,
                       type: TimeFormatType.TopReaderBadge,
                     })
-                  : 'Read deeply to earn your first badge'}
+                  : "İlk badge'inizi kazanmak için derinlemesine okuma yapın"}
               </Typography>
             }
           />
           <DataTile
-            label="Topics mastered"
+            label="Uzmanlaşılan konular"
             value={badgeSummary.uniqueTopics}
-            info="Distinct subjects where you earned a top-reader badge."
+            info="Top-reader badge'i kazandığınız farklı konular."
             icon={
               <MedalBadgeIcon
                 size={IconSize.Small}
@@ -568,19 +568,19 @@ function GameCenterPage({
                 type={TypographyType.Caption1}
                 color={TypographyColor.Tertiary}
               >
-                breadth of expertise
+                uzmanlık genişliği
               </Typography>
             }
           />
           <DataTile
-            label="Most earned badge"
+            label="En çok kazanılan badge"
             value={
               badgeSummary.mostEarnedBadge
                 ? getTopReaderTopicLabel(badgeSummary.mostEarnedBadge)
-                : 'No badge yet'
+                : 'Henüz badge yok'
             }
             valueClassName="truncate"
-            info="The badge topic that shows up most often in your collection."
+            info="Koleksiyonunuzda en sık yer alan badge konusu."
             subtitle={
               <Typography
                 type={TypographyType.Caption1}
@@ -610,8 +610,8 @@ function GameCenterPage({
   } else {
     badgeCaseContent = (
       <EmptyStateCard
-        title="No badges yet"
-        description="Read deeply in a topic and your first top-reader badge will show up here."
+        title="Henüz badge yok"
+        description="Bir konuda derinlemesine okuma yaptıkça ilk top-reader badge'iniz burada görünecektir."
       />
     );
   }
@@ -621,22 +621,22 @@ function GameCenterPage({
   if (!hasCoresAccess) {
     trophyCaseContent = (
       <EmptyStateCard
-        title="Awards are not available on this account yet"
-        description="Once Cores access is enabled for your account, your earned awards will show up here."
+        title="Ödüller bu hesapta henüz aktif değil"
+        description="Hesabınız için Cores erişimi açıldığında kazandığınız ödüller burada listelenecektir."
       />
     );
   } else if (isAwardsPending) {
     trophyCaseContent = (
       <EmptyStateCard
-        title="Loading awards"
-        description="We are gathering every award you have earned so far."
+        title="Ödüller yükleniyor"
+        description="Şimdiye kadar kazandığınız tüm ödüller toplanıyor."
       />
     );
   } else if (awardsError) {
     trophyCaseContent = (
       <EmptyStateCard
-        title="Awards are unavailable right now"
-        description="We could not load your trophy case. Please try again in a bit."
+        title="Ödüllere şu anda ulaşılamıyor"
+        description="Kupa dolabınız yüklenemedi. Lütfen biraz sonra tekrar deneyin."
       />
     );
   } else if (awardSummary.awards.length > 0) {
@@ -644,9 +644,9 @@ function GameCenterPage({
       <>
         <div className="grid gap-4 tablet:grid-cols-3">
           <DataTile
-            label="Total awards"
+            label="Toplam ödüller"
             value={awardSummary.totalAwards}
-            info="Every award you have earned across all award types."
+            info="Tüm ödül türlerinde kazandığınız her bir ödül."
             icon={
               <CoreIcon size={IconSize.Small} className="text-text-tertiary" />
             }
@@ -655,14 +655,14 @@ function GameCenterPage({
                 type={TypographyType.Caption1}
                 color={TypographyColor.Tertiary}
               >
-                all-time collection
+                tüm zamanlar koleksiyonu
               </Typography>
             }
           />
           <DataTile
-            label="Award types"
+            label="Ödül çeşitleri"
             value={awardSummary.uniqueAwards}
-            info="The number of distinct award designs in your collection."
+            info="Koleksiyonunuzdaki farklı ödül tasarımlarının sayısı."
             icon={
               <MedalBadgeIcon
                 size={IconSize.Small}
@@ -674,18 +674,18 @@ function GameCenterPage({
                 type={TypographyType.Caption1}
                 color={TypographyColor.Tertiary}
               >
-                unique trophies earned
+                kazanılan benzersiz kupalar
               </Typography>
             }
           />
           <DataTile
-            label="Most earned"
+            label="En çok kazanılan"
             value={awardSummary.favoriteAward?.count ?? 0}
-            info="The award type you have collected the most."
+            info="En çok topladığınız ödül türü."
             icon={
               <Image
                 src={awardSummary.favoriteAward?.image ?? featuredAwardImage}
-                alt={awardSummary.favoriteAward?.name ?? 'Award'}
+                alt={awardSummary.favoriteAward?.name ?? 'Ödül'}
                 fallbackSrc={featuredAwardImage}
                 className="size-6 shrink-0 object-contain"
               />
@@ -696,7 +696,7 @@ function GameCenterPage({
                 color={TypographyColor.Tertiary}
                 className="truncate"
               >
-                {awardSummary.favoriteAward?.name ?? 'No awards yet'}
+                {awardSummary.favoriteAward?.name ?? 'Henüz ödül yok'}
               </Typography>
             }
           />
@@ -705,7 +705,7 @@ function GameCenterPage({
           <div
             className="grid grid-cols-4 gap-x-4 gap-y-6 tablet:grid-cols-5 laptop:grid-cols-6"
             role="list"
-            aria-label="Award collection"
+            aria-label="Ödül koleksiyonu"
           >
             {awardSummary.awards.map((award) => (
               <TrophyCard
@@ -722,8 +722,8 @@ function GameCenterPage({
   } else {
     trophyCaseContent = (
       <EmptyStateCard
-        title="No awards yet"
-        description="When other developers award your work, every trophy and its count will be collected here."
+        title="Henüz ödül yok"
+        description="Diğer developer'lar çalışmalarınıza ödül verdikçe tüm kupalar ve adetleri burada birikecektir."
       />
     );
   }
@@ -760,51 +760,50 @@ function GameCenterPage({
                     color={TypographyColor.Tertiary}
                     bold
                   >
-                    Progress snapshot
+                    İlerleme özeti
                   </Typography>
                   <Typography
                     tag={TypographyTag.H1}
                     type={TypographyType.Title1}
                     bold
                   >
-                    {firstName}, here&apos;s how you&apos;re doing.
+                    {firstName}, işte son durumun.
                   </Typography>
                   <Typography
                     type={TypographyType.Body}
                     color={TypographyColor.Tertiary}
                   >
-                    The Game Center pulls together your quest progress,
-                    achievement milestones, recent badges, creator rewards, and
-                    a few community benchmarks so you can see both momentum and
-                    upside at a glance.
+                    Game Center; quest ilerlemenizi, başarım milestone&apos;larınızı,
+                    son badge&apos;lerinizi, creator ödüllerinizi ve topluluk sıralamasını
+                    tek bir yerde toplayarak gelişiminizi bir bakışta görmenizi sağlar.
                   </Typography>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 tablet:max-w-[calc(75%-0.1875rem)] tablet:grid-cols-3">
                   <StatPill
-                    label="Total XP"
+                    label="Toplam XP"
                     value={(
                       questDashboard?.level.totalXp ?? 0
                     ).toLocaleString()}
                   />
                   <StatPill
-                    label="Current quest streak"
+                    label="Mevcut quest serisi"
                     value={
                       isQuestPending
                         ? '...'
                         : `${
                             questDashboard?.currentStreak?.toLocaleString() ?? 0
-                          } days`
+                          } gün`
                     }
                   />
                   <StatPill
-                    label="Longest quest streak"
+                    label="En uzun quest serisi"
                     value={
                       isQuestPending
                         ? '...'
                         : `${
                             questDashboard?.longestStreak?.toLocaleString() ?? 0
-                          } days`
+                          } gün`
                     }
                   />
                 </div>
@@ -816,7 +815,7 @@ function GameCenterPage({
                       color={TypographyColor.Tertiary}
                       bold
                     >
-                      Upcoming milestone
+                      Yaklaşan milestone
                     </Typography>
                     <Typography
                       type={TypographyType.Callout}
@@ -824,7 +823,7 @@ function GameCenterPage({
                       className="mt-1"
                     >
                       {upcomingMilestoneQuest?.quest.name ??
-                        'No upcoming milestone yet'}
+                        'Henüz yaklaşan milestone yok'}
                     </Typography>
                     <Typography
                       type={TypographyType.Footnote}
@@ -837,8 +836,8 @@ function GameCenterPage({
                             upcomingMilestoneQuest.quest.targetCount,
                           )}/${
                             upcomingMilestoneQuest.quest.targetCount
-                          } progress`
-                        : 'Your next milestone will show up here.'}
+                          } ilerleme`
+                        : "Bir sonraki milestone'unuz burada görünecektir."}
                     </Typography>
                   </div>
 
@@ -850,14 +849,14 @@ function GameCenterPage({
                           color={TypographyColor.Tertiary}
                           bold
                         >
-                          Closest achievement
+                          En yakın başarım
                         </Typography>
                         {isFeaturedAchievementTrackable && (
                           <Tooltip
                             content={
                               isFeaturedAchievementTracked
-                                ? 'Stop tracking achievement'
-                                : 'Track achievement'
+                                ? 'Başarımı takibi bırak'
+                                : 'Başarımı takip et'
                             }
                             side="top"
                           >
@@ -874,8 +873,8 @@ function GameCenterPage({
                               onClick={handleFeaturedAchievementTracking}
                               aria-label={
                                 isFeaturedAchievementTracked
-                                  ? `Stop tracking ${featuredAchievement.achievement.name}`
-                                  : `Track ${featuredAchievement.achievement.name}`
+                                  ? `${featuredAchievement.achievement.name} takibini bırak`
+                                  : `${featuredAchievement.achievement.name} takip et`
                               }
                             />
                           </Tooltip>
@@ -900,7 +899,7 @@ function GameCenterPage({
                             )}
                           >
                             {featuredAchievement?.achievement.name ??
-                              'No tracked achievement'}
+                              'Takip edilen başarım yok'}
                           </Typography>
                           <Typography
                             type={TypographyType.Footnote}
@@ -912,8 +911,8 @@ function GameCenterPage({
                                   featuredAchievement.progress
                                 }/${getTargetCount(
                                   featuredAchievement.achievement,
-                                )} progress`
-                              : 'Once achievements load, your closest milestone shows here.'}
+                                )} ilerleme`
+                              : 'Başarımlar yüklendiğinde en yakın milestone burada listelenecektir.'}
                           </Typography>
                         </div>
                       </div>
@@ -937,10 +936,10 @@ function GameCenterPage({
                           type={TypographyType.Caption1}
                           color={TypographyColor.Tertiary}
                         >
-                          Current level
+                          Mevcut seviye
                         </Typography>
                         <Typography type={TypographyType.Title2} bold>
-                          Level {questDashboard.level.level}
+                          Seviye {questDashboard.level.level}
                         </Typography>
                       </div>
                     </div>
@@ -950,7 +949,7 @@ function GameCenterPage({
                           type={TypographyType.Footnote}
                           color={TypographyColor.Tertiary}
                         >
-                          XP to next level
+                          Sonraki seviyeye kalan XP
                         </Typography>
                         <Typography type={TypographyType.Footnote} bold>
                           {questDashboard.level.xpToNextLevel.toLocaleString()}
@@ -973,7 +972,7 @@ function GameCenterPage({
                         type={TypographyType.Caption1}
                         color={TypographyColor.Tertiary}
                       >
-                        Personal highlight
+                        Kişisel öne çıkanlar
                       </Typography>
                       <Typography type={TypographyType.Title2} bold>
                         {achievementSummary.unlockedCount}/
@@ -983,7 +982,7 @@ function GameCenterPage({
                         type={TypographyType.Footnote}
                         color={TypographyColor.Tertiary}
                       >
-                        achievements unlocked so far
+                        şimdiye kadar açılan başarımlar
                       </Typography>
                     </>
                   )
@@ -999,8 +998,8 @@ function GameCenterPage({
             className="flex scroll-mt-16 flex-col gap-4"
           >
             <SectionHeader
-              title="Milestone quests"
-              description="Longer-running quest goals that track your progress until they are ready to claim."
+              title="Milestone questleri"
+              description="Tamamlanıp ödülü alınana kadar ilerlemenizi kaydeden uzun vadeli hedefler."
             />
 
             {milestoneQuestContent}
@@ -1010,12 +1009,12 @@ function GameCenterPage({
 
           <section className="flex flex-col gap-4">
             <SectionHeader
-              title="Community pulse"
-              description="A quick look at what the community is up to"
+              title="Topluluk nabzı"
+              description="Topluluk genelinde öne çıkan aktivitelere hızlı bir bakış"
               action={
                 <Link href="/users" passHref>
                   <a className="inline-flex items-center gap-1 font-bold text-accent-cabbage-default typo-footnote">
-                    Open full leaderboards
+                    Tüm leaderboard&apos;u gör
                     <ArrowIcon className="rotate-90" />
                   </a>
                 </Link>
@@ -1024,13 +1023,13 @@ function GameCenterPage({
             {questCompletionStats && (
               <div className="grid gap-4 tablet:grid-cols-3">
                 <DataTile
-                  label="Most completed of all time"
+                  label="Tüm zamanların en çok tamamlananı"
                   value={
                     questCompletionStats.allTimeLeader?.questName ??
-                    'No quest data yet'
+                    'Henüz quest verisi yok'
                   }
                   valueClassName="max-w-full truncate !text-lg !leading-6"
-                  info="The quest with the most completed or claimed runs across the whole community."
+                  info="Tüm topluluk genelinde en çok tamamlanan veya claim edilen quest."
                   subtitle={
                     <div className="mt-1 flex flex-col gap-1">
                       <Typography
@@ -1039,7 +1038,7 @@ function GameCenterPage({
                         className="truncate"
                       >
                         {questCompletionStats.allTimeLeader?.questDescription ??
-                          'Criteria will show once the first quest is completed'}
+                          'İlk quest tamamlandığında kriterler görünecektir'}
                       </Typography>
                       <Typography
                         type={TypographyType.Footnote}
@@ -1049,19 +1048,19 @@ function GameCenterPage({
                           ? formatQuestCompletionCount(
                               questCompletionStats.allTimeLeader.count,
                             )
-                          : 'Waiting on the first completion'}
+                          : 'İlk tamamlama bekleniyor'}
                       </Typography>
                     </div>
                   }
                 />
                 <DataTile
-                  label="Most completed this week"
+                  label="Bu hafta en çok tamamlanan"
                   value={
                     questCompletionStats.weeklyLeader?.questName ??
-                    'No quest data yet'
+                    'Henüz quest verisi yok'
                   }
                   valueClassName="max-w-full truncate !text-lg !leading-6"
-                  info="The quest leading community completions since this week began."
+                  info="Bu hafta başlangıcından itibaren toplulukta lider olan quest."
                   subtitle={
                     <div className="mt-1 flex flex-col gap-1">
                       <Typography
@@ -1070,7 +1069,7 @@ function GameCenterPage({
                         className="truncate"
                       >
                         {questCompletionStats.weeklyLeader?.questDescription ??
-                          'Criteria will show once a quest is completed this week'}
+                          'Bu hafta bir quest tamamlandığında kriterler görünecektir'}
                       </Typography>
                       <Typography
                         type={TypographyType.Footnote}
@@ -1080,21 +1079,21 @@ function GameCenterPage({
                           ? formatQuestCompletionCount(
                               questCompletionStats.weeklyLeader.count,
                             )
-                          : 'No completed quests yet this week'}
+                          : 'Bu hafta henüz tamamlanan quest yok'}
                       </Typography>
                     </div>
                   }
                 />
                 <DataTile
-                  label="Total quests completed"
+                  label="Toplam tamamlanan quest"
                   value={questCompletionStats.totalCount}
-                  info="Every completed or claimed quest across the community."
+                  info="Topluluk genelinde tamamlanan veya claim edilen tüm questler."
                   subtitle={
                     <Typography
                       type={TypographyType.Caption1}
                       color={TypographyColor.Tertiary}
                     >
-                      all-time community total
+                      tüm zamanlar topluluk toplamı
                     </Typography>
                   }
                 />
@@ -1105,7 +1104,7 @@ function GameCenterPage({
                 {highestReputation.length > 0 && (
                   <UserTopList
                     containerProps={{
-                      title: 'Highest reputation',
+                      title: 'En yüksek repütasyon',
                       titleHref: `/users/${LeaderboardType.HighestReputation}`,
                     }}
                     items={highestReputation}
@@ -1115,7 +1114,7 @@ function GameCenterPage({
                 {mostQuestsCompleted.length > 0 && (
                   <UserTopList
                     containerProps={{
-                      title: 'Most quests completed',
+                      title: 'En çok quest tamamlayanlar',
                       titleHref: `/users/${LeaderboardType.MostQuestsCompleted}`,
                     }}
                     items={mostQuestsCompleted}
@@ -1125,8 +1124,8 @@ function GameCenterPage({
               </div>
             ) : (
               <EmptyStateCard
-                title="Community stats are unavailable right now"
-                description="We could not load the global leaderboards for this build, but your personal Game Center data is still live."
+                title="Topluluk istatistiklerine şu anda ulaşılamıyor"
+                description="Global leaderboard bu derleme için yüklenemedi ancak kişisel Game Center verileriniz canlı aktiftir."
               />
             )}
           </section>
@@ -1137,13 +1136,13 @@ function GameCenterPage({
 
               <section className="flex flex-col gap-4">
                 <SectionHeader
-                  title="Achievement shelf"
-                  description="A mix of what you just unlocked, what is rare, and what is closest to completion."
+                  title="Başarım vitrini"
+                  description="Yeni açtıklarınız, nadir başarımlar ve tamamlanmaya en yakın olanların karması."
                   action={
                     user?.username ? (
                       <Link href={`/${user.username}/achievements`} passHref>
                         <a className="inline-flex items-center gap-1 font-bold text-accent-cabbage-default typo-footnote">
-                          View all achievements
+                          Tüm başarımları gör
                           <ArrowIcon className="rotate-90" />
                         </a>
                       </Link>
@@ -1160,8 +1159,8 @@ function GameCenterPage({
 
           <section className="flex flex-col gap-4">
             <SectionHeader
-              title="Badge case"
-              description="Recent top-reader badges and the subjects you have gone deepest on."
+              title="Badge vitrini"
+              description="Son kazandığınız top-reader badge'leri ve en çok derinleştiğiniz konular."
             />
 
             {badgeCaseContent}
@@ -1171,8 +1170,8 @@ function GameCenterPage({
 
           <section className="flex flex-col gap-4">
             <SectionHeader
-              title="Trophy case"
-              description="Every award you've earned"
+              title="Kupa vitrini"
+              description="Kazandığınız tüm ödüller"
             />
 
             {trophyCaseContent}
