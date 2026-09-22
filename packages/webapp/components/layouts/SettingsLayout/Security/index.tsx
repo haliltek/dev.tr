@@ -27,7 +27,7 @@ import type { ManageSocialProvidersProps } from '../common';
 import { AccountSecurityDisplay as Display, AccountTextField } from '../common';
 import AccountLoginSection from './AccountLoginSection';
 
-const providers = Object.values(providerMap);
+const providers = [providerMap.google, providerMap.github];
 
 export interface ChangePasswordParams {
   password: string;
@@ -38,9 +38,8 @@ export interface UpdateProvidersParams {
   unlink?: string;
 }
 
-const removeProviderList = Object.values({
-  ...providerMap,
-  google: {
+const removeProviderList = [
+  {
     ...providerMap.google,
     icon: {
       ...providerMap.google.icon,
@@ -50,17 +49,8 @@ const removeProviderList = Object.values({
       },
     },
   },
-  facebook: {
-    ...providerMap.facebook,
-    icon: {
-      ...providerMap.facebook.icon,
-      props: {
-        ...providerMap.facebook.icon.props,
-        secondary: false,
-      },
-    },
-  },
-});
+  providerMap.github,
+];
 
 interface AccountSecurityDefaultProps {
   email?: string;

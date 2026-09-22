@@ -33,20 +33,7 @@ export function SocialRegistration({
   isDisabled,
 }: MobileSocialRegistrationProps): ReactElement {
   const { logEvent } = useLogContext();
-  const confirmedIOS = isIOS();
-  const firstProvider = (() => {
-    const inAppBrowser = isWebView();
-
-    if (!inAppBrowser) {
-      return SocialProvider.Google;
-    }
-
-    if (confirmedIOS) {
-      return SocialProvider.Apple;
-    }
-
-    return SocialProvider.Facebook;
-  })();
+  const firstProvider = SocialProvider.Google;
 
   const handleClick = (provider: SocialProvider) => {
     logEvent({

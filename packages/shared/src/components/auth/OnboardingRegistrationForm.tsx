@@ -95,7 +95,7 @@ export const isWebView = (): boolean => {
 
 const getSignupProviders = (preferGithub: boolean) => {
   if (isIOSNative()) {
-    return [providerMap.google, providerMap.apple];
+    return [providerMap.google, providerMap.github];
   }
   if (isWebView()) {
     return [providerMap.github];

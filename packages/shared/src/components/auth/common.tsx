@@ -51,7 +51,7 @@ export const providerMap: ProviderMap = {
   },
 };
 
-export const providers: Provider[] = Object.values(providerMap);
+export const providers: Provider[] = [providerMap.google, providerMap.github];
 
 export const AuthModalText = classed('p', 'typo-body text-text-secondary');
 
