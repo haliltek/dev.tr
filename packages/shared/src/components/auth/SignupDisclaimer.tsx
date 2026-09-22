@@ -15,25 +15,25 @@ function SignupDisclaimer({ className }: SignupDisclaimerProps): ReactElement {
         className,
       )}
     >
-      By continuing, you agree to the{' '}
+      Devam ederek,{' '}
       <a
         href={termsOfService}
         target="_blank"
         rel="noopener"
         className="underline hover:no-underline"
       >
-        Terms of Service
+        Kullanım Koşulları
       </a>{' '}
-      and{' '}
+      ve{' '}
       <a
         href={privacyPolicy}
         target="_blank"
         rel="noopener"
         className="underline hover:no-underline"
       >
-        Privacy Policy
+        Gizlilik Politikası
       </a>
-      .
+      'nı kabul etmiş olursunuz.
     </p>
   );
 }

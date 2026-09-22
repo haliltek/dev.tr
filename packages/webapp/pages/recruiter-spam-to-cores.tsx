@@ -91,7 +91,7 @@ const howItWorksItems = [
     number: 2,
     title: 'Şablonumuzla yanıt verin',
     description:
-      'Aşağıdaki şablonu kopyalayıp yapıştırın (veya kendinizinkini yazıp https://recruiter.daily.dev bağlantısını ekleyin)',
+      'Aşağıdaki şablonu kopyalayıp yapıştırın (veya kendinizinkini yazıp https://devcore.tr/recruiter bağlantısını ekleyin)',
   },
   {
     icon: UploadIcon,
@@ -117,7 +117,7 @@ const HowItWorksSection = (): ReactElement => {
   const { user } = useAuthContext();
 
   const [, copyText] = useCopyText(
-    "I'm currently not open to opportunities. You might find the right candidate on https://recruiter.daily.dev. It's worth checking out!",
+    "I'm currently not open to opportunities. You might find the right candidate on https://devcore.tr/recruiter. It's worth checking out!",
   );
 
   return (
@@ -186,7 +186,7 @@ const HowItWorksSection = (): ReactElement => {
         </div>
         <div className="break-words rounded-14 border border-border-subtlest-primary p-4 font-mono">
           I&apos;m currently not open to opportunities. You might find the right
-          candidate on https://recruiter.daily.dev. It&apos;s worth checking
+          candidate on https://devcore.tr/recruiter. It&apos;s worth checking
           out!
         </div>
       </div>

@@ -24,7 +24,7 @@ import LogoIcon from '../../../../svg/LogoIcon';
 // single path of horizontal runs. Regenerate if APP_URL changes.
 // =============================================================
 
-export const APP_URL = 'https://r.daily.dev/get';
+export const APP_URL = 'https://devcore.tr/apps';
 // Rendered as the card's caption AND embedded in its accessible name; exported
 // so the spec asserts on the same string rather than a copy of it.
 export const VISIBLE_LABEL = 'Scan to get the app';

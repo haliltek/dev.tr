@@ -54,26 +54,25 @@ export function CookieConsent({
         color={TypographyColor.Tertiary}
         data-testid="cookie_content"
       >
-        This site uses cookies to enhance your experience. By continuing, you
-        agree to our use of cookies as outlined in our{' '}
+        Bu site deneyiminizi geliştirmek için çerezleri kullanır. Devam ederek,{' '}
         <Typography
           tag={TypographyTag.Link}
           href={cookiePolicy}
           target="_blank"
           rel={anchorDefaultRel}
         >
-          Privacy Policy
+          Gizlilik Politikası
         </Typography>{' '}
-        and{' '}
+        ve{' '}
         <Typography
           tag={TypographyTag.Link}
           href={termsOfService}
           target="_blank"
           rel={anchorDefaultRel}
         >
-          Terms of Service
+          Kullanım Koşulları
         </Typography>
-        .
+        'nı kabul etmiş olursunuz.
       </Typography>
       <div className="flex flex-row gap-2">
         <ClickableText

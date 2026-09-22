@@ -16,7 +16,7 @@ import {
   TypographyTag,
   TypographyType,
 } from '../../../components/typography/Typography';
-import { cookiePolicy, termsOfService } from '../../../lib/constants';
+import { cookiePolicy, privacyPolicy, termsOfService } from '../../../lib/constants';
 import { anchorDefaultRel } from '../../../lib/strings';
 import { isWebView } from '../../../components/auth/OnboardingRegistrationForm';
 import { FunnelTargetId } from '../types/funnelEvents';
@@ -78,25 +78,25 @@ export function SocialRegistration({
         type={TypographyType.Caption2}
         color={TypographyColor.Tertiary}
       >
-        By continuing, you agree to the{' '}
+        Devam ederek,{' '}
         <Typography
           tag={TypographyTag.Link}
           href={termsOfService}
           rel={anchorDefaultRel}
           target="_blank"
         >
-          Terms of Service
+          Kullanım Koşulları
         </Typography>{' '}
-        and{' '}
+        ve{' '}
         <Typography
           tag={TypographyTag.Link}
-          href={cookiePolicy}
+          href={privacyPolicy}
           rel={anchorDefaultRel}
           target="_blank"
         >
-          Privacy Policy
+          Gizlilik Politikası
         </Typography>
-        .
+        'nı kabul etmiş olursunuz.
       </Typography>
     </div>
   );
