@@ -22,11 +22,11 @@ const handler = (req: NextApiRequest, res: NextApiResponse): void => {
         expiresDate.setUTCMilliseconds(999);
 
         const security: Record<string, string> = {
-          Contact: 'mailto:support@daily.dev',
+          Contact: 'mailto:destek@devcore.tr',
           Expires: expiresDate.toISOString(),
-          'Preferred-Languages': 'en',
-          Canonical: 'https://daily.dev/.well-known/security.txt',
-          Hiring: 'https://daily.dev/careers',
+          'Preferred-Languages': 'tr, en',
+          Canonical: 'https://devcore.tr/.well-known/security.txt',
+          Hiring: 'https://devcore.tr/careers',
         };
 
         res

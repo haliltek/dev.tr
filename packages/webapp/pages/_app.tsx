@@ -103,7 +103,7 @@ const GLOBAL_SEO_JSON_LD = JSON.stringify({
     {
       '@type': 'Organization',
       '@id': `${SITE_ORIGIN}/#organization`,
-      name: 'daily.dev',
+      name: 'devcore.tr',
       url: SITE_ORIGIN,
       logo: {
         '@type': 'ImageObject',
@@ -112,16 +112,15 @@ const GLOBAL_SEO_JSON_LD = JSON.stringify({
         height: 180,
       },
       sameAs: [
-        'https://twitter.com/dailydotdev',
-        'https://github.com/dailydotdev',
-        'https://www.linkedin.com/company/daily-dev-ltd',
+        'https://x.com/devcore_tr',
+        'https://github.com/haliltek/dev.tr',
       ],
     },
     {
       '@type': 'WebSite',
       '@id': `${APP_ORIGIN}/#website`,
       url: APP_ORIGIN,
-      name: 'daily.dev',
+      name: 'devcore.tr',
       publisher: { '@id': `${SITE_ORIGIN}/#organization` },
       potentialAction: {
         '@type': 'SearchAction',
@@ -286,8 +285,8 @@ function InternalApp({ Component, pageProps, router }: AppProps): ReactElement {
   return (
     <SerwistProvider
       swUrl="/serwist/sw.js"
-      disable={!user}
-      register={!!user}
+      disable={true}
+      register={false}
       reloadOnOnline={false}
     >
       <>
@@ -302,9 +301,9 @@ function InternalApp({ Component, pageProps, router }: AppProps): ReactElement {
             content={themeColor}
           />
 
-          <meta name="application-name" content="daily.dev" />
+          <meta name="application-name" content="devcore.tr" />
           <meta name="apple-mobile-web-app-capable" content="yes" />
-          <meta name="apple-mobile-web-app-title" content="daily.dev" />
+          <meta name="apple-mobile-web-app-title" content="devcore.tr" />
           <meta name="format-detection" content="telephone=no" />
           <meta name="mobile-web-app-capable" content="yes" />
           <meta name="slack-app-id" content="A07AM7XC529" />
@@ -356,12 +355,25 @@ function InternalApp({ Component, pageProps, router }: AppProps): ReactElement {
             dangerouslySetInnerHTML={{
               __html: `window.addEventListener('load', () => { window.windowLoaded = true; }, {
       once: true,
-    });`,
+    });
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(regs) {
+        for (var i = 0; i < regs.length; i++) { regs[i].unregister(); }
+      });
+    }
+    if (typeof window !== 'undefined' && 'caches' in window) {
+      caches.keys().then(function(names) {
+        for (var i = 0; i < names.length; i++) {
+          if (names[i].indexOf('serwist') !== -1 || names[i].indexOf('precache') !== -1) {
+            caches.delete(names[i]);
+          }
+        }
+      });
+    }
+    `,
             }}
           />
 
-          <link rel="preconnect" href="https://api.daily.dev" />
-          <link rel="preconnect" href="https://media.daily.dev" />
           <link rel="dns-prefetch" href="https://connect.facebook.net" />
           <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
           <link rel="dns-prefetch" href="https://static.hotjar.com" />
@@ -394,7 +406,7 @@ function InternalApp({ Component, pageProps, router }: AppProps): ReactElement {
             trigger={loginState?.trigger}
           />
         )}
-        {!isImageGenerator && <Iubenda />}
+        {/* Iubenda disabled */}
         <div className="award-easter-egg-container" />
       </>
     </SerwistProvider>

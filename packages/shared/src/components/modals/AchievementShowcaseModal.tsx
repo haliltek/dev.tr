@@ -145,7 +145,7 @@ export const AchievementShowcaseModal = ({
                     imgSrc={userAchievement.achievement.image}
                     imgAlt={userAchievement.achievement.name}
                     className="size-10 rounded-10 object-cover"
-                    fallbackSrc="https://daily.dev/default-achievement.png"
+                    fallbackSrc="https://devcore.tr/default-achievement.png"
                   />
                   <div className="min-w-0 flex-1 text-left">
                     <Typography
@@ -202,3 +202,4 @@ export const AchievementShowcaseModal = ({
 };
 
 export default AchievementShowcaseModal;
+

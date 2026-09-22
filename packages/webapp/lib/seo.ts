@@ -1,8 +1,8 @@
 import type { Post } from '@dailydotdev/shared/src/graphql/posts';
 import { PostType } from '@dailydotdev/shared/src/graphql/posts';
 
-const DEFAULT_APP_ORIGIN = 'https://daily.dev';
-const DEFAULT_SITE_ORIGIN = 'https://daily.dev';
+const DEFAULT_APP_ORIGIN = 'https://devcore.tr';
+const DEFAULT_SITE_ORIGIN = 'https://devcore.tr';
 
 const normalizeOrigin = (value?: string): string | undefined => {
   if (!value) {

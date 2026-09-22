@@ -19,10 +19,10 @@ import { getLayout } from '../../components/layouts/MainLayout';
 import { defaultOpenGraph, defaultSeo } from '../../next-seo';
 import { getPageSeoTitles } from '../../components/layouts/utils';
 
-const HACKATHON_URL = 'https://daily.dev/hackathon';
+const HACKATHON_URL = 'https://devcore.tr/hackathon';
 const HACKATHON_TITLE = 'Hackathon';
 const HACKATHON_DESCRIPTION =
-  '5 days, the daily.dev Public API, and three open tracks. Work on it at your own pace. Build something for developers, from developers.';
+  '5 days, the devcore.tr Public API, and three open tracks. Work on it at your own pace. Build something for developers, from developers.';
 
 const HACKATHON_OG_IMAGE = fromCDN('/app/assets/hackathon-og.png?v=3');
 
@@ -48,8 +48,8 @@ const getHackathonJsonLd = (): string =>
     eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
     organizer: {
       '@type': 'Organization',
-      name: 'daily.dev',
-      url: 'https://daily.dev',
+      name: 'devcore.tr',
+      url: 'https://devcore.tr',
     },
   });
 

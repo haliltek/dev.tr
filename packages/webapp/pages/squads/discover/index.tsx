@@ -32,22 +32,22 @@ const getSquadsSchemas = (
     '@graph': [
       {
         '@type': 'CollectionPage',
-        '@id': 'https://daily.dev/squads/discover#collection',
-        url: 'https://daily.dev/squads/discover',
+        '@id': 'https://devcore.tr/squads/discover#collection',
+        url: 'https://devcore.tr/squads/discover',
         name: 'Tüm Squad\'ları Keşfet',
         description:
-          'daily.dev üzerindeki Squad\'lara göz atın ve ortak ilgi alanlarına sahip geliştiricilerle bağlantı kurun.',
+          'devcore.tr üzerindeki Squad\'lara göz atın ve ortak ilgi alanlarına sahip geliştiricilerle bağlantı kurun.',
       },
       {
         '@type': 'ItemList',
-        '@id': 'https://daily.dev/squads/discover#items',
+        '@id': 'https://devcore.tr/squads/discover#items',
         itemListElement: categories.map(({ node }, index) => ({
           '@type': 'ListItem',
           position: index + 1,
           item: {
             '@type': 'Thing',
             name: node.title,
-            url: `https://daily.dev/squads/discover/${encodeURIComponent(
+            url: `https://devcore.tr/squads/discover/${encodeURIComponent(
               node.id,
             )}`,
           },

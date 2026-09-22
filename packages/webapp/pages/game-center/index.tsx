@@ -886,7 +886,7 @@ function GameCenterPage({
                             imgSrc={featuredAchievement.achievement.image}
                             imgAlt={featuredAchievement.achievement.name}
                             className="size-14 shrink-0 rounded-12 border border-border-subtlest-tertiary bg-background-subtle"
-                            fallbackSrc="https://daily.dev/default-achievement.png"
+                            fallbackSrc="https://devcore.tr/default-achievement.png"
                           />
                         )}
                         <div className="min-w-0">

@@ -104,7 +104,7 @@ function RecentAchievements({
                     imgSrc={ua.achievement.image}
                     imgAlt={ua.achievement.name}
                     className="size-full rounded-10 object-cover"
-                    fallbackSrc="https://daily.dev/default-achievement.png"
+                    fallbackSrc="https://devcore.tr/default-achievement.png"
                   />
                 </a>
               }
@@ -158,3 +158,4 @@ export function AchievementsWidget({
     </ActivityContainer>
   );
 }
+

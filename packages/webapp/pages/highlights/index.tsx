@@ -24,12 +24,12 @@ HighlightsPageWrapper.layoutProps = {
   seo: {
     title: HIGHLIGHTS_TITLE,
     description: HIGHLIGHTS_DESCRIPTION,
-    canonical: 'https://daily.dev/highlights',
+    canonical: 'https://devcore.tr/highlights',
     openGraph: {
       ...defaultOpenGraph,
       title: HIGHLIGHTS_TITLE,
       description: HIGHLIGHTS_DESCRIPTION,
-      url: 'https://daily.dev/highlights',
+      url: 'https://devcore.tr/highlights',
       type: 'website',
     },
     ...defaultSeo,

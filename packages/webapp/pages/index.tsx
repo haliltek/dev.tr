@@ -16,10 +16,10 @@ const seo: NextSeoProps = {
 
 const Home = (): ReactElement => (
   <SiteLinksSearchBoxJsonLd
-    url="https://daily.dev"
+    url="https://devcore.tr"
     potentialActions={[
       {
-        target: 'https://daily.dev/search?q',
+        target: 'https://devcore.tr/search?q',
         queryInput: 'search_term_string',
       },
     ]}

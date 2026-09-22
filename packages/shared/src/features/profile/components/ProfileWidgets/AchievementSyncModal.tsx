@@ -85,7 +85,7 @@ const AchievementRevealCard = ({
           imgSrc={achievement.achievement.image}
           imgAlt={achievement.achievement.name}
           className="size-full object-cover"
-          fallbackSrc="https://daily.dev/default-achievement.png"
+          fallbackSrc="https://devcore.tr/default-achievement.png"
         />
       </div>
       <Typography type={TypographyType.Title4} bold>
@@ -366,7 +366,7 @@ export const AchievementSyncModal = ({
                           imgSrc={achievement.achievement.image}
                           imgAlt={achievement.achievement.name}
                           className="size-full object-cover"
-                          fallbackSrc="https://daily.dev/default-achievement.png"
+                          fallbackSrc="https://devcore.tr/default-achievement.png"
                         />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -404,3 +404,4 @@ export const AchievementSyncModal = ({
     </Modal>
   );
 };
+

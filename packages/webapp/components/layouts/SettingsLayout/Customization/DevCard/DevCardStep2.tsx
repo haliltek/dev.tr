@@ -82,7 +82,7 @@ export const DevCardStep2 = ({
   );
   const embedCode = useMemo(
     () =>
-      `<a href="https://daily.dev/${
+      `<a href="https://devcore.tr/${
         user?.username ?? ''
       }"><img src="${devCardSrc}" width="${
         type === DevCardType.Horizontal ? 652 : 356

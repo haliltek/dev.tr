@@ -121,7 +121,7 @@ export const AchievementPickerModal = ({
                       imgSrc={userAchievement.achievement.image}
                       imgAlt={userAchievement.achievement.name}
                       className="size-10 rounded-10 object-cover"
-                      fallbackSrc="https://daily.dev/default-achievement.png"
+                      fallbackSrc="https://devcore.tr/default-achievement.png"
                     />
                     <div className="min-w-0 flex-1">
                       <Typography
@@ -187,3 +187,4 @@ export const AchievementPickerModal = ({
 };
 
 export default AchievementPickerModal;
+

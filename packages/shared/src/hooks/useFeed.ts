@@ -623,9 +623,9 @@ export default function useFeed<T>(
       if (!ad) {
         return {
           source: AD_PLACEHOLDER_SOURCE_ID,
-          link: 'https://daily.dev',
-          company: 'daily.dev',
-          description: 'daily.dev',
+          link: 'https://devcore.tr',
+          company: 'devcore.tr',
+          description: 'devcore.tr',
           image: cloudinaryPostImageCoverPlaceholder,
         };
       }

@@ -34,21 +34,21 @@ const getTagsSchemas = (tags: Keyword[]): string =>
     '@graph': [
       {
         '@type': 'CollectionPage',
-        '@id': 'https://daily.dev/tags#collection',
-        url: 'https://daily.dev/tags',
+        '@id': 'https://devcore.tr/tags#collection',
+        url: 'https://devcore.tr/tags',
         name: 'Explore trending tags for developers',
-        description: 'Discover trending, popular, and new tags on daily.dev.',
+        description: 'Discover trending, popular, and new tags on devcore.tr.',
       },
       {
         '@type': 'ItemList',
-        '@id': 'https://daily.dev/tags#items',
+        '@id': 'https://devcore.tr/tags#items',
         itemListElement: tags.map((tag, index) => ({
           '@type': 'ListItem',
           position: index + 1,
           item: {
             '@type': 'Thing',
             name: tag.value,
-            url: `https://daily.dev/tags/${encodeURIComponent(tag.value)}`,
+            url: `https://devcore.tr/tags/${encodeURIComponent(tag.value)}`,
           },
         })),
       },

@@ -110,10 +110,10 @@ export const link = {
   },
   search: {
     requestKeys:
-      'mailto:hi@daily.dev?subject=I want more invites for daily.dev search',
+      'mailto:destek@devcore.tr?subject=devcore.tr arama',
   },
   referral: {
-    defaultUrl: 'https://daily.dev',
+    defaultUrl: 'https://devcore.tr',
   },
 };
 

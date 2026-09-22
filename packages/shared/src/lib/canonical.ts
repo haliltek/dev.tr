@@ -1,7 +1,7 @@
 import type { ParsedUrlQuery } from 'querystring';
 import type { BaseRouter } from 'next/dist/shared/lib/router/router';
 
-const CANONICAL_ORIGIN = 'https://daily.dev';
+const CANONICAL_ORIGIN = 'https://devcore.tr';
 
 export const parsedQueryToString = (query: ParsedUrlQuery): string => {
   const keys = Object.keys(query);

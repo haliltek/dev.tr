@@ -126,7 +126,7 @@ export function ProfileAchievementShowcase({
                       imgSrc={achievement.image}
                       imgAlt={achievement.name}
                       className="size-full rounded-14 object-cover"
-                      fallbackSrc="https://daily.dev/default-achievement.png"
+                      fallbackSrc="https://devcore.tr/default-achievement.png"
                     />
                   </button>
                 }
@@ -161,3 +161,4 @@ export function ProfileAchievementShowcase({
     </div>
   );
 }
+

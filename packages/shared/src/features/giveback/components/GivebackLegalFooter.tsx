@@ -7,7 +7,7 @@ import {
   TypographyTag,
   TypographyType,
 } from '../../../components/typography/Typography';
-import { privacyPolicy } from '../../../lib/constants';
+import { privacyPolicy, termsOfService } from '../../../lib/constants';
 import { anchorDefaultRel } from '../../../lib/strings';
 
 // Legal/footer home for the campaign. One quiet line: funding disclaimer on the
@@ -15,10 +15,10 @@ import { anchorDefaultRel } from '../../../lib/strings';
 // purpose since the global cookie banner already covers it.
 const legalLinks: { label: string; href: string }[] = [
   {
-    label: 'Terms of Service',
-    href: 'https://daily.dev/giveback-program-terms/',
+    label: 'Kullanım Koşulları',
+    href: termsOfService,
   },
-  { label: 'Privacy Policy', href: privacyPolicy },
+  { label: 'Gizlilik Politikası', href: privacyPolicy },
 ];
 
 export const GivebackLegalFooter = (): ReactElement => (

@@ -97,7 +97,7 @@ export const AchievementTrackingWidget = ({
               imgSrc={trackedAchievement.achievement.image}
               imgAlt={trackedAchievement.achievement.name}
               className="size-12 rounded-12 object-cover"
-              fallbackSrc="https://daily.dev/default-achievement.png"
+              fallbackSrc="https://devcore.tr/default-achievement.png"
             />
             <div className="min-w-0 flex-1">
               <Typography
@@ -192,3 +192,4 @@ export const AchievementTrackingWidget = ({
     </ActivityContainer>
   );
 };
+

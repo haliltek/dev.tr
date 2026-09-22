@@ -52,15 +52,15 @@ const getSourcesSchemas = (sources: Source[]): string =>
     '@graph': [
       {
         '@type': 'CollectionPage',
-        '@id': 'https://daily.dev/sources#collection',
-        url: 'https://daily.dev/sources',
+        '@id': 'https://devcore.tr/sources#collection',
+        url: 'https://devcore.tr/sources',
         name: 'Geliştirici içerikleri için en iyi kaynaklar',
         description:
-          'daily.dev üzerindeki en iyi geliştirici içerik kaynaklarını keşfedin.',
+          'devcore.tr üzerindeki en iyi geliştirici içerik kaynaklarını keşfedin.',
       },
       {
         '@type': 'ItemList',
-        '@id': 'https://daily.dev/sources#items',
+        '@id': 'https://devcore.tr/sources#items',
         itemListElement: sources.map((source, index) => ({
           '@type': 'ListItem',
           position: index + 1,

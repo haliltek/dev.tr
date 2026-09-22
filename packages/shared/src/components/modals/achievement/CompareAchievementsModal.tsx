@@ -189,7 +189,7 @@ export const CompareAchievementsModal = ({
                       imgSrc={ua.achievement.image}
                       imgAlt={ua.achievement.name}
                       className="size-10 rounded-10 object-cover"
-                      fallbackSrc="https://daily.dev/default-achievement.png"
+                      fallbackSrc="https://devcore.tr/default-achievement.png"
                     />
                   </div>
                   <div className="flex min-w-0 flex-1 flex-col">
@@ -280,3 +280,4 @@ export const CompareAchievementsModal = ({
 };
 
 export default CompareAchievementsModal;
+

@@ -88,7 +88,7 @@ export function AchievementCard({
                 imgSrc={achievement.image}
                 imgAlt={achievement.name}
                 className="size-12 rounded-12 object-cover"
-                fallbackSrc="https://daily.dev/default-achievement.png"
+                fallbackSrc="https://devcore.tr/default-achievement.png"
               />
             </div>
           }
@@ -212,3 +212,4 @@ export function AchievementCard({
     </div>
   );
 }
+

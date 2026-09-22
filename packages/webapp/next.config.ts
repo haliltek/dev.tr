@@ -391,7 +391,7 @@ const nextConfig: NextConfig = {
             {
               key: 'X-Recruiting',
               value:
-                'We are hiring! Check https://daily.dev/careers for more info!',
+                'We are hiring! Check https://devcore.tr/careers for more info!',
             },
             // AI agent discovery headers (llms.txt spec)
             { key: 'Link', value: '</llms.txt>; rel="llms-txt"' },

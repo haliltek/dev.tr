@@ -33,10 +33,10 @@ import { getLayout } from '../../../components/layouts/MainLayout';
 import { defaultOpenGraph, defaultSeo } from '../../../next-seo';
 import { getPageSeoTitles } from '../../../components/layouts/utils';
 
-const ASK_URL = 'https://daily.dev/agents/ask';
-const ASK_TITLE = 'daily-dev-ask | WebSearch for developers';
+const ASK_URL = 'https://devcore.tr/agents/ask';
+const ASK_TITLE = 'devcore-ask | WebSearch for developers';
 const ASK_DESCRIPTION =
-  'Ask any development question and get real answers backed by trusted developer content. daily-dev-ask searches articles from the daily.dev community so you get answers you can trust.';
+  'Ask any development question and get real answers backed by trusted developer content. devcore-ask searches articles from the devcore.tr community so you get answers you can trust.';
 
 const seoTitles = getPageSeoTitles(ASK_TITLE);
 const seo: NextSeoProps = {
@@ -50,13 +50,13 @@ const getAskJsonLd = (): string =>
   JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'daily-dev-ask — WebSearch for developers',
+    name: 'devcore-ask — WebSearch for developers',
     description: ASK_DESCRIPTION,
     url: ASK_URL,
     isPartOf: {
       '@type': 'WebSite',
-      name: 'daily.dev',
-      url: 'https://daily.dev',
+      name: 'devcore.tr',
+      url: 'https://devcore.tr',
     },
     about: [
       { '@type': 'Thing', name: 'WebSearch for developers' },
@@ -74,7 +74,7 @@ const getAskBreadcrumbJsonLd = (): string =>
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: 'https://daily.dev',
+        item: 'https://devcore.tr',
       },
       {
         '@type': 'ListItem',
