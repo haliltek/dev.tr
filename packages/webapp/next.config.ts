@@ -178,6 +178,12 @@ const nextConfig: NextConfig = {
         destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
       });
 
+      // Proxy /auth/:path* OAuth callbacks and Better Auth endpoints to daily-api
+      rewrites.unshift({
+        source: '/auth/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/auth/:path*`,
+      });
+
 
 
       return {
