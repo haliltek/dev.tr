@@ -20,8 +20,11 @@ export default async function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Public login API bypasses auth
-  if (pathname === '/api/auth/login') {
+  // Public APIs bypass auth
+  if (
+    pathname === '/api/auth/login' ||
+    pathname.startsWith('/api/telemetry')
+  ) {
     return NextResponse.next();
   }
 
