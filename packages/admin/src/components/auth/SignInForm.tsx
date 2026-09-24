@@ -65,23 +65,6 @@ export default function SignInForm() {
           </p>
         </div>
 
-        {/* Credentials Info Badge */}
-        <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50/70 p-4 dark:border-blue-900/50 dark:bg-blue-950/30">
-          <div className="flex items-start gap-3">
-            <div className="mt-0.5 text-blue-600 dark:text-blue-400">
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div className="text-xs text-blue-800 dark:text-blue-300">
-              <span className="font-semibold block mb-1">Varsayılan Giriş Bilgileri:</span>
-              <div className="flex flex-col gap-0.5 font-mono text-[11px]">
-                <span>Kullanıcı: <strong>admin</strong></span>
-                <span>Şifre: <strong>DevcoreAdmin2026!</strong></span>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Error Alert */}
         {error && (

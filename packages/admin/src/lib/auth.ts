@@ -24,7 +24,7 @@ function getStoredConfig(): AdminConfig {
   }
   return {
     username: process.env.ADMIN_USERNAME || 'admin',
-    passwordPlain: process.env.ADMIN_PASSWORD || 'DevcoreAdmin2026!',
+    passwordPlain: process.env.ADMIN_PASSWORD || 'Halil12621262.',
   };
 }
 
@@ -63,7 +63,7 @@ export async function verifySessionToken(token: string): Promise<{ username: str
 export function validateAdminCredentials(user: string, pass: string): boolean {
   const config = getStoredConfig();
   const expectedUser = (config.username || process.env.ADMIN_USERNAME || 'admin').trim().toLowerCase();
-  const expectedPass = (config.passwordPlain || process.env.ADMIN_PASSWORD || 'DevcoreAdmin2026!').trim();
+  const expectedPass = (config.passwordPlain || process.env.ADMIN_PASSWORD || 'Halil12621262.').trim();
   return user.trim().toLowerCase() === expectedUser && pass.trim() === expectedPass;
 }
 

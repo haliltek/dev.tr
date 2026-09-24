@@ -316,12 +316,6 @@ const useAccountPageItems = ({ onClose }: { onClose?: () => void } = {}) => {
               href: reputation,
               external: true,
             },
-            apps: {
-              title: 'Uygulamalar',
-              icon: PhoneIcon,
-              href: appsUrl,
-              external: true,
-            },
             docs: {
               title: 'Dokümanlar',
               icon: DocsIcon,

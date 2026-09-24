@@ -32,10 +32,6 @@ export function HeaderButtons({
       <Container>
         {/* Feed scope toggle (Global on/off) */}
         <FeedScopeToggle />
-        {/* Sits ahead of the Log in / Sign up pair. It keeps its label here
-            because there is room, but it stays Float (not Primary) so it never
-            competes with Sign up, which is the CTA that matters logged out. */}
-        <GetAppButton showLabel />
         <LoginButton
           className={{
             container: 'gap-4',

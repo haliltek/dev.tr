@@ -59,6 +59,7 @@ export function GetAppButton({
   showLabel = false,
   className,
 }: GetAppButtonProps): ReactElement | null {
+  return null;
   const [isOpen, setIsOpen] = useState(false);
   const { logEvent } = useLogContext();
   const { isLoggedIn, isAndroidApp } = useAuthContext();

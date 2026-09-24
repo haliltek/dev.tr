@@ -455,12 +455,6 @@ const SidebarInviteButton = (): ReactElement => (
 
 const supportItems: ProfileSectionItemProps[] = [
   {
-    title: 'Mobil uygulamayı indirin',
-    href: appsUrl,
-    icon: PhoneIcon,
-    external: true,
-  },
-  {
     title: 'Tarayıcı eklentisini edinin',
     href: downloadBrowserExtension,
     icon: BrowserGroupIcon,
