@@ -53,6 +53,7 @@ import {
 import { useCheckLocation } from '@dailydotdev/shared/src/hooks/useCheckLocation';
 import Seo, { defaultSeo, defaultSeoTitle, robotsProps } from '../next-seo';
 import useWebappVersion from '../hooks/useWebappVersion';
+import { useDevcoreTelemetry } from '../hooks/useDevcoreTelemetry';
 import { getAppOrigin, getSiteOrigin } from '../lib/seo';
 import { getOnboardingRedirect } from '../lib/onboardingRedirect';
 import { PixelsProvider } from '../context/PixelsContext';
@@ -155,6 +156,7 @@ function InternalApp({ Component, pageProps, router }: AppProps): ReactElement {
   useIubendaConsentMirror();
   useWebVitals();
   useLogPageView();
+  useDevcoreTelemetry();
   const { modal, closeModal, openModal } = useLazyModal();
   useConsoleLogo();
   useIOSError();

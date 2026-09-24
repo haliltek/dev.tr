@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import DevcoreMetrics from "@/components/devcore/DevcoreMetrics";
+import RealtimeMetricsDashboard from "@/components/devcore/RealtimeMetricsDashboard";
 import CrawlerControlCard from "@/components/devcore/CrawlerControlCard";
 import RecentPostsSummary from "@/components/devcore/RecentPostsSummary";
 import ActiveSponsorsSummary from "@/components/devcore/ActiveSponsorsSummary";
 
 export const metadata: Metadata = {
-  title: "devcore.tr Yönetim Merkezi | Gösterge Paneli",
-  description: "Türkiye Geliştirici Ekosistemi yönetim ve denetim paneli.",
+  title: "devcore.tr Yönetim Merkezi | Canlı Gösterge Paneli",
+  description: "devcore.tr gerçek zamanlı ziyaretçi, online kullanıcı ve içerik yönetim paneli.",
 };
 
 export default function AdminDashboard() {
@@ -19,7 +19,7 @@ export default function AdminDashboard() {
             Sistem Gösterge Paneli
           </h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            devcore.tr içerik akışı, Türk teknoloji kaynakları ve sponsorluk performansı.
+            devcore.tr gerçek zamanlı ziyaretçi trafiği, anlık online kullanıcılar ve içerik performansı.
           </p>
         </div>
 
@@ -39,8 +39,8 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Metrics Row */}
-      <DevcoreMetrics />
+      {/* Real-time Metrics & Visitor Analytics Section */}
+      <RealtimeMetricsDashboard />
 
       {/* Crawler Engine Control */}
       <CrawlerControlCard />
