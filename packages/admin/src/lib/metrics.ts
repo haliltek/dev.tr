@@ -202,33 +202,33 @@ export async function getRealtimeMetrics(): Promise<RealtimeMetrics> {
       LIMIT 4;
     `);
 
-    // Calculate aggregations & fallbacks
+    // Calculate aggregations & real values
     const t = telemetryAgg[0] || {
-      total_visitors: '1397',
-      total_pageviews: '3798',
-      today_visitors: '69',
-      today_pageviews: '73',
-      yesterday_visitors: '224',
-      online_now: '16',
+      total_visitors: '0',
+      total_pageviews: '0',
+      today_visitors: '0',
+      today_pageviews: '0',
+      yesterday_visitors: '0',
+      online_now: '0',
     };
 
     const s = statsAgg[0] || {
-      total_users: '130',
+      total_users: '0',
       today_users: '0',
-      this_week_users: '4',
-      total_post_views: '2805316',
-      total_upvotes: '115377',
-      total_sources: '24',
+      this_week_users: '0',
+      total_post_views: '0',
+      total_upvotes: '0',
+      total_sources: '0',
     };
 
     const todayVis = Number(t.today_visitors) || 0;
-    const yestVis = Number(t.yesterday_visitors) || 1;
-    const changePercent = Math.round(((todayVis - yestVis) / yestVis) * 100);
+    const yestVis = Number(t.yesterday_visitors) || 0;
+    const changePercent = yestVis > 0 ? Math.round(((todayVis - yestVis) / yestVis) * 100) : 0;
 
-    const totalPostViews = Number(s.total_post_views) || 2805316;
-    const totalPageviews = Number(t.total_pageviews) || 3798;
-    const totalVisitors = Number(t.total_visitors) || 1397;
-    const avgPerVisitor = totalVisitors > 0 ? Number((totalPageviews / totalVisitors).toFixed(1)) : 2.7;
+    const totalPostViews = Number(s.total_post_views) || 0;
+    const totalPageviews = Number(t.total_pageviews) || 0;
+    const totalVisitors = Number(t.total_visitors) || 0;
+    const avgPerVisitor = totalVisitors > 0 ? Number((totalPageviews / totalVisitors).toFixed(1)) : 0;
 
     // Devices
     let desktopCount = 0;
@@ -240,14 +240,14 @@ export async function getRealtimeMetrics(): Promise<RealtimeMetrics> {
       else if (d.device_type === 'mobile') mobileCount = cnt;
       else if (d.device_type === 'tablet') tabletCount = cnt;
     }
-    const devTotal = Math.max(1, desktopCount + mobileCount + tabletCount);
+    const devTotal = desktopCount + mobileCount + tabletCount;
 
     // Browsers
-    const totalBrowsers = browserRows.reduce((acc, b) => acc + (Number(b.count) || 0), 0) || 1;
+    const totalBrowsers = browserRows.reduce((acc, b) => acc + (Number(b.count) || 0), 0);
     const browsersList = browserRows.map((b) => ({
       name: b.browser,
       count: Number(b.count) || 0,
-      percent: Math.round(((Number(b.count) || 0) / totalBrowsers) * 100),
+      percent: totalBrowsers > 0 ? Math.round(((Number(b.count) || 0) / totalBrowsers) * 100) : 0,
     }));
 
     // Top Pages with Friendly Labels
@@ -268,17 +268,29 @@ export async function getRealtimeMetrics(): Promise<RealtimeMetrics> {
       visitors: Number(p.visitors) || 0,
     }));
 
-    // Format Timeline Categories
+    // Format Timeline Categories - 24 hourly buckets up to current hour
+    const hourMap = new Map<string, { visitors: number; pageviews: number }>();
+    for (const h of hourlyRows) {
+      hourMap.set(h.hour_label, {
+        visitors: Number(h.visitors) || 0,
+        pageviews: Number(h.pageviews) || 0,
+      });
+    }
+
     const categories: string[] = [];
     const timelineVisitors: number[] = [];
     const timelinePageviews: number[] = [];
-    for (const h of hourlyRows) {
-      categories.push(h.hour_label);
-      timelineVisitors.push(Number(h.visitors) || 0);
-      timelinePageviews.push(Number(h.pageviews) || 0);
+
+    for (let i = 23; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * 60 * 60 * 1000);
+      const hourStr = String(d.getHours()).padStart(2, '0') + ':00';
+      categories.push(hourStr);
+      const match = hourMap.get(hourStr);
+      timelineVisitors.push(match ? match.visitors : 0);
+      timelinePageviews.push(match ? match.pageviews : 0);
     }
 
-    const onlineCount = Math.max(1, Number(t.online_now) || 16);
+    const onlineCount = Number(t.online_now) || 0;
 
     const liveActivity = activityRows.map((r) => ({
       id: r.id,
@@ -288,7 +300,7 @@ export async function getRealtimeMetrics(): Promise<RealtimeMetrics> {
       device: r.device_type,
       browser: r.browser,
       city: r.city || 'Istanbul',
-      agoSeconds: Math.max(2, Number(r.ago_seconds) || 10),
+      agoSeconds: Math.max(1, Number(r.ago_seconds) || 1),
       timestamp: new Date(r.created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
     }));
 
@@ -298,25 +310,25 @@ export async function getRealtimeMetrics(): Promise<RealtimeMetrics> {
         today: todayVis,
         yesterday: yestVis,
         changePercent,
-        thisWeek: todayVis * 5 + yestVis * 2,
+        thisWeek: todayVis,
       },
       views: {
-        total: totalPostViews + totalPageviews,
+        total: totalPageviews,
         postViewsTotal: totalPostViews,
         pageviewsTotal: totalPageviews,
-        pageviewsToday: Number(t.today_pageviews) || 73,
+        pageviewsToday: Number(t.today_pageviews) || 0,
         avgPerVisitor,
       },
       online: {
         current: onlineCount,
-        peakToday: Math.max(onlineCount + 12, 42),
+        peakToday: onlineCount,
         pulseStatus: onlineCount > 25 ? 'active' : 'normal',
       },
       users: {
-        total: Number(s.total_users) || 130,
+        total: Number(s.total_users) || 0,
         today: Number(s.today_users) || 0,
-        thisWeek: Number(s.this_week_users) || 4,
-        totalUpvotes: Number(s.total_upvotes) || 115377,
+        thisWeek: Number(s.this_week_users) || 0,
+        totalUpvotes: Number(s.total_upvotes) || 0,
         topMembers: topMembersRows.map((u) => ({
           id: u.id,
           name: u.name,
@@ -326,20 +338,20 @@ export async function getRealtimeMetrics(): Promise<RealtimeMetrics> {
         })),
       },
       sources: {
-        total: Number(s.total_sources) || 24,
+        total: Number(s.total_sources) || 0,
       },
       hourlyTimeline: {
-        categories: categories.length > 0 ? categories : ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
-        visitors: timelineVisitors.length > 0 ? timelineVisitors : [12, 10, 30, 40, 42, 35],
-        pageviews: timelinePageviews.length > 0 ? timelinePageviews : [14, 11, 32, 45, 48, 40],
+        categories,
+        visitors: timelineVisitors,
+        pageviews: timelinePageviews,
       },
       devices: {
         desktop: desktopCount,
         mobile: mobileCount,
         tablet: tabletCount,
-        desktopPercent: Math.round((desktopCount / devTotal) * 100),
-        mobilePercent: Math.round((mobileCount / devTotal) * 100),
-        tabletPercent: Math.round((tabletCount / devTotal) * 100),
+        desktopPercent: devTotal > 0 ? Math.round((desktopCount / devTotal) * 100) : 0,
+        mobilePercent: devTotal > 0 ? Math.round((mobileCount / devTotal) * 100) : 0,
+        tabletPercent: devTotal > 0 ? Math.round((tabletCount / devTotal) * 100) : 0,
       },
       browsers: browsersList,
       topPages,
@@ -348,56 +360,59 @@ export async function getRealtimeMetrics(): Promise<RealtimeMetrics> {
     };
   } catch (err) {
     console.error('[getRealtimeMetrics Error]', err);
-    // Graceful fallback
+    // Graceful zeroed fallback
+    const categories: string[] = [];
+    const timelineZero: number[] = [];
+    for (let i = 23; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * 60 * 60 * 1000);
+      categories.push(String(d.getHours()).padStart(2, '0') + ':00');
+      timelineZero.push(0);
+    }
+
     return {
       visitors: {
-        total: 1397,
-        today: 69,
-        yesterday: 224,
-        changePercent: 14,
-        thisWeek: 1120,
+        total: 0,
+        today: 0,
+        yesterday: 0,
+        changePercent: 0,
+        thisWeek: 0,
       },
       views: {
-        total: 2809114,
-        postViewsTotal: 2805316,
-        pageviewsTotal: 3798,
-        pageviewsToday: 73,
-        avgPerVisitor: 2.7,
+        total: 0,
+        postViewsTotal: 0,
+        pageviewsTotal: 0,
+        pageviewsToday: 0,
+        avgPerVisitor: 0,
       },
       online: {
-        current: 16,
-        peakToday: 42,
+        current: 0,
+        peakToday: 0,
         pulseStatus: 'normal',
       },
       users: {
-        total: 130,
-        today: 1,
-        thisWeek: 4,
-        totalUpvotes: 115377,
+        total: 0,
+        today: 0,
+        thisWeek: 0,
+        totalUpvotes: 0,
         topMembers: [],
       },
       sources: {
-        total: 24,
+        total: 0,
       },
       hourlyTimeline: {
-        categories: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
-        visitors: [12, 10, 30, 40, 42, 35],
-        pageviews: [14, 11, 32, 45, 48, 40],
+        categories,
+        visitors: timelineZero,
+        pageviews: timelineZero,
       },
       devices: {
-        desktop: 1895,
-        mobile: 1258,
-        tablet: 645,
-        desktopPercent: 50,
-        mobilePercent: 33,
-        tabletPercent: 17,
+        desktop: 0,
+        mobile: 0,
+        tablet: 0,
+        desktopPercent: 0,
+        mobilePercent: 0,
+        tabletPercent: 0,
       },
-      browsers: [
-        { name: 'Chrome', count: 1906, percent: 50 },
-        { name: 'Firefox', count: 651, percent: 17 },
-        { name: 'Safari', count: 622, percent: 16 },
-        { name: 'Edge', count: 619, percent: 17 },
-      ],
+      browsers: [],
       topPages: [],
       liveActivity: [],
       updatedAt: now.toLocaleTimeString('tr-TR'),

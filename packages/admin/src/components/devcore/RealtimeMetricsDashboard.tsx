@@ -270,18 +270,18 @@ export default function RealtimeMetricsDashboard() {
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-              {loading ? "..." : data?.views.postViewsTotal.toLocaleString("tr-TR")}
+              {loading ? "..." : (data?.views.pageviewsTotal ?? 0).toLocaleString("tr-TR")}
             </span>
             <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-              içerik okunması
+              sayfa görüntülenmesi
             </span>
           </div>
           <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-2.5 text-xs dark:border-gray-800">
             <span className="font-semibold text-purple-600 dark:text-purple-400">
-              {data?.views.pageviewsTotal.toLocaleString("tr-TR")} sayfa gezintisi
+              +{data?.views.pageviewsToday || 0} bugün
             </span>
             <span className="text-gray-500 dark:text-gray-400">
-              ~{data?.views.avgPerVisitor || 2.7} sayfa / kişi
+              ~{data?.views.avgPerVisitor ?? 0} sayfa / kişi
             </span>
           </div>
         </div>
@@ -315,7 +315,7 @@ export default function RealtimeMetricsDashboard() {
               Son 5 dakikada aktif
             </span>
             <span className="font-medium text-gray-700 dark:text-gray-300">
-              Günün zirvesi: {data?.online.peakToday || 42}
+              Günün zirvesi: {data?.online.peakToday ?? 0}
             </span>
           </div>
         </div>
@@ -402,13 +402,13 @@ export default function RealtimeMetricsDashboard() {
                 <div className="flex justify-between text-xs font-medium mb-1">
                   <span className="text-gray-700 dark:text-gray-300">💻 Masaüstü (Desktop)</span>
                   <span className="font-bold text-gray-900 dark:text-white">
-                    %{data?.devices.desktopPercent || 50} ({data?.devices.desktop.toLocaleString("tr-TR")})
+                    %{data?.devices.desktopPercent ?? 0} ({data?.devices.desktop.toLocaleString("tr-TR") ?? 0})
                   </span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
                   <div
                     className="h-full rounded-full bg-blue-500 transition-all duration-500"
-                    style={{ width: `${data?.devices.desktopPercent || 50}%` }}
+                    style={{ width: `${data?.devices.desktopPercent || 0}%` }}
                   />
                 </div>
               </div>
@@ -417,13 +417,13 @@ export default function RealtimeMetricsDashboard() {
                 <div className="flex justify-between text-xs font-medium mb-1">
                   <span className="text-gray-700 dark:text-gray-300">📱 Mobil Cihazlar</span>
                   <span className="font-bold text-gray-900 dark:text-white">
-                    %{data?.devices.mobilePercent || 33} ({data?.devices.mobile.toLocaleString("tr-TR")})
+                    %{data?.devices.mobilePercent ?? 0} ({data?.devices.mobile.toLocaleString("tr-TR") ?? 0})
                   </span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
                   <div
                     className="h-full rounded-full bg-emerald-500 transition-all duration-500"
-                    style={{ width: `${data?.devices.mobilePercent || 33}%` }}
+                    style={{ width: `${data?.devices.mobilePercent || 0}%` }}
                   />
                 </div>
               </div>
@@ -432,13 +432,13 @@ export default function RealtimeMetricsDashboard() {
                 <div className="flex justify-between text-xs font-medium mb-1">
                   <span className="text-gray-700 dark:text-gray-300">📟 Tablet & Diğer</span>
                   <span className="font-bold text-gray-900 dark:text-white">
-                    %{data?.devices.tabletPercent || 17} ({data?.devices.tablet.toLocaleString("tr-TR")})
+                    %{data?.devices.tabletPercent ?? 0} ({data?.devices.tablet.toLocaleString("tr-TR") ?? 0})
                   </span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
                   <div
                     className="h-full rounded-full bg-purple-500 transition-all duration-500"
-                    style={{ width: `${data?.devices.tabletPercent || 17}%` }}
+                    style={{ width: `${data?.devices.tabletPercent || 0}%` }}
                   />
                 </div>
               </div>
@@ -446,13 +446,19 @@ export default function RealtimeMetricsDashboard() {
 
             {/* Tarayıcılar */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
-              {data?.browsers.map((b, i) => (
-                <div key={i} className="rounded-xl bg-gray-50 p-2.5 text-center dark:bg-gray-800/60">
-                  <div className="text-xs font-semibold text-gray-700 dark:text-gray-300">{b.name}</div>
-                  <div className="text-base font-bold text-gray-900 dark:text-white">%{b.percent}</div>
-                  <div className="text-[10px] text-gray-400">{b.count} ziyaret</div>
+              {data?.browsers && data.browsers.length > 0 ? (
+                data.browsers.map((b, i) => (
+                  <div key={i} className="rounded-xl bg-gray-50 p-2.5 text-center dark:bg-gray-800/60">
+                    <div className="text-xs font-semibold text-gray-700 dark:text-gray-300">{b.name}</div>
+                    <div className="text-base font-bold text-gray-900 dark:text-white">%{b.percent}</div>
+                    <div className="text-[10px] text-gray-400">{b.count} ziyaret</div>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full py-2 text-center text-xs text-gray-400">
+                  Henüz tarayıcı verisi toplanmadı.
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
@@ -462,32 +468,38 @@ export default function RealtimeMetricsDashboard() {
               En Çok Bakılan Sayfalar ve İçerikler
             </h3>
             <div className="divide-y divide-gray-100 dark:divide-gray-800">
-              {data?.topPages.map((p, i) => (
-                <div key={i} className="flex items-center justify-between py-2.5 text-xs">
-                  <div className="min-w-0 pr-3">
-                    <div className="font-semibold text-gray-900 dark:text-white truncate">
-                      {p.title}
+              {data?.topPages && data.topPages.length > 0 ? (
+                data.topPages.map((p, i) => (
+                  <div key={i} className="flex items-center justify-between py-2.5 text-xs">
+                    <div className="min-w-0 pr-3">
+                      <div className="font-semibold text-gray-900 dark:text-white truncate">
+                        {p.title}
+                      </div>
+                      <div className="text-[11px] font-mono text-gray-400 truncate">
+                        {p.path}
+                      </div>
                     </div>
-                    <div className="text-[11px] font-mono text-gray-400 truncate">
-                      {p.path}
+                    <div className="flex items-center gap-3 shrink-0 text-right">
+                      <div>
+                        <div className="font-bold text-gray-900 dark:text-white">
+                          {p.views.toLocaleString("tr-TR")}
+                        </div>
+                        <div className="text-[10px] text-gray-400">görüntülenme</div>
+                      </div>
+                      <div>
+                        <div className="font-semibold text-blue-600 dark:text-blue-400">
+                          {p.visitors.toLocaleString("tr-TR")}
+                        </div>
+                        <div className="text-[10px] text-gray-400">tekil kişi</div>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 shrink-0 text-right">
-                    <div>
-                      <div className="font-bold text-gray-900 dark:text-white">
-                        {p.views.toLocaleString("tr-TR")}
-                      </div>
-                      <div className="text-[10px] text-gray-400">görüntülenme</div>
-                    </div>
-                    <div>
-                      <div className="font-semibold text-blue-600 dark:text-blue-400">
-                        {p.visitors.toLocaleString("tr-TR")}
-                      </div>
-                      <div className="text-[10px] text-gray-400">tekil kişi</div>
-                    </div>
-                  </div>
+                ))
+              ) : (
+                <div className="py-6 text-center text-xs text-gray-400">
+                  Henüz ziyaret edilen sayfa kaydı yok. Sistem ilk ziyaretçileri bekliyor.
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
@@ -540,16 +552,16 @@ export default function RealtimeMetricsDashboard() {
                   </div>
                 ))
               ) : (
-                <div className="text-center py-8 text-xs text-gray-400">
-                  Canlı hareketler yükleniyor...
+                <div className="text-center py-12 text-xs text-gray-400">
+                  Henüz ziyaretçi hareketi kaydedilmedi. Canlı dinleme devrede...
                 </div>
               )}
             </div>
 
             {/* Bottom Live Summary Footer */}
             <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-              <span>Şu an canlı: <strong className="text-emerald-600 dark:text-emerald-400 font-semibold">{data?.online.current || 16} online</strong></span>
-              <span>Bugün: <strong className="text-gray-900 dark:text-white font-semibold">{data?.visitors.today || 69} ziyaretçi</strong></span>
+              <span>Şu an canlı: <strong className="text-emerald-600 dark:text-emerald-400 font-semibold">{data?.online.current ?? 0} online</strong></span>
+              <span>Bugün: <strong className="text-gray-900 dark:text-white font-semibold">{data?.visitors.today ?? 0} ziyaretçi</strong></span>
             </div>
           </div>
         </div>
